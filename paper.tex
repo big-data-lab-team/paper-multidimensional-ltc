@@ -1,0 +1,86 @@
+\documentclass[10pt, conference, compsocconf]{IEEEtran}
+
+% packages
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{amsfonts} % for R symbol (the set of real numbers)
+\usepackage{color}
+\usepackage[pdftex]{graphicx}
+\usepackage{graphicx}
+\usepackage[bookmarks=false]{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,filecolor=black,urlcolor=blue}
+\usepackage{mathtools}
+\usepackage{multirow}
+\usepackage{stmaryrd} % for llbracket and rrbracket
+\usepackage{subcaption}
+\usepackage{nicefrac}
+\usepackage{amsmath}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+
+% new commands
+\newcommand{\todo}[1]{\marginpar{\parbox{18mm}{\flushleft\tiny\color{red}\textbf{TODO}:
+      #1}}}
+\newcommand{\note}[1]{
+  \color{blue}\emph{[Note: #1]}
+  \color{black}
+}
+
+\begin{document}
+
+\title{A multi-dimensional extension of the Lightweight Temporary Compression method}
+
+\author{Bo Li, Tristan Glatard\\
+  Department of Computer Science and Software Engineering\\ Concordia University, Montreal, Quebec, Canada\\
+  {first.last}@concordia.ca \vspace*{-0.5cm}}
+
+\maketitle
+
+\begin{abstract}
+\end{abstract}
+
+\section{Introduction}
+
+LTC is among the stream compression method that provides the highest 
+compression rate for the lowest resource (CPU, RAM) consumption. As 
+such, it makes it a very good candidate for the compression of data 
+streams acquired in embedded, low-power systems such as connected 
+objects, systems on module (SoMs), etc The type of data acquired on 
+such systems, however, is often multi-dimensional. For instance 
+accelerometers and gyroscopes usually measure variables along 3 
+directions, these variables being distinct but related through the 
+actual movement of the sensor. In this paper, we investigate the 
+extension of LTC to higher dimensions. First, we express the algorithm 
+in an arbitrary vectorial space of dimension $n$. Second, we 
+instantiate it for the Euclidean and xxx distances, in spaces of 
+dimension 2D+t and 3D+t. Finally, we compare the multi-dimensional LTC 
+to the 1-dimensional version, on gyroscopic data acquired on a SoM 
+device.
+
+\section{Lightweight Temporal Compression}
+
+Summarize existing paper.
+
+\section{Extension to dimension $n$}
+
+
+\section{Results}
+
+\subsection{Data sets}
+
+\subsection{Compression ratios}
+
+\subsection{Errors}
+
+\subsection{Memory consumption}
+
+\section{Conclusion}
+
+\section*{Acknowledgement}
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv,biblio.bib}
+
+
+\end{document}
