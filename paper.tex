@@ -18,6 +18,8 @@
 \usepackage{nicefrac}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{stmaryrd}
+\usepackage{amsthm}
 \DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 \DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
 
@@ -28,6 +30,7 @@
   \color{blue}\emph{[Note: #1]}
   \color{black}
 }
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
 \begin{document}
 
@@ -60,17 +63,91 @@ dimension 2D+t and 3D+t. Finally, we compare the multi-dimensional LTC
 to the 1-dimensional version, on gyroscopic data acquired on a SoM 
 device.
 
+In practice, It's needed to transmit raw data which has 
+multi-parameters to clients e.g. Accelerometer, Euler Angle and 
+Magnetometer etc. LTC not work well when we transmit multi-parameters 
+data, cause if we just implement LTC for each parameter, the difference 
+between estimation and origin could exceed error margin which was set 
+in advance. For instance, there is a data $(x, y)$ with two parameters, 
+and using LTC for both parameter respectively. According to LTC method 
+$\mid{\hat{x}-x}\mid\leqslant \epsilon$~\cite{jalaleddine1990ecg}, the 
+estimation may be $(\hat{x}=x+\epsilon, \hat{y}=y+\epsilon)$, then the 
+difference between estimation and original data $(x,y)$ is which is 
+bigger than error margin predefined. In this case, we design a new 
+algorithm, which is multi-parameter version of LTC, and it also work 
+with any type of distance. In standard LTC method, it checks if there 
+is overlapping part between new sector area and recorded range. 
+However, in our multidimensional method, we will map every data point 
+into same time-stamp e.g. $t_0$. It is convenient for us to calculate 
+distance between them and check if overlapping range exists. we provide 
+Multidimensional-LTC with Euclidean and Manhattan distance in below.
+
+
 \section{Lightweight Temporal Compression}
 
 Summarize existing paper.
 
-Lightweight temporal compression (LTC) is one of the linear estimation method to compress data. It is The first-order interpolator with two degrees of freedom(FOI-2DF) which is mentioned in ~\cite{jalaleddine1990ecg}.  Most of linear estimation method need a predefined parameter which is the error margin (let's call $\epsilon$) in order to guarantee the difference between estimation and original data within a scope.
+Lightweight temporal compression (LTC) is one of the linear estimation 
+method to compress data. It is The first-order interpolator with two 
+degrees of freedom(FOI-2DF) which is mentioned in 
+~\cite{jalaleddine1990ecg}.  Most of linear estimation method need a 
+predefined parameter which is the error margin (let's call $\epsilon$) 
+in order to guarantee the difference between estimation and original 
+data within a scope.
 
 \todo{rewrite LTC algorithm, and there is a DP version of LTC maybe should also be writen}
 
 \section{Extension to dimension $n$}
 
-In practice, It's needed to transmit raw data which has multi-parameters to clients e.g. Accelerometer, Euler Angle and Magnetometer etc. LTC not work well when we transmit multi-parameters data, cause if we just implement LTC for each parameter, the difference between estimation and origin could exceed error margin which was set in advance. For instance, there is a data $(x, y)$ with two parameters, and using LTC for both parameter respectively. According to LTC method $\mid{\hat{x}-x}\mid\leqslant \epsilon$~\cite{jalaleddine1990ecg}, the estimation may be $(\hat{x}=x+\epsilon, \hat{y}=y+\epsilon)$, then the difference between estimation and original data $(x,y)$ is which is bigger than error margin predefined. In this case, we design a new algorithm, which is multi-parameter version of LTC, and it also work with any type of distance. In standard LTC method, it checks if there is overlapping part between new sector area and recorded range. However, in our multidimensional method, we will map every data point into same time-stamp e.g. $t_0$. It is convenient for us to calculate distance between them and check if overlapping range exists. we provide Multidimensional-LTC with Euclidean and Manhattan distance in below.
+\subsection{General formulation}
+
+In this section we provide a distance-independent formulation of LTC in 
+dimension $n$. The formulation of LTC in~\cite{ltc} relies on the intersection
+of \emph{convex cones} in dimension $n+1$.
+
+When $n$ is higher than 1, the intersection of convex cones unwieldy to 
+formalize. Instead, we formulate LTC as an intersection test 
+between $m$ \emph{balls} of dimension 
+$n$. We formulate LTC recursively, as follows.
+
+Let $x_0 \in \mathbb{R}^n$ be the last data point transmitted by the 
+algorithm. For convenience, all the subsequent data points will be 
+expressed in the orthogonal space with origin $x_0$. Without loss of 
+generality, we assume that the data points are sampled uniformly with a 
+sampling period of 1 time unit. Let k be the number of data points 
+following $x_0$ that have been compressed.
+
+The intersection of convex cones in dimension $n+1$ can be written as follows:
+\ldots
+
+Which is equivalent to the following formulation in $\mathbb{R}^n$:
+\begin{eqnarray*}
+&& \exists \textbf{u} \in \mathbb{R}^{n} \  s.t. \  \forall i \in \llbracket 1, k \rrbracket, \quad
+\norm{i\textbf{u} - \textbf{x}_i} \leq \epsilon\\
+\Leftrightarrow && \exists \textbf{u} \in \mathbb{R}^{n} \  s.t. \  \forall i \in \llbracket 1, k \rrbracket, \quad
+\norm{\textbf{u} - \frac{1}{i}\textbf{x}_i} \leq \frac{\epsilon}{i} \\
+\Leftrightarrow && \bigcap_{i=1}^{k} {\mathcal{B}}_i \neq \O,
+\end{eqnarray*}
+where $\mathcal{B}_i 
+\subset \mathbb{R}^n$ is the ball of center $\frac{1}{i}\textbf{x}_i$ 
+and radius $\frac{\epsilon}{i}$.
+
+\subsection{Effect of the norm}
+
+It should be noted that the norm has a critical impact on the 
+compression error and ratio. For instance, using the infinity instead 
+of the Euclidean norm increases the compression error by a factor of 
+$\sqrt{n}$ in dimension $n$, and increases the compression ratio by xxx. 
+
+%~ Point $k+1$ will be compressed if and only if:
+%~ \begin{eqnarray*}
+%~ && \bigcap_{i=1}^{k+1} {\mathcal{B}}_i \neq \O \\
+%~ \Leftrightarrow && {\mathcal{B}}_{k+1} \cap \bigcap_{i=1}^{k} {\mathcal{B}}_i \neq \O
+%~ \end{eqnarray*}
+
+
+
+
 
 \section{Implementation}
 Our code is available at ... (make a clean release!)
