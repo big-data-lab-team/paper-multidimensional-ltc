@@ -5,6 +5,7 @@
 \usepackage{algorithmic}
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
+%\usepackage{algpseudocode}
 \usepackage{amsfonts} % for R symbol (the set of real numbers)
 \usepackage{color}
 \usepackage[pdftex]{graphicx}
@@ -95,7 +96,7 @@ predefined parameter which is the error margin (let's call $\epsilon$)
 in order to guarantee the difference between estimation and original 
 data within a scope.
 
-\todo{rewrite LTC algorithm, and there is a DP version of LTC maybe should also be writen}
+\todo{rewrite LTC algorithm, and there is a DP version of LTC maybe should also be written}
 
 \section{Extension to dimension $n$}
 
@@ -154,6 +155,7 @@ Our code is available at ... (make a clean release!)
 
 \subsection{Multidimensional LTC with Manhattan distance}
 In practice, Multidimensional LTC is same as implementing LTC in each parameter respectively. But we did some changes in our method. Assume $(x_{i1}, x_{i2}, ..., x_{in},t_i)$ is the $i_{th}$ coming data with n-dimension, and a base data point Z  $(z_{1}, z_{2}, ..., z_{n},t_z)$~\cite{schoellhammer2004lightweight}. We map each coming data to $t_1$ time-stamp and create a bounding box for recording overlapping range which includes upper and lower bound for each dimension base on $t_1$. cause the time different between two adjacent data, so the $i_th$ data after mapping is $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$. After that updating tolerance range by adding designed error margin which after mapping $\frac{\epsilon}{t_i-t_z}$ on $\hat{x_{ij}}, j={1...n}$ with Manhattan distance. checking if there is overlap between tolerance and bounding box.The algorithm is as follows.
+
 \note{not clear about Manhattan distance, in my opinion for each axis the distance less than $EPSILEN/t_i-t_0$ + bounding box length}
 
 At beginning of the algorithm, we need a base point (which we will call \textit{z}) and bounding box which has upper and lower bound for each parameter respectively.Then start the algorithm.
@@ -242,7 +244,7 @@ For 3-dimension, assume data point like $(x, y, z)$ also need time-stamp t, we c
 \begin{algorithm}
     \caption{whether intersect  for n dimension}
     \begin{flushleft}
-        \textbf{Input:} $l$ - list oebjct, $o$ - object of mapped coming data, $p$ - point will be base point\\
+        \textbf{Input:} $l$ - list object, $o$ - object of mapped coming data, $p$ - point will be base point\\
         \textbf{Output:} $true|false$  is there a intersection\\
         \textbf{function} isIntersect$(l, o, p)$
     \end{flushleft}
@@ -316,14 +318,32 @@ For 3-dimension, assume data point like $(x, y, z)$ also need time-stamp t, we c
 
 \section{Results}
 \todo{ result table ?}
-\subsection{Data sets}
-\todo{ my data set}
+\subsection{Experiment 1: Pilot tests on Computer}
+\begin{itemize}
+    \item Data set: 5-times bicep curl which includes 613 data; 
+                    Mohammad Lateral bicep curl which include 41428 data; 
+                    All data is collected from Neblina, with 50Hz sampling of Sensors.
+                    Using Valgrind massif measure memory usage. And using 'gettimeofday()' function in 'sys/time.h' for measure processing time usage.
+    \item Experiment Condition: Fedora 64-bit system with 16G memory, i5-3210M CPU @ 2.50GHz × 4. For each data set, we change number of Dimension and EPSILON.
+    \item Result: Result shows in table.
+    \item Conclusion: From the table, The LTC-Manhattan has higher compression radio. But LTC-Euclidean make sure the Max Error between reconstructed data and original data under EPSILON.Compression ratios would decrease with changing EPSILON smaller.
+\end{itemize}
 
-The tranform rate of Neblina is 50Hz.
+\subsection{Experiment 1: energy reduction on the Neblina}
+\begin{itemize}
+    \item Data set: 
+    \item Experiment Condition: 
+    \item Result: 
+    \item Conclusion: 
+\end{itemize}
+
+
+
+The transform rate of Neblina is 50Hz.
 \\
 5-times bicep curl from Neblina. It includes 613 data which produced in 12.28 seconds. 
 \\
-Mohamad Lateral bicep data which include 41428, produced in proximate 14 minutes.
+Mohammad Lateral bicep data which include 41428, produced in proximate 14 minutes.
 
 \subsection{Compression ratios}
 
@@ -334,6 +354,33 @@ Mohamad Lateral bicep data which include 41428, produced in proximate 14 minutes
 \section{Conclusion}
 
 \section*{Acknowledgement}
+\begin{table}[]
+    \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
+    \hline
+    \multicolumn{9}{|l|}{Dimension 2}                                                                                                                         \\ \hline
+    Data set               & \multicolumn{4}{l|}{5-times bicep curl}                        & \multicolumn{4}{l|}{Mohammad Lateral bicep}                     \\ \hline
+    Distance               & \multicolumn{2}{l|}{Manhattan} & \multicolumn{2}{l|}{Eclidean} & \multicolumn{2}{l|}{Manhattan} & \multicolumn{2}{l|}{Euclidean} \\ \hline
+    Epsilon                & 100          & 100/$\sqrt{2}$  & 100         & 100/$\sqrt{2}$  & 100        & 100/$\sqrt{2}$    & 100        & 100/$\sqrt{2}$    \\ \hline
+    Max Error              & 127.63       & 94.46           & 99.63       & 70.47           & 140.70     & 99.73             & 99.99      & 70.71             \\ \hline
+    Compression Radio      & 29.03\%      & 20.88\%         & 25.12\%     & 19.57\%         & 60.17\%    & 51.59\%           & 57.75\%    & 48.86\%           \\ \hline
+    Max memory Usage(peak) & 80B          & 80B             & 432B        & 240B            & 80B        & 80B               & 2.1KB      & 1.3KB             \\ \hline
+    Time Usage(Total)      & 0.103ms      & 0.082ms         & 0.220ms     & 0.200ms         & 5.70ms     & 4.85ms            & 20.04ms    & 19.28ms           \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[]
+    \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
+    \hline
+    \multicolumn{9}{|l|}{Dimension 3}                                                                                                                         \\ \hline
+    Data set               & \multicolumn{4}{l|}{5-times bicep curl}                        & \multicolumn{4}{l|}{Mohammad Lateral bicep}                     \\ \hline
+    Distance               & \multicolumn{2}{l|}{Manhattan} & \multicolumn{2}{l|}{Euclidean} & \multicolumn{2}{l|}{Manhattan} & \multicolumn{2}{l|}{Euclidean} \\ \hline
+    Epsilon                & 100          & 100/$\sqrt{3}$  & 100         & 100/$\sqrt{3}$  & 100        & 100/$\sqrt{3}$    & 100        & 100/$\sqrt{3}$    \\ \hline
+    Max Error              & 141.66       & 85.40           & 99.94       & 56.89           & 168.95     & 97.01             & 99.99      & 57.73             \\ \hline
+    Compression Radio      & 23.00\%      & 12.89\%         & 18.43\%     & 9.95\%          & 51.13\%    & 37.17\%           & 46.05\%    & 32.63\%           \\ \hline
+    Max memory Usage(peak) & 112B         & 112B            & 384B        & 256B            & 112B       & 112B              & 4.9KB      & 3.0KB             \\ \hline
+    Time Usage(Total)      & 0.119ms      & 0.094ms         & 0.230ms     & 0.200ms         & 8.50ms     & 7.07ms            & 26.41ms    & 21.26ms           \\ \hline
+    \end{tabular}
+\end{table}
 
 
 \bibliographystyle{IEEEtran}
