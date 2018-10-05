@@ -83,20 +83,64 @@ into same time-stamp e.g. $t_0$. It is convenient for us to calculate
 distance between them and check if overlapping range exists. we provide 
 Multidimensional-LTC with Euclidean and Manhattan distance in below.
 
+% Some related works from Bo's report
+
+
+% transmitted, received points
+
+% contributions: formalization of LTC algorithm, extension to n d, extension to any norm, open-source implementation.
 
 \section{Lightweight Temporal Compression}
 
-Summarize existing paper.
+Lightweight Temporal Compression 
+(LTC~\cite{schoellhammer2004lightweight}) approximates the data stream 
+by a piece-wise linear function of time, ensuring that the error at 
+every time-point is bounded.
 
-Lightweight temporal compression (LTC) is one of the linear estimation 
-method to compress data. It is The first-order interpolator with two 
-degrees of freedom(FOI-2DF) which is mentioned in 
-~\cite{jalaleddine1990ecg}.  Most of linear estimation method need a 
-predefined parameter which is the error margin (let's call $\epsilon$) 
-in order to guarantee the difference between estimation and original 
-data within a scope.
+\subsection{Notations}
 
-\todo{rewrite LTC algorithm, and there is a DP version of LTC maybe should also be written}
+We use the following notations and assumptions to describe the LTC algorithm.
+The algorithm \emph{receives} a stream of \emph{data points} $x_i$
+at times $t_i$ ($i \in \mathbb{N}$), and it \emph{transmits} a stream of data points $\xi_i$ 
+at times $\tau_i$ ($i \in \mathbb{N}$). To simplify the notations, we assume that:
+\begin{equation*}
+\forall k \in \mathbb{N}, \  \exists ! j \in \mathbb{N} \  \xi_k = t_j
+\end{equation*}
+That is, transmission times coincide with reception times. 
+We define the \emph{centered received points} as follows:
+\begin{equation*}
+\forall k \in \mathbb{N}\ , \forall i \in \mathbb{N},\ (u^k_i, y^k_i) = (t_{j+i} - t_j, x_{j+i}), \quad \mathrm{where}\ t_j = \xi_k.
+\end{equation*}
+This definition is such that $u^k_0=0$, and $y^k_i$ is the $i^{th}$ point received
+after the $k^{th}$ transmission.
+
+\subsection{LTC algorithm}
+
+Using the notations defined previously, the original LTC algorithm is written as 
+follows:
+% define x_i (1D), (t, x_i)
+\begin{enumerate}
+\item Initialization, after $k^{th}$ transmission:
+    \begin{itemize}
+        \item Wait until first point $(u^k_1, y^k_1)$ is received.
+        \item UL $\leftarrow$ $(u^k_1, y^k_1+\epsilon)$
+        \item LL $\leftarrow$ $(u^k_1, y^k_1-\epsilon)$
+    \end{itemize}
+\item Calculate \emph{highLine} as the line connecting $(u^k_0, y^k_0)$ and UL.
+\item Calculate \emph{lowLine} as the line connecting $(u^k_0, y^k_0)$ and LL.
+\end{enumerate}
+
+
+
+ %~ is one of the linear estimation 
+%~ method to compress data. It is The first-order interpolator with two 
+%~ degrees of freedom (FOI-2DF) which is mentioned in 
+%~ ~\cite{jalaleddine1990ecg}.  Most of linear estimation method need a 
+%~ predefined parameter which is the error margin (let's call $\epsilon$) 
+%~ in order to guarantee the difference between estimation and original 
+%~ data within a scope.
+
+%~ \todo{rewrite LTC algorithm, and there is a DP version of LTC maybe should also be written}
 
 \section{Extension to dimension $n$}
 
