@@ -45,20 +45,20 @@
 
 \section{Introduction}
 
-LTC is among the stream compression method that provides the highest 
-compression rate for the lowest resource (CPU, RAM) consumption. As 
-such, it makes it a very good candidate for the compression of data 
-streams acquired in embedded, low-power systems such as connected 
-objects, systems on module (SoMs), etc The type of data acquired on 
-such systems, however, is often multi-dimensional. For instance 
-accelerometers and gyroscopes usually measure variables along 3 
-directions, these variables being distinct but related through the 
-actual movement of the sensor. In this paper, we investigate the 
-extension of LTC to higher dimensions. First, we express the algorithm 
-in an arbitrary vectorial space of dimension $n$. Second, we 
-instantiate it for the Euclidean and xxx distances, in spaces of 
-dimension 2D+t and 3D+t. Finally, we compare the multi-dimensional LTC 
-to the 1-dimensional version, on gyroscopic data acquired on a SoM 
+LTC is among the stream compression method that provides the highest
+compression rate for the lowest resource (CPU, RAM) consumption. As
+such, it makes it a very good candidate for the compression of data
+streams acquired in embedded, low-power systems such as connected
+objects, systems on module (SoMs), etc The type of data acquired on
+such systems, however, is often multi-dimensional. For instance
+accelerometers and gyroscopes usually measure variables along 3
+directions, these variables being distinct but related through the
+actual movement of the sensor. In this paper, we investigate the
+extension of LTC to higher dimensions. First, we express the algorithm
+in an arbitrary vectorial space of dimension $n$. Second, we
+instantiate it for the Euclidean and xxx distances, in spaces of
+dimension 2D+t and 3D+t. Finally, we compare the multi-dimensional LTC
+to the 1-dimensional version, on gyroscopic data acquired on a SoM
 device.
 
 \section{Lightweight Temporal Compression}
@@ -66,6 +66,10 @@ device.
 Summarize existing paper.
 
 Lightweight temporal compression (LTC) is one of the linear estimation method to compress data. It is The first-order interpolator with two degrees of freedom(FOI-2DF) which is mentioned in ~\cite{jalaleddine1990ecg}.  Most of linear estimation method need a predefined parameter which is the error margin (let's call $\epsilon$) in order to guarantee the difference between estimation and original data within a scope.
+
+LTC会记录一个范围，from which 可以找到一条直线，代替original data，并且保证 保证度，或者 distort。 当一个新data来的时候，base data会与 data+/-EPSILON 创建一个 临时的范围， 如果这个范围与 已经记录的范围 存在 交集，那么更新已记录的范围， 如果交集为空，则transmit base data，并将，已经记录的范围的median，and current timesamp - 1 作为 base point的值和timestamp. 以此循环。
+画个图。
+只需要 constant Memory。
 
 \todo{rewrite LTC algorithm, and there is a DP version of LTC maybe should also be written}
 
@@ -79,7 +83,7 @@ Our code is available at ... (make a clean release!)
 \subsection{Multidimensional LTC with Manhattan distance}
 In practice, Multidimensional LTC is same as implementing LTC in each parameter respectively. But we did some changes in our method. Assume $(x_{i1}, x_{i2}, ..., x_{in},t_i)$ is the $i_{th}$ coming data with n-dimension, and a base data point Z  $(z_{1}, z_{2}, ..., z_{n},t_z)$~\cite{schoellhammer2004lightweight}. We map each coming data to $t_1$ time-stamp and create a bounding box for recording overlapping range which includes upper and lower bound for each dimension base on $t_1$. cause the time different between two adjacent data, so the $i_th$ data after mapping is $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$. After that updating tolerance range by adding designed error margin which after mapping $\frac{\epsilon}{t_i-t_z}$ on $\hat{x_{ij}}, j={1...n}$ with Manhattan distance. checking if there is overlap between tolerance and bounding box.The algorithm is as follows.
 
-\note{not clear about Manhattan distance, in my opinion for each axis the distance less than $EPSILEN/t_i-t_0$ + bounding box length}
+\note{not clear about Manhattan distance, in my opinion for each axis the distance less than $EPSILON/t_i-t_0$ + bounding box length}
 
 At beginning of the algorithm, we need a base point (which we will call \textit{z}) and bounding box which has upper and lower bound for each parameter respectively.Then start the algorithm.
 \begin{enumerate}
@@ -93,8 +97,19 @@ At beginning of the algorithm, we need a base point (which we will call \textit{
   \item After all, output \textit{z} data point and center of bounding box respectively.
 \end{enumerate}
 
-\subsection{Multidimensional LTC with Euclidean distance} 
-In Euclidean distance version, we also map the coming data into same time-stamp. The difference with Manhattan distance version is that recording overlapping part with a post-designed model is difficult, which need retain several arcs in 2-dimension, or convex surfaces in 3-dimension. In our method, we will record all tolerance range for every mapped data which come from base data point until coming data point, in order to checking if there is intersection among them. In the rest of this section, we describe examples for 2-dimensional and 3-dimensional version. After that, we extend the method for n-dimension.
+\subsection{Multidimensional LTC with Euclidean distance}
+In Euclidean distance version, we also map the coming data into same time-stamp. The difference with Manhattan distance version is that recording overlapping part with a post-designed model is difficult, which need retain several arcs in 2-dimension, or convex surfaces in 3-dimension.
+In our method, we will record all tolerance range for every mapped data which come from base data point until coming data point, in order to checking if there is intersection among them.
+画图；
+写一个3-D的例子，并解释一下 算法
+assume 有一个 3D 的数据 (x,y,z, t_n)， 会被mapping到 (....) with error sphere EPSILON/(t_n - t_1).and check if there is public intersection with list of circle which recorded.
+首先确定x的范围，C_maxX = Min=1.n(c_i.x + E/i), C_minX = Max=1.n(c_i.x - E/i), if C_maxX < C_minX, means there is no public intersection amount those circles.
+after that 使用二分法 mid_x=(C_maxX + C_minX)/2, with x=mid_x computer bounding range of y-axis, 并对y轴继续使用 二分法，在z-axis 上计算 C_minZ and C_maxZ, 如果 C_maxZ > C_minZ 说明 在x=mid_x, y=mid_y 这条线上 存在一个或多个点 在intersection amount those circles. so 我们可以确认 确认交集的存在，并且 把点(mid_x, mid_y, mid_z) 保存下来，以便将来更新base point.
+
+通过这个 例子 我们可以把 3-D 延伸到 n-D。
+
+
+In the rest of this section, we describe examples for 2-dimensional and 3-dimensional version. After that, we extend the method for n-dimension.
 \begin{itemize}
 \item \textbf{2-dimensional LTC in Euclidean distance:}In this situation, the tolerance range after mapping is a disk. After initializing base data point \textit{z}, for each coming data point need to be mapped into a same time-stamp, and heck if there is a intersection amount disks in disks set and new mapped coming data. Therefore, a algorithm is need to determine whether \textit{n} disks intersect or not.
 \item \textbf{3-dimensional LTC in Euclidean distance:}In 3-dimension, cause of the preassigned error margin, the disks become balls with one extra axis. So In 3-dimension whether \textit{n} balls intersect need to be check.
@@ -105,14 +120,14 @@ At first, let us solve the \textit{n} disks intersect. We use a algorithm which 
     \caption{whether disks intersect}
     \begin{flushleft}
         \textbf{Input:} $l$ - list of disks, $d$ - mapped coming disk, $p$ - point will be base point\\
-        \textbf{Output:} $true|false$  is there a intersection\\ 
+        \textbf{Output:} $true|false$  is there a intersection\\
         \textbf{function} isIntersect$(l, d, p)$
     \end{flushleft}
     \begin{algorithmic}[1]
         \STATE $tmp_list \gets null$
         \STATE $max\_x\gets d.x+d.r$
         \STATE $min\_x\gets d.x-d.r$
-        
+
         \FORALL{$old\_disk$ \textbf{in} $l$}
             \IF{$d \cap old\_disk = \emptyset$} % distance(d.center, old\_disk.center) > d.r + old\_disk.r
                 \STATE \textbf{return} false
@@ -147,7 +162,7 @@ At first, let us solve the \textit{n} disks intersect. We use a algorithm which 
                 \STATE $l \gets tmp\_list$
                 \STATE \textbf{return} true
             \ENDIF
-            \STATE {Assume $P_d$ is the intersection between line of 
+            \STATE {Assume $P_d$ is the intersection between line of
             centers from $tmp\_list[max\_index]$ and $tmp\_list[min\_index]$
             , and their common chord}
             \IF{$P_d.x < mid$}
@@ -175,9 +190,9 @@ For 3-dimension, assume data point like $(x, y, z)$ also need time-stamp t, we c
         \STATE $tmp_list \gets null$
         \STATE $max \gets o.d\_n+o.r$
         \STATE $min \gets o.d\_n-o.r$
-        
+
         \FORALL{$old\_obj$ \textbf{in} $l$}
-            \IF{$o \cap old\_obj = \emptyset$} 
+            \IF{$o \cap old\_obj = \emptyset$}
                 \STATE \textbf{return} false
             \ELSIF{$o \cap old\_obj \neq o$}
                 \STATE {$\textbf{add } old\_obj \textbf{ into } tmp\_list$\\
@@ -243,8 +258,8 @@ For 3-dimension, assume data point like $(x, y, z)$ also need time-stamp t, we c
 \todo{ result table ?}
 \subsection{Experiment 1: Pilot tests on Computer}
 \begin{itemize}
-    \item Data set: 5-times bicep curl which includes 613 data; 
-                    Mohammad Lateral bicep curl which include 41428 data; 
+    \item Data set: 5-times bicep curl which includes 613 data;
+                    Mohammad Lateral bicep curl which include 41428 data;
                     All data is collected from Neblina, with 50Hz sampling of Sensors.
                     Using Valgrind massif measure memory usage. And using 'gettimeofday()' function in 'sys/time.h' for measure processing time usage.
     \item Experiment Condition: Fedora 64-bit system with 16G memory, i5-3210M CPU @ 2.50GHz × 4. For each data set, we change number of Dimension and EPSILON.
@@ -253,18 +268,24 @@ For 3-dimension, assume data point like $(x, y, z)$ also need time-stamp t, we c
 \end{itemize}
 
 \subsection{Experiment 1: energy reduction on the Neblina}
+
+The capacity of battery in Neblina is 100mAh, and the battery usage would not change too much, because it contans others fusion method which will running when turning on the Neblina.
+In 50Hz sensor sampling rate, the average usage electric current for transmit accelerometers data is 2.0mA. It means Neblina could tranmit accelerometers data constantly in 100/2.0=50 hours.
+After compressed by LTC-Manhattan method, the average usage electric current is 1.95mA. It just extend Neblina lift abou 1.28 hours.
+But in 200Hz sampling rate. The electric before and after compression are 3.5 and 2.9 respectively. The running time of Neblina would be extended about 5.9 hours/
+
 \begin{itemize}
-    \item Data set: 
-    \item Experiment Condition: 
-    \item Result: 
-    \item Conclusion: 
+    \item Data set: human activities, running, walking, jogging and work behind desk.
+    \item Experiment Condition: work with neblina.
+    \item Result:
+    \item Conclusion:
 \end{itemize}
 
 
 
 The transform rate of Neblina is 50Hz.
 \\
-5-times bicep curl from Neblina. It includes 613 data which produced in 12.28 seconds. 
+5-times bicep curl from Neblina. It includes 613 data which produced in 12.28 seconds.
 \\
 Mohammad Lateral bicep data which include 41428, produced in proximate 14 minutes.
 
