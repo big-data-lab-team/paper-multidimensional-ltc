@@ -73,6 +73,37 @@ LTC会记录一个范围，from which 可以找到一条直线，代替original 
 
 \todo{rewrite LTC algorithm, and there is a DP version of LTC maybe should also be written}
 
+In practice, It's needed to transmit raw data which has multi-parameters to clients e.g. Accelerometer, Euler Angle and Magnetometer etc. Most of 以前的 paper just force on single dimension sensor data Compression. **** . So we purpose a method to compress multi-dimensional sensor data named LTC-D. It is used as linear estimation method. Same as usual estimation compression method,  distance(different) with compressed data from LTC-D and original data would not exceed the predefined error range. We need to find line to represent original data, it means the lines
+pass through datas' error range. But in stream data, time seires data, it is difficult, because all data do not show in same time plane. So this method will mapping all data into one time plane. Then for each mapped error range of data, check if there is intersection among them. If so means there is a line could represent original data, and vice versa.
+
+The method as below: assume the stream $i_{th}$ data $D_i = (x_{i1}, x_{i2}, ..., x_{in},t_i)$, the first data $D_0$ would be save as base point $Z=(z_{1}, z_{2}, ..., z_{n},t_z)$ in our Method. 通常设置 base point之后的一个时间节点作为mapping节点. We also need to record the intersect S for find result lines. 我们确定以 base point 之后的第一个时间节点， 作为mapping的目标节点，再在 The first data D_1 would change into tolerance range R_1. 我们 set S = R_1. For each follow data D_i i>1, mapping D_1 into hat(D_1) = $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$, and error margin after mapping should be $\frac{\epsilon}{t_i-t_z}$ on $\hat{x_{ij}}, j={1...n}$.
+the tolerance range after R_i, intersect with S, if there is overlap, update S = S 交 R_i. If not, the base point would be transmited and select a point in S as base point with timestamp t_{i-1}.
+
+\todo{refector}
+At beginning of the algorithm, we need a base point (which we will call \textit{z}) and bounding box which has upper and lower bound for each parameter respectively.Then start the algorithm.
+\begin{enumerate}
+  \item Initialization: Get first data point, and set point \textit{z} equals to first data point. Get the second data point $(x_{21},...,x_{2n},t_2)$, and assign each upper bound $U_j = x_{2j}+\frac{\epsilon}{t_2-t_1}$ and lower bound $L_j = x_{2j}-\frac{\epsilon}{t_2-t_1}$ where $j=\{1...n\}$.
+  \item Get next data point, map the data point $(x_{i1},...,x_{in},t_i)$ into $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
+  \item For each parameter(dimension) \textit{j}, if upper bound $U_j$ smaller than $x_{ij}-\frac{\epsilon}{t_i-t_1}$ or lower bound $L_j$ bigger than $x_{ij}+\frac{\epsilon}{t_i-t_1}$, then \textbf{goto 5}, else $U_j = min(U_j, x_{ij}+\frac{\epsilon}{t_i-t_1})$, and $L_j = max(L_j, x_{ij}-\frac{\epsilon}{t_i-t_1})$.
+  \item Goto 2.
+  \item output \textit{z} data point.
+  \item Reset: set data point \textit{z} equals to center of the bounding box with time-stamp $t_{i-1}$, and $U_j=x_{ij}+\frac{\epsilon}{t_i-t_{i-1}}$, $L_j =x_{ij}-\frac{\epsilon}{t_i-t_{i-1}}$ with $j=\{1...n\}$.
+  \item Goto 2.
+  \item After all, output \textit{z} data point and center of bounding box respectively.
+\end{enumerate}
+
+对于 误差范围，会根据EPSILON 改变，也会根据我们设定的 data 与 EPSILON 的 不同类型的距离有关系。
+
+如果使用 Manhattan的话 误差范围 会变成 RequirePackagectangle or cube for 2d and 3d respectively. 就是 EPSILON*sqrt(d)  图
+如果使用 Euclidean的话 误差范围 会变成 disk or ball 分别是 2d, 3d， 保持 EPSILON.图
+
+我们用2d Manhattan 来做例子。 画图
+
+
+
+
+
+
 \section{Extension to dimension $n$}
 
 In practice, It's needed to transmit raw data which has multi-parameters to clients e.g. Accelerometer, Euler Angle and Magnetometer etc. LTC not work well when we transmit multi-parameters data, cause if we just implement LTC for each parameter, the difference between estimation and origin could exceed error margin which was set in advance. For instance, there is a data $(x, y)$ with two parameters, and using LTC for both parameter respectively. According to LTC method $\mid{\hat{x}-x}\mid\leqslant \epsilon$~\cite{jalaleddine1990ecg}, the estimation may be $(\hat{x}=x+\epsilon, \hat{y}=y+\epsilon)$, then the difference between estimation and original data $(x,y)$ is which is bigger than error margin predefined. In this case, we design a new algorithm, which is multi-parameter version of LTC, and it also work with any type of distance. In standard LTC method, it checks if there is overlapping part between new sector area and recorded range. However, in our multidimensional method, we will map every data point into same time-stamp e.g. $t_0$. It is convenient for us to calculate distance between them and check if overlapping range exists. we provide Multidimensional-LTC with Euclidean and Manhattan distance in below.
@@ -81,7 +112,9 @@ In practice, It's needed to transmit raw data which has multi-parameters to clie
 Our code is available at ... (make a clean release!)
 
 \subsection{Multidimensional LTC with Manhattan distance}
-In practice, Multidimensional LTC is same as implementing LTC in each parameter respectively. But we did some changes in our method. Assume $(x_{i1}, x_{i2}, ..., x_{in},t_i)$ is the $i_{th}$ coming data with n-dimension, and a base data point Z  $(z_{1}, z_{2}, ..., z_{n},t_z)$~\cite{schoellhammer2004lightweight}. We map each coming data to $t_1$ time-stamp and create a bounding box for recording overlapping range which includes upper and lower bound for each dimension base on $t_1$. cause the time different between two adjacent data, so the $i_th$ data after mapping is $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$. After that updating tolerance range by adding designed error margin which after mapping $\frac{\epsilon}{t_i-t_z}$ on $\hat{x_{ij}}, j={1...n}$ with Manhattan distance. checking if there is overlap between tolerance and bounding box.The algorithm is as follows.
+In practice, Multidimensional LTC is same as implementing LTC in each parameter respectively. But we did some changes in our method. Assume $(x_{i1}, x_{i2}, ..., x_{in},t_i)$ is the $i_{th}$ coming data with n-dimension, and a base data point Z  $(z_{1}, z_{2}, ..., z_{n},t_z)$~\cite{schoellhammer2004lightweight}. We map each coming data to $t_1$ time-stamp and create a bounding box for recording overlapping range which includes upper and lower bound for each dimension base on $t_1$. cause the time different between two adjacent data, so the $i_th$ data after mapping is $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
+After that updating tolerance range by adding designed error margin which after mapping
+$\frac{\epsilon}{t_i-t_z}$ on $\hat{x_{ij}}, j={1...n}$ with Manhattan distance. checking if there is overlap between tolerance and bounding box.The algorithm is as follows.
 
 \note{not clear about Manhattan distance, in my opinion for each axis the distance less than $EPSILON/t_i-t_0$ + bounding box length}
 
@@ -104,7 +137,8 @@ In our method, we will record all tolerance range for every mapped data which co
 写一个3-D的例子，并解释一下 算法
 assume 有一个 3D 的数据 (x,y,z, t_n)， 会被mapping到 (....) with error sphere EPSILON/(t_n - t_1).and check if there is public intersection with list of circle which recorded.
 首先确定x的范围，C_maxX = Min=1.n(c_i.x + E/i), C_minX = Max=1.n(c_i.x - E/i), if C_maxX < C_minX, means there is no public intersection amount those circles.
-after that 使用二分法 mid_x=(C_maxX + C_minX)/2, with x=mid_x computer bounding range of y-axis, 并对y轴继续使用 二分法，在z-axis 上计算 C_minZ and C_maxZ, 如果 C_maxZ > C_minZ 说明 在x=mid_x, y=mid_y 这条线上 存在一个或多个点 在intersection amount those circles. so 我们可以确认 确认交集的存在，并且 把点(mid_x, mid_y, mid_z) 保存下来，以便将来更新base point.
+after that 使用二分法 mid_x=(C_maxX + C_minX)/2, with x=mid_x computer bounding range of y-axis, 并对y轴继续使用 二分法，在z-axis 上计算 C_minZ and C_maxZ, 如果 C_maxZ > C_minZ 说明 在x=mid_x, y=mid_y 这条线上 存在一个或多个点 在intersection amount those circles. so 我们可以确认 确认交集的存在，并且 把点(mid_x, mid_y, mid_z) 保存下来，以便将来更新base point. 在这个算法中 第一次遍历circle 得到maxX maxY 需要 O(n) 然后 二分法O(lgn) 进入循环, 之后 O(n) 遍历，在二分法 mid_y, 进入循环之后需要O(n) 遍历circle 得到 max_z and min_z 所以 复杂度是 O(n) + O(lgn)*(O(n) + O(lgn)*O(n)) = O(lgn lgn n)
+
 
 通过这个 例子 我们可以把 3-D 延伸到 n-D。
 
