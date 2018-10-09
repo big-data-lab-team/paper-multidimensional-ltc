@@ -16,7 +16,7 @@ Fork the repository, edit ```paper.tex``` and ```biblio.bib```, and make a pull-
 
 # How to generate the pdf
 
-0. Install ```pdflatex```, ```gnuplot``` and ```bibtex```
-1. Generate the figures: ```./plot_figures.sh``` (requires ```gnuplot```)
+0. Install ```pdflatex```, ```Python``` with ```matplotlib``` and ```bibtex```
+1. Generate the figures: ```./ltc-plot.py```.
 2. Compile the document: ```pdflatex paper ; pdflatex paper``` (yes, twice).
 3. Generate the bibliography: ```bibtex paper ; pdflatex paper``` (yes, once again).

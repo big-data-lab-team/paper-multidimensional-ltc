@@ -2,9 +2,11 @@
 
 % packages
 \usepackage{algorithm}
-\usepackage{algorithmic}
-\renewcommand{\algorithmicrequire}{\textbf{Input:}}
-\renewcommand{\algorithmicensure}{\textbf{Output:}}
+%\usepackage{algorithmic}
+\usepackage{algorithmicx} % Doc is at http://tug.ctan.org/macros/latex/contrib/algorithmicx/algorithmicx.pdf
+\usepackage{algpseudocode}
+%\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+%\renewcommand{\algorithmicensure}{\textbf{Output:}}
 %\usepackage{algpseudocode}
 \usepackage{amsfonts} % for R symbol (the set of real numbers)
 \usepackage{color}
@@ -35,7 +37,7 @@
 
 \begin{document}
 
-\title{A multi-dimensional extension of the Lightweight Temporary Compression method}
+\title{A multi-dimensional extension of the Lightweight Temporal Compression method}
 
 \author{Bo Li, Tristan Glatard\\
   Department of Computer Science and Software Engineering\\ Concordia University, Montreal, Quebec, Canada\\
@@ -99,37 +101,83 @@ every time-point is bounded.
 
 \subsection{Notations}
 
-We use the following notations and assumptions to describe the LTC algorithm.
 The algorithm \emph{receives} a stream of \emph{data points} $x_i$
 at times $t_i$ ($i \in \mathbb{N}$), and it \emph{transmits} a stream of data points $\xi_i$ 
 at times $\tau_i$ ($i \in \mathbb{N}$). To simplify the notations, we assume that:
 \begin{equation*}
-\forall k \in \mathbb{N}, \  \exists ! j \in \mathbb{N} \  \xi_k = t_j
+\forall k \in \mathbb{N}, \  \exists ! i \in \mathbb{N} \  \tau_k = t_i
 \end{equation*}
 That is, transmission times coincide with reception times. 
 We define the \emph{centered received points} as follows:
 \begin{equation*}
-\forall k \in \mathbb{N}\ , \forall i \in \mathbb{N},\ (u^k_i, y^k_i) = (t_{j+i} - t_j, x_{j+i}), \quad \mathrm{where}\ t_j = \xi_k.
+\forall k \in \mathbb{N}\ , \forall j \in \mathbb{N^*},\ (u^k_j, y^k_j) = (t_{i+j}, x_{i+j}), \quad \mathrm{where\ }i\mathrm{\ is\ s.t.}\ t_i = \tau_k.
 \end{equation*}
-This definition is such that $u^k_0=0$, and $y^k_i$ is the $i^{th}$ point received
+and:
+\begin{equation*}
+\forall k \in \mathbb{N},\  (u^k_0, y^k_0) = (\tau_k, \xi_k).
+\end{equation*}
+This definition is such that $u^k_0=0$, and $y^k_j$ is the $j^{th}$ data point received
 after the $k^{th}$ transmission.
 
+Figure~\ref{fig:ltc} illustrates the notations and algorithm.  
+\begin{figure}
+\includegraphics[width=\columnwidth]{ltc.pdf}
+\caption{Illustration of the LTC algorithm and notations used. Red dots indicate transmitted points. Dashed lines
+represent the high line and the low line before a point is transmitted.}
+\label{fig:ltc}
+\end{figure}
 \subsection{LTC algorithm}
 
-Using the notations defined previously, the original LTC algorithm is written as 
-follows:
-% define x_i (1D), (t, x_i)
-\begin{enumerate}
-\item Initialization, after $k^{th}$ transmission:
-    \begin{itemize}
-        \item Wait until first point $(u^k_1, y^k_1)$ is received.
-        \item UL $\leftarrow$ $(u^k_1, y^k_1+\epsilon)$
-        \item LL $\leftarrow$ $(u^k_1, y^k_1-\epsilon)$
-    \end{itemize}
-\item Calculate \emph{highLine} as the line connecting $(u^k_0, y^k_0)$ and UL.
-\item Calculate \emph{lowLine} as the line connecting $(u^k_0, y^k_0)$ and LL.
-\end{enumerate}
+The LTC algorithm maintains two lines, the \emph{high line}, and the 
+\emph{low line} defined by (1) the latest transmitted point and (2) the 
+\emph{high point} (high line) and the \emph{low point} (low line). When 
+a point ($t_i$, $x_i$) is received, the high line is updated as 
+follows: if $x_i+\epsilon$ is below the high line, the high line is 
+updated to the line defined by the last transmitted point and ($t_i$, 
+$x_i$); otherwise, the high line is not updated. Likewise, the low line 
+is updated from $x_i-\epsilon$. Threfore, any line located between the 
+high line and the low line approximates the data points received since 
+the last transmitted point with an error bounded by $\epsilon$.
 
+Using the notations defined previously, the original LTC algorithm can 
+be written as in Algorithm~\ref{algo:ltc}. For readability, we assume 
+that access to data points is blocking, i.e., the program will wait 
+until the points are available. We also assume that the content of 
+variable \texttt{tr} is transmitted after each assignment of this 
+variable. Function \texttt{line}, omitted for brevity, returns the 
+ordinate at abscissa $x$ (1st argument) of the line defined by the points
+in its 2nd and 3rd arguments.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\State tr = $(u^0_0, y^0_0)$ \Comment{last transmitted point}
+\State k = 1 ; j = 1
+\State lp = $y^1_1 - \epsilon$ \Comment{low point}
+\State hp = $y^1_1 + \epsilon$ \Comment{high point}
+%\Function{line}{$x$, ($x_0$, $y_0$), ($x_1$, $y_1$)} 
+% \Comment{Return the ordinate of the line defined by $(x_0, y_0)$, $(x_1, y_1)$ at abscissa $x$.}
+%\Return $y_0 + \frac{y_1-y_0}{x_1-x_0}(x-x_0)$
+%\EndFunction
+\While{True} \Comment{Process received points as they come}
+    \State j += 1
+    \State new\_lp = max($y^k_j-\epsilon$, line($u^k_j$, tr, ($u^k_{j-1}$, lp)))
+    \State new\_hp = max($y^k_j+\epsilon$, line($u^k_j$, tr, ($u^k_{j-1}$, hp)))
+    \If{new\_lp $<$ new\_hp} \Comment{Keep compressing}
+        \State lp = new\_lp
+        \State hp = new\_hp
+        \State \textbf{continue}
+    \EndIf
+    \State tr = $(u^k_j, (lp+hp)/2)$
+    \Comment{Transmit point}
+    \State lp = $y^k_j-\epsilon$
+    \State hp = $y^k_j+\epsilon$
+    \State k += 1
+    \State j = 0
+\EndWhile
+\end{algorithmic}
+\caption{Original LTC algorithm, adapted from~\cite{schoellhammer2004lightweight}.}
+\label{algo:ltc}
+\end{algorithm}
 
 
  %~ is one of the linear estimation 
@@ -144,38 +192,67 @@ follows:
 
 \section{Extension to dimension $n$}
 
-\subsection{General formulation}
-
 In this section we provide a distance-independent formulation of LTC in 
-dimension $n$. The formulation of LTC in~\cite{ltc} relies on the intersection
-of \emph{convex cones} in dimension $n+1$.
+dimension $n$. By $n$, we refer to the dimension of the data points 
+($x_i$). To handle time, LTC actually operates in dimension 
+$n+1$. 
 
-When $n$ is higher than 1, the intersection of convex cones unwieldy to 
-formalize. Instead, we formulate LTC as an intersection test 
-between $m$ \emph{balls} of dimension 
-$n$. We formulate LTC recursively, as follows.
+\subsection{Preliminary comments}
 
-Let $x_0 \in \mathbb{R}^n$ be the last data point transmitted by the 
-algorithm. For convenience, all the subsequent data points will be 
-expressed in the orthogonal space with origin $x_0$. Without loss of 
+The formulation of LTC in~\cite{schoellhammer2004lightweight} relies on 
+the intersection of \emph{convex cones} in dimension $n+1$. For $n=1$, it 
+corresponds to the intersection of triangles, which can efficiently be 
+computed by maintaining boundary lines, as detailed in the previous 
+section. In higher dimension, however, cone intersections are not so 
+straighforward, due to the fact that the intersection between 2 cones 
+may not be a cone.
+
+To address this issue, we formulate LTC as an intersection test between 
+\emph{balls} of dimension $n$, that is, segments for $n=1$, disks for 
+$n=2$, etc. Balls are defined with respect to the \emph{norm} used in 
+the vector space of data points. For $n=1$, the choice of the norm does 
+not really matter, as all p-norms and the infinity norm are identical. 
+In dimension $n$, however, norm selection will be critical.
+
+\subsection{Algebraic formulation of LTC}
+
+Let $(u_0^k, y_0^k) \in \mathbb{R}^{n+1}$ be the latest transmitted point. For convenience, all the subsequent points will be 
+expressed in the orthogonal space with origin $(u_0^k, y_0^k)$. We denote by $(v_j, z_j)_{j \in \llbracket 0, m \rrbracket}$ such points:
+\begin{equation*}
+\forall j \leq m,\  (v_j, z_j) = (u_j^k - u_0^k, y_j^k - y_0^k)
+\end{equation*}
+Without loss of 
 generality, we assume that the data points are sampled uniformly with a 
-sampling period of 1 time unit. Let k be the number of data points 
-following $x_0$ that have been compressed.
+sampling period of 1 time unit.
 
-The intersection of convex cones in dimension $n+1$ can be written as follows:
-\ldots
+We define $\mathcal{B}_j$ as the ball of $\mathbb{R}^n$ of center $z_j$ and of radius 
+$\epsilon$:
+\begin{equation*}
+\mathcal{B}_j = \left\{ z \in \mathbb{R}^n,\  \norm{z-z_j} \leq \epsilon \right\} \ (j \leq m)
+\end{equation*}
+We define $\mathcal{B}'_j$ by plunging $\mathcal{B}_j$ in $\mathbb{R}^{n+1}$:
+\begin{equation*}
+\mathcal{B'}_j = \left\{ (a_0, \ldots, a_{n}) \in \mathbb{R}^{n+1},\  a_0 = v_j^k \mathrm{\ and\ } (a_1, \ldots, a_{n}) \in \mathcal{B}_j \right\}
+\end{equation*}
+$\mathcal{B'}_j$ defines a convex cone $\mathcal{C}_j$ in $\mathbb{R}^{n+1}$:
+\begin{equation*}
+\mathcal{C}_j = \left\{ \alpha x  \in \mathbb{R}^{n+1},\ x \in \mathcal{B'}_j,\ \alpha \in \mathbb{R}^+ \right\}
+\end{equation*}
 
-Which is equivalent to the following formulation in $\mathbb{R}^n$:
-\begin{eqnarray*}
-&& \exists \textbf{u} \in \mathbb{R}^{n} \  s.t. \  \forall i \in \llbracket 1, k \rrbracket, \quad
-\norm{i\textbf{u} - \textbf{x}_i} \leq \epsilon\\
-\Leftrightarrow && \exists \textbf{u} \in \mathbb{R}^{n} \  s.t. \  \forall i \in \llbracket 1, k \rrbracket, \quad
-\norm{\textbf{u} - \frac{1}{i}\textbf{x}_i} \leq \frac{\epsilon}{i} \\
-\Leftrightarrow && \bigcap_{i=1}^{k} {\mathcal{B}}_i \neq \O,
-\end{eqnarray*}
-where $\mathcal{B}_i 
-\subset \mathbb{R}^n$ is the ball of center $\frac{1}{i}\textbf{x}_i$ 
-and radius $\frac{\epsilon}{i}$.
+No data point will be transmitted as long as:
+\begin{equation*}
+\bigcap_{j=0}^m{\mathcal{C}_j} \neq \O
+\end{equation*}
+Which, due to the definition of convex cones, implies that:
+\begin{equation*}
+\exists x=(a_0, \ldots a_n) \in \mathbb{R}^{n+1},\ \forall j \in \llbracket 0, m \rrbracket,\ \forall \alpha \in \mathbb{R^+}, \alpha x \in \mathcal{C}_j
+\end{equation*}
+Without loss of generality, we can assume that $a_0=v^k_1$ since any multiple
+of $x$ is also in $\mathcal{C}_j$. 
+This implies that $x \in \mathcal{B}'_1$.
+
+
+
 
 \subsection{Effect of the norm}
 
@@ -191,7 +268,9 @@ $\sqrt{n}$ in dimension $n$, and increases the compression ratio by xxx.
 %~ \end{eqnarray*}
 
 
-
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv,biblio.bib}
+\end{document}
 
 
 \section{Implementation}
@@ -427,8 +506,7 @@ Mohammad Lateral bicep data which include 41428, produced in proximate 14 minute
 \end{table}
 
 
-\bibliographystyle{IEEEtran}
-\bibliography{IEEEabrv,biblio.bib}
+
 
 
 \end{document}
