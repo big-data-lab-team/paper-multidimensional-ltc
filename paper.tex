@@ -2,9 +2,13 @@
 
 % packages
 \usepackage{algorithm}
-\usepackage{algorithmic}
-\renewcommand{\algorithmicrequire}{\textbf{Input:}}
-\renewcommand{\algorithmicensure}{\textbf{Output:}}
+%\usepackage{algorithmic}
+\usepackage{algorithmicx} % Doc is at http://tug.ctan.org/macros/latex/contrib/algorithmicx/algorithmicx.pdf
+\usepackage{algpseudocode}
+%\newtheorem*{theorem}{Lemma}
+
+%\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+%\renewcommand{\algorithmicensure}{\textbf{Output:}}
 %\usepackage{algpseudocode}
 \usepackage{amsfonts} % for R symbol (the set of real numbers)
 \usepackage{color}
@@ -19,6 +23,8 @@
 \usepackage{nicefrac}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{stmaryrd}
+\usepackage{amsthm}
 \DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 \DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
 
@@ -29,10 +35,14 @@
   \color{blue}\emph{[Note: #1]}
   \color{black}
 }
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\newtheorem*{theorem}{Theorem}
+
 
 \begin{document}
 
-\title{A multi-dimensional extension of the Lightweight Temporary Compression method}
+\title{A multi-dimensional extension of the Lightweight Temporal Compression method}
 
 \author{Bo Li, Tristan Glatard\\
   Department of Computer Science and Software Engineering\\ Concordia University, Montreal, Quebec, Canada\\
@@ -41,42 +51,264 @@
 \maketitle
 
 \begin{abstract}
-\end{abstract}
-
-\section{Introduction}
-
-LTC is among the stream compression method that provides the highest
-compression rate for the lowest resource (CPU, RAM) consumption. As
-such, it makes it a very good candidate for the compression of data
-streams acquired in embedded, low-power systems such as connected
+Lightweight Temporal Compression
+(LTC~\cite{schoellhammer2004lightweight}) is among the stream
+compression method that provides the highest compression rate for the
+lowest resource (CPU, RAM) consumption. As such, it makes it a very
+good candidate for the compression of data streams acquired in
+embedded, low-power systems such as connected
 objects, systems on module (SoMs), etc The type of data acquired on
 such systems, however, is often multi-dimensional. For instance
 accelerometers and gyroscopes usually measure variables along 3
 directions, these variables being distinct but related through the
 actual movement of the sensor. In this paper, we investigate the
-extension of LTC to higher dimensions. First, we express the algorithm
-in an arbitrary vectorial space of dimension $n$. Second, we
-instantiate it for the Euclidean and xxx distances, in spaces of
+extension of LTC to higher dimensions. First, we provide a formulation of the algorithm
+in an arbitrary vectorial space of dimension $n$. Furthermore, we
+implement the algorithm for the infinity and Euclidean norms, in spaces of
 dimension 2D+t and 3D+t. Finally, we compare the multi-dimensional LTC
 to the 1-dimensional version, on gyroscopic data acquired on a SoM
 device.
+\end{abstract}
+
+\section{Introduction}
+
+Section~\ref{sec:ltc} provides some background on the LTC algorithm.
+Section~\ref{sec:extension} presents our formulation in dimension $n$.
+
+% Some related works from Bo's report
+
+
+% transmitted, received points
+
+% contributions: formalization of LTC algorithm, extension to n d, extension to any norm, open-source implementation.
 
 \section{Lightweight Temporal Compression}
+\label{sec:ltc}
 
-Summarize existing paper.
+LTC approximates the data stream
+by a piece-wise linear function of time, ensuring that the error at
+every time-point is bounded.
 
-Lightweight temporal compression (LTC) is one of the linear estimation
- method to compress data. It is The first-order interpolator with two
-degrees of freedom(FOI-2DF) which is mentioned in ~\cite{jalaleddine1990ecg}.
-Most of linear estimation method need a predefined parameter which is
-the error margin (let's call $\epsilon$) in order to guarantee the
-difference between estimation and original data within a scope.
+\subsection{Notations}
 
-\todo{rewrite LTC algorithm, and there is a DP version of LTC maybe should also be written}
+The algorithm \emph{receives} a stream of \emph{data points} $x_i$
+at times $t_i$ ($i \in \mathbb{N}$), and it \emph{transmits} a stream of data points $\xi_i$
+at times $\tau_i$ ($i \in \mathbb{N}$). To simplify the notations, we assume that:
+\begin{equation*}
+\forall k \in \mathbb{N}, \  \exists ! i \in \mathbb{N} \  \tau_k = t_i
+\end{equation*}
+That is, transmission times coincide with reception times.
+We define the \emph{centered received points} as follows:
+\begin{equation*}
+\forall k \in \mathbb{N}\ , \forall j \in \mathbb{N^*},\ (u^k_j, y^k_j) = (t_{i+j}, x_{i+j}), \quad \mathrm{where\ }i\mathrm{\ is\ s.t.}\ t_i = \tau_k.
+\end{equation*}
+and:
+\begin{equation*}
+\forall k \in \mathbb{N},\  (u^k_0, y^k_0) = (\tau_k, \xi_k).
+\end{equation*}
+This definition is such that $y^k_j$ is the $j^{th}$ data point received
+after the $k^{th}$ transmission.
+Figure~\ref{fig:ltc} illustrates the notations and algorithm.
+\begin{figure}
+\includegraphics[width=\columnwidth]{ltc.pdf}
+\caption{Illustration of the LTC algorithm and notations used. Red dots indicate transmitted points. Dashed lines
+represent the high line and the low line at times when a point is transmitted.}
+\label{fig:ltc}
+\end{figure}
+\subsection{LTC algorithm}
+
+The LTC algorithm maintains two lines, the \emph{high line}, and the
+\emph{low line} defined by (1) the latest transmitted point and (2) the
+\emph{high point} (high line) and the \emph{low point} (low line). When
+a point ($t_i$, $x_i$) is received, the high line is updated as
+follows: if $x_i+\epsilon$ is below the high line then the high line is
+updated to the line defined by the last transmitted point and ($t_i$,
+$x_i+\epsilon$); otherwise, the high line is not updated. Likewise, the low line
+is updated from $x_i-\epsilon$. Therefore, any line located between the
+high line and the low line approximates the data points received since
+the last transmitted point with an error bounded by $\epsilon$.
+
+Using these notations, the original LTC algorithm can
+be written as in Algorithm~\ref{algo:ltc}. For readability, we assume
+that access to data points is blocking, i.e., the program will wait
+until the points are available. We also assume that the content of
+variable \texttt{tr} is transmitted after each assignment of this
+variable. Function \texttt{line}, omitted for brevity, returns the
+ordinate at abscissa $x$ (1st argument) of the line defined by the points
+in its 2nd and 3rd arguments.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\State tr = $(u^0_0, y^0_0)$ \Comment{last transmitted point}
+\State k = 0 ; j = 1
+\State (lp, hp) = ($y^1_1 - \epsilon$, $y^1_1 + \epsilon$) \Comment{low and high points}
+
+\While{True} \Comment{Process received points as they come}
+    \State j += 1
+    \State new\_lp = max($y^k_j-\epsilon$, line($u^k_j$, tr, ($u^k_{j-1}$, lp)))
+    \State new\_hp = max($y^k_j+\epsilon$, line($u^k_j$, tr, ($u^k_{j-1}$, hp)))
+    \If{new\_lp $<$ new\_hp} \Comment{Keep compressing}
+        \State (lp = new\_lp, new\_hp)
+        \State \textbf{continue}
+    \EndIf
+    \State tr = $(u^k_j, (lp+hp)/2)$
+    \Comment{Transmit point}
+    \State (lp, hp) = ($y^k_j-\epsilon$, $y^k_j+\epsilon$)
+    \State k += 1
+    \State j = 0
+\EndWhile
+\end{algorithmic}
+\caption{Original LTC algorithm, adapted from~\cite{schoellhammer2004lightweight}.}
+\label{algo:ltc}
+\end{algorithm}
+
+
+ %~ is one of the linear estimation
+%~ method to compress data. It is The first-order interpolator with two
+%~ degrees of freedom (FOI-2DF) which is mentioned in
+%~ ~\cite{jalaleddine1990ecg}.  Most of linear estimation method need a
+%~ predefined parameter which is the error margin (let's call $\epsilon$)
+%~ in order to guarantee the difference between estimation and original
+%~ data within a scope.
+
+%~ \todo{rewrite LTC algorithm, and there is a DP version of LTC maybe should also be written}
 
 \section{Extension to dimension $n$}
+\label{sec:extension}
+In this section we provide a norm-independent formulation of LTC in
+dimension $n$. By $n$ we refer to the dimension of the data points
+$x_i$. To handle time, LTC actually operates in dimension
+$n+1$.
+
+\subsection{Preliminary comments}
+
+We note that the formulation of LTC in~\cite{schoellhammer2004lightweight} relies on
+the intersection of \emph{convex cones} in dimension $n+1$. For $n=1$, it
+corresponds to the intersection of triangles, which can efficiently be
+computed by maintaining boundary lines, as detailed previously. In higher dimension, however, cone intersections are not so
+straighforward, due to the fact that the intersection between cones
+may not be a cone.
+
+To address this issue, we formulate LTC as an intersection test between
+\emph{balls} of dimension $n$, that is, segments for $n=1$, disks for
+$n=2$, etc. Balls are defined from the \emph{norm} used in
+the vector space of data points. For $n=1$, the choice of the norm does
+not really matter, as all p-norms and the infinity norm are identical.
+In dimension $n$, however, norm selection will be critical.
+
+\subsection{Algebraic formulation of LTC}
+
+\subsubsection{Definitions}
+
+Let $(u_0^k, y_0^k) \in \mathbb{R}^{n+1}$ be the latest transmitted point. For convenience, all the subsequent points will be
+expressed in the orthogonal space with origin $(\tau^k, \xi^k)$. We denote by $(v_j, z_j)_{j \in \llbracket 0, m \rrbracket}$ such points:
+\begin{equation*}
+\forall j \leq m,\  (v_j, z_j) = (u_j^k - \tau^k, y_j^k - \xi^k)
+\end{equation*}
+We define $\mathcal{B}_j$ as the ball of $\mathbb{R}^n$ of center $\frac{1}{j}z_j$ and of radius
+$\frac{\epsilon}{j}$:
+\begin{equation*}
+\mathcal{B}_j = \left\{ z \in \mathbb{R}^n,\  \norm{z-\frac{v_1}{v_j}z_j} \leq \frac{v_1}{v_j}\epsilon \right\}
+\end{equation*}
+
+\subsection{LTC property}
+
+We formulate the \emph{LTC property} as follows:
+\begin{equation*}
+\exists z \in \mathbb{R}^n, \ \forall j \in \llbracket 1, m \rrbracket, \norm{\frac{v_j}{v_1}z-z_j} \leq \epsilon.
+\end{equation*}
+The LTC algorithm ensures that the LTC property is
+verified between each transmission. Indeed, all the data points
+$z$ such that $(v_1, z)$ is between the high line and the low line
+verify the property. Line 9 in Algorithm~\ref{algo:ltc} guarantees that
+such a point exists.
+The LTC property can be written as follows:
+\begin{equation*}
+\exists z \in \mathbb{R}^n, \ \forall j \in \llbracket 1, m \rrbracket, \norm{z-\frac{v_1}{v_j}z_j} \leq \frac{v_1}{v_j}\epsilon
+\end{equation*}
+that is:
+\begin{equation}
+\bigcap_{j=1}^m \mathcal{B}_j \neq \O
+\label{eq:ltc-property}
+\end{equation}
+Note that $(\mathcal{B}_j)_{j \in \llbracket 1, m \rrbracket}$ is a sequence
+of balls of strictly decreasing radius, since $v_j > v_1$.
+\todo{Add a figure to illustrate this}
+
+\subsection{Algorithm}
+
+The LTC algorithm generalized to dimension $n$ test, for each data point,
+that the LTC property in Equation~\ref{eq:ltc-property} is verified. It is written in
+Algorithm~\ref{algo:general-ltc}.
+\begin{algorithm}
+\begin{algorithmic}[1]
+\State tr = ($\tau, \xi$) = ($u^0_0, y^0_0$)
+\State k = 0 ; j = 0
+\While{True}
+    \State j += 1
+    \State ($v_j, z_j$) = ($u_j^k - \tau, y_j^k - \xi$)
+    \If{$\bigcap_{l=1}^j{\mathcal{B}_l} \neq \O$}
+        \State \textbf{continue}
+    \EndIf
+    \State Pick $z$ in $\bigcap_{l=1}^{j-1}{\mathcal{B}_j}$
+    \State tr = ($\tau$, $\xi$) = ($u^k_{j-1}, z$)
+    \State k += 1
+    \State j = 0
+\EndWhile
+\end{algorithmic}
+\caption{Generalized LTC}
+\label{algo:general-ltc}
+\end{algorithm}
+
+\todo{Check algorithms (reimplement)}
+
+\subsection{Ball intersections}
+
+Although Algorithm~\ref{algo:general-ltc} looks simple, one should not
+overlook the fact that there is no good general algorithm to test
+whether a set of balls intersect. The best general algorithm we could find
+so far relies on Helly's theorem which is formulated as follows~\cite{helly1923mengen}:
+\begin{theorem}
+Let $\left\{ X_i \right\}_{i \in \llbracket 1, m \rrbracket}$ be a collection of convex subsets of $\mathbb{R}^n$. If the intersection of every $n+1$
+subsets is non-empty, then the whole collection has an non-empty intersection.
+\end{theorem}
+This theorem leads to an algorithm of complexity ${m \choose n+1}$ which is
+not usable in resource-constrained environment.
+
+The only feasible algorithm that we found is norm-specific. It
+maintains a representation of the intersection
+$\bigcap_{j=1}^{m}{\mathcal{B}_m}$ which is updated at every iteration.
+The intersection tests can then be done in constant time, however,
+updating the representation of the intersection may be more costly
+depending on the norm used. For the infinity norm, the representation
+is a rectangular cuboid which is straightforward to update by
+intersection with an n-ball, since the n-ball is a rectangular cuboid too.
+For the Euclidean norm, the representation is a volume with no specific property,
+which is more costly to maintain.
+
+\subsection{Effect of the norm}
+
+As mentioned before, norm selection in $\mathbb{R}^n$ has a critical
+impact on the compression error and ratio. To appreciate this effect,
+let us consider the comparison between the infinity norm and the
+Euclidean norm in dimension 2. By comparing the unit disk to the unit
+square, we obtain that the compression ratio of a random stream would
+be $\frac{4}{\pi}$ times larger with the infinity norm than with the
+Euclidean norm. Conversely, a compression error bounded by $\epsilon$
+with the infinity norm corresponds to a compression error of
+$\frac{\epsilon}{\sqrt{2}}$ with the Euclidean norm. Unsurprisingly, the
+infinity norm is more 'tolerant' than the Euclidean norm.
+
+\todo{Perhaps add a figure}
+
+It should also be noted that using the infinity norm boils down to the
+use of the 1D LTC algorithm independently in each dimension: a data
+point is transmitted as soon as the linear approximation doesn't hold
+in any of the coordinates. \todo{This is unclear}
 
 
+\section{Implementation}
+Our code is available at ... (make a clean release!)
 In practice, It's needed to transmit raw data which has multi-parameters
 to clients e.g. Accelerometer, Euler Angle and Magnetometer etc.
 Most of previous paper just force on single dimension sensor
@@ -122,23 +354,27 @@ for tolerance range, it depends on EPSILON and different type of distances for E
 If we using Manhattan distance to create tolerance range, it would become rectangle in 2D and cube for 3D.
 But the tolerance range wold become disk or ball in 2D and 3D respectively, by using Euclidean distance.
 \todo{maybe need a graphic}
-
-
-
-
-In practice, It's needed to transmit raw data which has multi-parameters to clients e.g. Accelerometer, Euler Angle and Magnetometer etc. LTC not work well when we transmit multi-parameters data, cause if we just implement LTC for each parameter, the difference between estimation and origin could exceed error margin which was set in advance. For instance, there is a data $(x, y)$ with two parameters, and using LTC for both parameter respectively. According to LTC method $\mid{\hat{x}-x}\mid\leqslant \epsilon$~\cite{jalaleddine1990ecg}, the estimation may be $(\hat{x}=x+\epsilon, \hat{y}=y+\epsilon)$, then the difference between estimation and original data $(x,y)$ is which is bigger than error margin predefined. In this case, we design a new algorithm, which is multi-parameter version of LTC, and it also work with any type of distance. In standard LTC method, it checks if there is overlapping part between new sector area and recorded range. However, in our multidimensional method, we will map every data point into same time-stamp e.g. $t_0$. It is convenient for us to calculate distance between them and check if overlapping range exists. we provide Multidimensional-LTC with Euclidean and Manhattan distance in below.
-
-\section{Implementation}
-Our code is available at ... (make a clean release!)
 \todo{below content is useful? }
 \subsection{Multidimensional LTC with Manhattan distance}
-In practice, Multidimensional LTC is same as implementing LTC in each parameter respectively. But we did some changes in our method. Assume $(x_{i1}, x_{i2}, ..., x_{in},t_i)$ is the $i_{th}$ coming data with n-dimension, and a base data point Z  $(z_{1}, z_{2}, ..., z_{n},t_z)$~\cite{schoellhammer2004lightweight}. We map each coming data to $t_1$ time-stamp and create a bounding box for recording overlapping range which includes upper and lower bound for each dimension base on $t_1$. cause the time different between two adjacent data, so the $i_th$ data after mapping is $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
-After that updating tolerance range by adding designed error margin which after mapping
-$\frac{\epsilon}{t_i-t_z}$ on $\hat{x_{ij}}, j={1...n}$ with Manhattan distance. checking if there is overlap between tolerance and bounding box.The algorithm is as follows.
 
-\note{not clear about Manhattan distance, in my opinion for each axis the distance less than $EPSILON/t_i-t_0$ + bounding box length}
+In practice, Multidimensional LTC is same as implementing LTC in each
+parameter respectively. But we did some changes in our method. Assume
+$(x_{i1}, x_{i2}, ..., x_{in},t_i)$ is the $i_{th}$ coming data with
+n-dimension, and a base data point Z  $(z_{1}, z_{2}, ...,
+z_{n},t_z)$~\cite{schoellhammer2004lightweight}. We map each coming
+data to $t_1$ time-stamp and create a bounding box for recording
+overlapping range which includes upper and lower bound for each
+dimension base on $t_1$. cause the time different between two adjacent
+data, so the $i_th$ data after mapping is $(\{\hat{x_{ij}}=z_j +
+\frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
+After that updating tolerance range by adding designed error margin
+which after mapping $\frac{\epsilon}{t_i-t_z}$ on $\hat{x_{ij}},
+j={1...n}$ with Manhattan distance. checking if there is overlap
+between tolerance and bounding box.The algorithm is as follows.
 
-At beginning of the algorithm, we need a base point (which we will call \textit{z}) and bounding box which has upper and lower bound for each parameter respectively.Then start the algorithm.
+At beginning of the algorithm, we need a base point (which we will call
+\textit{z}) and bounding box which has upper and lower bound for each
+parameter respectively.Then start the algorithm.
 \begin{enumerate}
   \item Initialization: Get first data point, and set point \textit{z} equals to first data point. Get the second data point $(x_{21},...,x_{2n},t_2)$, and assign each upper bound $U_j = x_{2j}+\frac{\epsilon}{t_2-t_1}$ and lower bound $L_j = x_{2j}-\frac{\epsilon}{t_2-t_1}$ where $j=\{1...n\}$.
   \item Get next data point, map the data point $(x_{i1},...,x_{in},t_i)$ into $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
@@ -151,7 +387,40 @@ At beginning of the algorithm, we need a base point (which we will call \textit{
 \end{enumerate}
 
 \subsection{Multidimensional LTC with Euclidean distance}
-In Euclidean distance version, we also map the coming data into same time-stamp $t_{1}$ the timestamp after base point. The difference with Manhattan distance version is that recording overlapping part with a post-designed model is difficult, which need retain several arcs in 2-dimension, or convex surfaces in 3-dimension. In our method, we will record all tolerance range for every mapped data which come from base data point until coming data point, in order to checking if there is intersection among them. For instance, in 3D-t, assume we have a the base point $Z = D_{0}$ and the tolerance range $R_{1}$ which is a ball as the intersection S. we need a list L to record mapped balls from $D_{1}$ to coming data. For each comming data $D_i, i>{1}$ mapping this data into $t_{1}$, and add it into list. Then the work is check out if all balls intersect, and form a public intersection. The method is based on plane sweep and binary search. At first, select one parameter, such as x-axis, finding a bounding range of all balls $B_i$ in x-axis. suppose $Max_bound_x = Min{1..n}{B_i.center.x + EPSILON/i}$, and $Min_bound_x = Max{1..n}{B_i.center.x - EPSILON/i}$. If there is overlap among balls, then the axis of the points inside intersection must located between Min_bound_x and Max_bound_x. Using binary search to select mid_x = (Min_bound_x + Max_bound_x)/2, then calculate a y-axis bounding with the plane x = mid_x. If the get bounding range in y-axis where $Max_bound_y > Min_bound_y$ and using binary search again to find mid_y, It means there is a line x=mid_x, Max_bound_y>= y >= Min_bound_y, parallels z-axis, could pass through all balls. Finally, in z-axis, compute bounding range, and If $Max_bound_z > Min_bound_z$, there must be one or more points inside all balls. The problem be solved. If the loop of binary search in x-axis overs, then there is no public intersection among balls, and need to transmit and update base point. In this method we need O(n*logn*logn) time complexity for binary search in x-axis and y-axis and traversal all balls in z-axis, also O(n) space complexity is needed for maintaining list. According this method, it could be extended into N-dimensional data. The main idea is to search, dimension by dimension, from a room or plane or line and get intersection point finally.
+In Euclidean distance version, we also map the coming data into same
+time-stamp $t_1$ the timestamp after base point. The difference with
+Manhattan distance version is that recording overlapping part with
+a post-designed model is difficult, which need retain several arcs in
+2-dimension, or convex surfaces in 3-dimension. In our method, we will
+record all tolerance range for every mapped data which come from base
+data point until coming data point, in order to checking if there is
+intersection among them. For instance, in 3D-t, assume we have a the
+base point $Z = D_0$ and the tolerance range $R_1$ which is a ball
+as the intersection S. we need a list L to record mapped balls
+from $D_1$ to coming data. For each comming data $D_i, i>1$ mapping
+this data into $t_1$, and add it into list. Then the work is check out
+if all balls intersect, and form a public intersection. The method is
+based on plane sweep and binary search. At first, select one parameter,
+such as x-axis, finding a bounding range of all balls $B_i$ in x-axis.
+suppose $Max_bound_x = Min{1..n}{B_i.center.x + EPSILON/i}$, and
+$Min_bound_x = Max{1..n}{B_i.center.x - EPSILON/i}$. If there is overlap
+among balls, then the axis of the points inside intersection must located
+between Min_bound_x and Max_bound_x. Using binary search to select
+mid_x = (Min_bound_x + Max_bound_x)/2, then calculate a y-axis bounding
+with the plane x = mid_x. If the get bounding range in y-axis where
+$Max_bound_y > Min_bound_y$ and using binary search again to find mid_y,
+It means there is a line x=mid_x, Max_bound_y>= y >= Min_bound_y,
+parallels z-axis, could pass through all balls. Finally, in z-axis,
+computing bounding range, and If $Max_bound_z > Min_bound_z$, there
+must be one or more points inside all balls. The problem be solved.
+If the loop of binary search in x-axis overs, then there is no public
+intersection among balls, and need to transmit and update base point.
+In this method we need O(n*logn*logn) time complexity for binary search
+in x-axis and y-axis and traversal all balls in z-axis, also O(n) space
+complexity is needed for maintaining list. According this method,
+it could be extended into N-dimensional data. The main idea is to search,
+dimension by dimension, from a room or plane or line and get intersection
+point finally.
 
 \todo{below content is useful? }
 In the rest of this section, we describe examples for 2-dimensional and 3-dimensional version. After that, we extend the method for n-dimension.
@@ -162,9 +431,141 @@ In the rest of this section, we describe examples for 2-dimensional and 3-dimens
 
 At first, let us solve the \textit{n} disks intersect. We use a algorithm which is based on plane sweep and dichotomy. Assume a disk include center$(x,y)$ and radius $r$. The pseudo-code in Algorithm 1.
 
+\begin{algorithm}
+    \caption{whether disks intersect}
+    \begin{flushleft}
+        \textbf{Input:} $l$ - list of disks, $d$ - mapped coming disk, $p$ - point will be base point\\
+        \textbf{Output:} $true|false$  is there a intersection\\
+        \textbf{function} isIntersect$(l, d, p)$
+    \end{flushleft}
+    \begin{algorithmic}[1]
+        \State $tmp_list \gets null$
+        \State $max\_x\gets d.x+d.r$
+        \State $min\_x\gets d.x-d.r$
+
+        \ForAll{$old\_disk$ \textbf{in} $l$}
+            \If{$d \cap old\_disk = \emptyset$} % distance(d.center, old\_disk.center) > d.r + old\_disk.r
+                \State \textbf{return} false
+            \ElsIf{$d \cap old\_disk \neq d$}
+                \State {$\textbf{add } old\_disk \textbf{ into } tmp\_list$\\
+                        $max\_x\gets $ MIN($max\_x, old\_disk.x+old\_disk.r$)\\
+                        $min\_x\gets $ MAX($min\_x, old\_disk.x-old\_disk.r$)}
+            \EndIf
+        \EndFor
+        \State $\textbf{add } d \textbf{ into } tmp\_list$
+        \If{$max\_x < min\_x$}
+            \State \textbf{return} false
+        \EndIf
+        \While{$min\_x \leqslant max\_x$}
+            \State $mid \gets (min\_x + max\_x)/2$
+            \State $max\_y \gets +\infty$
+            \State $min\_y \gets -\infty$
+            \For{$i=1$ \textbf{to} $tmp\_list.length$}
+                \State $P_1$ and $P_2$ are intersection points of $tmp\_list[i]$ and line $x=mid$, $(P1.y\geqslant P2.y)$
+                \If{$P_1.y < max\_y$}
+                    \State $max\_y \gets p_1.y$
+                    \State $max\_index \gets i$
+                \EndIf
+                \If{$P_2.y > min\_y$}
+                    \State $min\_y \gets p_2.y$
+                    \State $min\_index \gets i$
+                \EndIf
+            \EndFor
+            \If{$max\_y >= min\_y$}
+                \State $p.x \gets mid$
+                \State $p.y \gets (max\_y+min\_y)/2$
+                \State $l \gets tmp\_list$
+                \State \textbf{return} true
+            \EndIf
+            \State {Assume $P_d$ is the intersection between line of
+            centers from $tmp\_list[max\_index]$ and $tmp\_list[min\_index]$
+            , and their common chord}
+            \If{$P_d.x < mid$}
+                \State $max\_y \gets mid-1$
+            \ElsIf{$P_d.x > mid$}
+                \State $min\_y \gets mid+1$
+            \EndIf
+        \EndWhile
+        \Return false
+    \end{algorithmic}
+\end{algorithm}
+
 The main idea of the algorithm is, remove the bigger disk who contains mapped coming disk. It maybe increase Computational efficiency in the rest of algorithm, cause mapped coming disk is the smallest one than all in list of disks. Then we make a bounding range for x-axis and select a x-value $mid$ by using dichotomy method in order to calculate if a point $(y, mid)$ is included all disks. The complexity of this algorithm is $O(n)+O(n\log\epsilon) = O(n\log\epsilon)$.
 
 For 3-dimension, assume data point like $(x, y, z)$ also need time-stamp t, we can also use above method by selecting $x$ and $y$ with dichotomy method and then check if there are points $(mid\_x, mid\_y, z)$ included by all balls. It needs $O(\log^2\epsilon)$ to determine $mid\_x, mid\_y$, and $O(n)$ to traverse all balls in list and calculate $z$. So 3-dimensional method need $O(n \log^2\epsilon)$ totally. If we extend this idea for n-dimension, suppose that the coming data is $(x_1,x_2,...,x_n)$ and the mapped data is a object with center $(d_1,d_2,...d_n)$ and radius $r$. The pseudo-code would show like Algorithm 2.
+
+\begin{algorithm}
+    \caption{whether intersect  for n dimension}
+    \begin{flushleft}
+        \textbf{Input:} $l$ - list object, $o$ - object of mapped coming data, $p$ - point will be base point\\
+        \textbf{Output:} $true|false$  is there a intersection\\
+        \textbf{function} isIntersect$(l, o, p)$
+    \end{flushleft}
+    \begin{algorithmic}[1]
+        \State $tmp_list \gets null$
+        \State $max \gets o.d\_n+o.r$
+        \State $min \gets o.d\_n-o.r$
+
+        \ForAll{$old\_obj$ \textbf{in} $l$}
+            \If{$o \cap old\_obj = \emptyset$}
+                \State \textbf{return} false
+            \ElsIf{$o \cap old\_obj \neq o$}
+                \State {$\textbf{add } old\_obj \textbf{ into } tmp\_list$\\
+                        $max\gets $ MIN($max, old\_obj.d\_n+old\_obj.r$)\\
+                        $min\gets $ MAX($min, old\_obj.d\_n-old\_obj.r$)}
+            \EndIf
+        \EndFor
+        \State $\textbf{add } o \textbf{ into } tmp\_list$
+        \If{$max < min$}
+            \State \textbf{return} false
+        \EndIf
+        $p\_cp \gets p$
+        \If{Recursive$(min, max, n, p\_cp)$}
+            \State $p \gets p\_cp$
+            \State \textbf{return} true
+        \Else
+            \State \textbf{return} false
+        \EndIf
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+    \begin{flushleft}
+        \textbf{function} Recursive$(left, right, j, p)$  -- $j$ means $j_th$ dimension
+    \end{flushleft}
+    \begin{algorithmic}[1]
+        \While{$left \leqslant right$}
+            \State $mid \gets (left + right)/2$
+            \State $max \gets +\infty$
+            \State $min \gets -\infty$
+            \For{$i=1$ \textbf{to} $tmp\_list.length$}
+                \State $P_1$ and $P_2$ are intersection points of $tmp\_list[i]$ and line $d_{j}=mid$, $(P1.d_{j-1}\geqslant P2.d_{j-1})$
+                \If{$P_1.d_{j-1} < max$}
+                    \State $max \gets p_1.d_{j-1}$
+                    \State $max\_index \gets i$
+                \EndIf
+                \If{$P_2.d_{j-1} > min$}
+                    \State $min \gets p_2.d_{j-1}$
+                    \State $min\_index \gets i$
+                \EndIf
+            \EndFor
+            \If{$max >= min$}
+                \State $p.d_j \gets mid$
+                \If{Recursive$(min, max, j-1, p)$}
+                    \State \textbf{return} true
+                \EndIf
+            \EndIf
+            \State Assume $P_d$ is the intersection between common chord of two objects $tmp\_list[max\_index]$, $tmp\_list[min\_index]$ and their line of centers.
+            \If{$P_d.d_j < mid$}
+                \State $right \gets mid-1$
+            \ElsIf{$P_d.d_j > mid$}
+                \State $left \gets mid+1$
+            \EndIf
+
+        \EndWhile
+        \Return false
+    \end{algorithmic}
+\end{algorithm}
 
 \section{Results}
 \todo{ result table ?}
@@ -211,6 +612,20 @@ And vigorous exercise, with same condition, it extends 5.7(19.7\%)
 and 4.8(16.7\%) hours. So LTC-Euclidean and LTC-Manhattan are useful
 to save devices Energy. At same time, The fidelity is guaranteed.
 
+\todo{ update }
+try using difference data set to measure compression radio, Error
+and energy usage. The numerical value presented below, is the
+average value in 5 seconds. The current electric current for Neblina
+without transmit is ***. we received 4000 data for human running and
+walking in 200Hz. Because of the limite RAM, for energy test, we only
+could save 400 static data into Neblina. We make 400 data run as a circle.
+For walking, one time swing arm need 1.2 second. Every 400 data must have 1 arm swing.
+change epsilon in order to decrease compression radio, measuring energy consumption.
+
+\todo {running}
+If it's possible to save more static data?
+
+
 
 \begin{itemize}
     \item Data set: human activities, running, walking, jogging and work behind desk.
@@ -236,7 +651,7 @@ Mohammad Lateral bicep data which include 41428, produced in proximate 14 minute
 \section{Conclusion}
 
 \section*{Acknowledgement}
-\begin{table}[]
+\begin{table*}[]
     \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
     \hline
     \multicolumn{9}{|l|}{Dimension 2}                                                                                                                         \\ \hline
@@ -248,9 +663,9 @@ Mohammad Lateral bicep data which include 41428, produced in proximate 14 minute
     Max memory Usage(peak) & 80B          & 80B             & 432B        & 240B            & 80B        & 80B               & 2.1KB      & 1.3KB             \\ \hline
     Time Usage(Total)      & 0.103ms      & 0.082ms         & 0.220ms     & 0.200ms         & 5.70ms     & 4.85ms            & 20.04ms    & 19.28ms           \\ \hline
     \end{tabular}
-\end{table}
+\end{table*}
 
-\begin{table}[]
+\begin{table*}[]
     \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
     \hline
     \multicolumn{9}{|l|}{Dimension 3}                                                                                                                         \\ \hline
@@ -262,7 +677,8 @@ Mohammad Lateral bicep data which include 41428, produced in proximate 14 minute
     Max memory Usage(peak) & 112B         & 112B            & 384B        & 256B            & 112B       & 112B              & 4.9KB      & 3.0KB             \\ \hline
     Time Usage(Total)      & 0.119ms      & 0.094ms         & 0.230ms     & 0.200ms         & 8.50ms     & 7.07ms            & 26.41ms    & 21.26ms           \\ \hline
     \end{tabular}
-\end{table}
+\end{table*}
+
 
 \begin{table}[]
 \begin{tabular}{lllllll}
@@ -289,6 +705,7 @@ Energy Usage      & 3.098    & 3.020    & 3.134   & 2.952    & 3.320    & 3.393
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,biblio.bib}
+\end{document}
 
 
 \end{document}
