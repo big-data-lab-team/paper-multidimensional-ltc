@@ -309,82 +309,111 @@ in any of the coordinates. \todo{This is unclear}
 
 \section{Implementation}
 Our code is available at ... (make a clean release!)
-In practice, It's needed to transmit raw data which has multi-parameters
-to clients e.g. Accelerometer, Euler Angle and Magnetometer etc.
-Most of previous paper just force on single dimension sensor
-data Compression. So we purpose a method to compress multi-dimensional
-sensor data named LTC-D. It is used as linear estimation method.
-Same as usual estimation compression method,  distance(different)
-with compressed data from LTC-D and original data would not exceed
-the predefined error range. We need to find line to represent
-original data, it means the lines pass through datas' error range.
-But in stream data, time seires data, it is difficult, because
-all data do not show in same time plane. So this method will
-mapping all data into one time plane. Then for each mapped error
-range of data, check if there is intersection among them. If so means
-there is a line could represent original data, and vice versa.
 
-The method as below: assume the stream $i_{th}$ data
-$D_i = (x_{i1}, x_{i2}, ..., x_{in},t_i)$, the first data $D_0$ would
-be save as base point $Z=(z_{1}, z_{2}, ..., z_{n},t_z)$in the Method.
-As usual, the timestamp after basepoint would be set as mapping plane.
-We also need to record the intersect $S$ for find result lines.
-The first data $D_1$ would change into tolerance range $R_1$.
-initializing $S = R_1$. For each follow data$ D_i, i>1$, mapping $D_1$
-into $\hat{D_1}$ = $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$,
-and error margin after mapping should be $\frac{\epsilon}{t_i-t_z}$
-on $\hat{x_{ij}}, j={1...n}$. The tolerance range after R_i, intersect
-with S, if there is overlap, update S = S intersect R_i. If not, the base point
-would be transmited and select a point in S as base point with timestamp $t_{i-1}$.
+As reference above, the norm selection is importance. In this section,
+we show the implementation of infinity norm and Euclidean norm.
 
-\todo{refector}
-At beginning of the algorithm, we need a base point (which we will call \textit{z}) and bounding box which has upper and lower bound for each parameter respectively.Then start the algorithm.
-\begin{enumerate}
-  \item Initialization: Get first data point, and set point \textit{z} equals to first data point. Get the second data point $(x_{21},...,x_{2n},t_2)$, and assign each upper bound $U_j = x_{2j}+\frac{\epsilon}{t_2-t_1}$ and lower bound $L_j = x_{2j}-\frac{\epsilon}{t_2-t_1}$ where $j=\{1...n\}$.
-  \item Get next data point, map the data point $(x_{i1},...,x_{in},t_i)$ into $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
-  \item For each parameter(dimension) \textit{j}, if upper bound $U_j$ smaller than $x_{ij}-\frac{\epsilon}{t_i-t_1}$ or lower bound $L_j$ bigger than $x_{ij}+\frac{\epsilon}{t_i-t_1}$, then \textbf{goto 5}, else $U_j = min(U_j, x_{ij}+\frac{\epsilon}{t_i-t_1})$, and $L_j = max(L_j, x_{ij}-\frac{\epsilon}{t_i-t_1})$.
-  \item Goto 2.
-  \item output \textit{z} data point.
-  \item Reset: set data point \textit{z} equals to center of the bounding box with time-stamp $t_{i-1}$, and $U_j=x_{ij}+\frac{\epsilon}{t_i-t_{i-1}}$, $L_j =x_{ij}-\frac{\epsilon}{t_i-t_{i-1}}$ with $j=\{1...n\}$.
-  \item Goto 2.
-  \item After all, output \textit{z} data point and center of bounding box respectively.
-\end{enumerate}
-
-for tolerance range, it depends on EPSILON and different type of distances for EPSILON.
-If we using Manhattan distance to create tolerance range, it would become rectangle in 2D and cube for 3D.
-But the tolerance range wold become disk or ball in 2D and 3D respectively, by using Euclidean distance.
-\todo{maybe need a graphic}
-\todo{below content is useful? }
+%~ In practice, It's needed to transmit raw data which has multi-parameters
+%~ to clients e.g. Accelerometer, Euler Angle and Magnetometer etc.
+%~ Most of previous paper just force on single dimension sensor
+%~ data Compression. So we purpose a method to compress multi-dimensional
+%~ sensor data named LTC-D. It is used as linear estimation method.
+%~ Same as usual estimation compression method,  distance(different)
+%~ with compressed data from LTC-D and original data would not exceed
+%~ the predefined error range. We need to find line to represent
+%~ original data, it means the lines pass through datas' error range.
+%~ But in stream data, time seires data, it is difficult, because
+%~ all data do not show in same time plane. So this method will
+%~ mapping all data into one time plane. Then for each mapped error
+%~ range of data, check if there is intersection among them. If so means
+%~ there is a line could represent original data, and vice versa.
 \subsection{Multidimensional LTC with Manhattan distance}
-
-In practice, Multidimensional LTC is same as implementing LTC in each
-parameter respectively. But we did some changes in our method. Assume
-$(x_{i1}, x_{i2}, ..., x_{in},t_i)$ is the $i_{th}$ coming data with
-n-dimension, and a base data point Z  $(z_{1}, z_{2}, ...,
-z_{n},t_z)$~\cite{schoellhammer2004lightweight}. We map each coming
-data to $t_1$ time-stamp and create a bounding box for recording
-overlapping range which includes upper and lower bound for each
-dimension base on $t_1$. cause the time different between two adjacent
-data, so the $i_th$ data after mapping is $(\{\hat{x_{ij}}=z_j +
-\frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
-After that updating tolerance range by adding designed error margin
-which after mapping $\frac{\epsilon}{t_i-t_z}$ on $\hat{x_{ij}},
-j={1...n}$ with Manhattan distance. checking if there is overlap
-between tolerance and bounding box.The algorithm is as follows.
-
-At beginning of the algorithm, we need a base point (which we will call
-\textit{z}) and bounding box which has upper and lower bound for each
-parameter respectively.Then start the algorithm.
+In section 2, we can know that the repersentation of intersection
+is a rectangular cuboid. So only one bounding box with n-dimansional
+is needed to represent the intersection. Assume a bounding box
+$\mathcal{BOX}_{m-1} = \bigcap_{j=1}^{m-1}{\mathcal{B}_{m-1}}$ which
+has Upper bound $U_i$ and lower Bound $L_i$ for each dimension
+$i$. So the fomular (1) in $6_{th}$ line of Algorithm 2 would
+be changed to $\mathcal{BOX}_{m-1} \bigcap \mathcal{B}_{m} \neq \O $. The Bounding box
+would be updated when this formular return true.
+Otherwise return false.
 \begin{enumerate}
-  \item Initialization: Get first data point, and set point \textit{z} equals to first data point. Get the second data point $(x_{21},...,x_{2n},t_2)$, and assign each upper bound $U_j = x_{2j}+\frac{\epsilon}{t_2-t_1}$ and lower bound $L_j = x_{2j}-\frac{\epsilon}{t_2-t_1}$ where $j=\{1...n\}$.
-  \item Get next data point, map the data point $(x_{i1},...,x_{in},t_i)$ into $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
-  \item For each parameter(dimension) \textit{j}, if upper bound $U_j$ smaller than $x_{ij}-\frac{\epsilon}{t_i-t_1}$ or lower bound $L_j$ bigger than $x_{ij}+\frac{\epsilon}{t_i-t_1}$, then \textbf{goto 5}, else $U_j = min(U_j, x_{ij}+\frac{\epsilon}{t_i-t_1})$, and $L_j = max(L_j, x_{ij}-\frac{\epsilon}{t_i-t_1})$.
-  \item Goto 2.
-  \item output \textit{z} data point.
-  \item Reset: set data point \textit{z} equals to center of the bounding box with time-stamp $t_{i-1}$, and $U_j=x_{ij}+\frac{\epsilon}{t_i-t_{i-1}}$, $L_j =x_{ij}-\frac{\epsilon}{t_i-t_{i-1}}$ with $j=\{1...n\}$.
-  \item Goto 2.
-  \item After all, output \textit{z} data point and center of bounding box respectively.
+    \item Initialization: Let origin $(u^k_0, y^k_0) = (\tau_k, \xi_k)$.
+    \item For the each $m_{th}$ data $(u_m^k, y_m^k)$ with diminsion $n$,
+            defines $(v_m, z_m) = (u_m^k - \tau^k, y_m^k - \xi^k)$ where $z_m =
+            \{ x_{mi} \mid 1\leqslant{i}\leqslant{n}\}$.
+    \item The $\mathcal{B}_{m}$ should be a ractangular cube with center
+            $\frac{v_1}{v_j}z_m$ and weight $\frac{v_1}{v_j}\epsilon$.
+    \item For each dimension $i$, box upper bound $U_i < \frac{v_1}{v_j}x_{mi}+
+            \frac{v_1}{v_j}\epsilon$ OR lower bound $L_i > \frac{v_1}{v_j}x_{mi}-\frac{v_1}{v_j}\epsilon$, return False.
+    \item Otherwise, the intersection do not be empty. Updating
+            the Bounding box $\mathcal{BOX}_m = \mathcal{BOX}_{m-1} \bigcap \mathcal{B}_{m}$. For
+            each dimension $i$ in $\mathcal{BOX}_m$, $U_i = min(U_i, \frac{v_1}{v_j}x_{mi}+
+            \frac{v_1}{v_j}\epsilon})$, and $L_i = max(L_i , \frac{v_1}{v_j}x_{mi}-\frac{v_1}{v_j}\epsilon})$. Return True.
 \end{enumerate}
+
+
+% The method as below: assume the stream $i_{th}$ data
+% $D_i = (x_{i1}, x_{i2}, ..., x_{in},t_i)$, the first data $D_0$ would
+% be save as base point $Z=(z_{1}, z_{2}, ..., z_{n},t_z)$in the Method.
+% As usual, the timestamp after basepoint would be set as mapping plane.
+% We also need to record the intersect $S$ for find result lines.
+% The first data $D_1$ would change into tolerance range $R_1$.
+% initializing $S = R_1$. For each follow data$ D_i, i>1$, mapping $D_1$
+% into $\hat{D_1}$ = $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$,
+% and error margin after mapping should be $\frac{\epsilon}{t_i-t_z}$
+% on $\hat{x_{ij}}, j={1...n}$. The tolerance range after R_i, intersect
+% with S, if there is overlap, update S = S intersect R_i. If not, the base point
+% would be transmited and select a point in S as base point with timestamp $t_{i-1}$.
+
+% \todo{refector}
+% At beginning of the algorithm, we need a base point (which we will call \textit{z}) and bounding box which has upper and lower bound for each parameter respectively.Then start the algorithm.
+% \begin{enumerate}
+%   \item Initialization: Get first data point, and set point \textit{z} equals to first data point. Get the second data point $(x_{21},...,x_{2n},t_2)$, and assign each upper bound $U_j = x_{2j}+\frac{\epsilon}{t_2-t_1}$ and lower bound $L_j = x_{2j}-\frac{\epsilon}{t_2-t_1}$ where $j=\{1...n\}$.
+%   \item Get next data point, map the data point $(x_{i1},...,x_{in},t_i)$ into $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
+%   \item For each parameter(dimension) \textit{j}, if upper bound $U_j$ smaller than $x_{ij}-\frac{\epsilon}{t_i-t_1}$ or lower bound $L_j$ bigger than $x_{ij}+\frac{\epsilon}{t_i-t_1}$, then \textbf{goto 5}, else $U_j = min(U_j, x_{ij}+\frac{\epsilon}{t_i-t_1})$, and $L_j = max(L_j, x_{ij}-\frac{\epsilon}{t_i-t_1})$.
+%   \item Goto 2.
+%   \item output \textit{z} data point.
+%   \item Reset: set data point \textit{z} equals to center of the bounding box with time-stamp $t_{i-1}$, and $U_j=x_{ij}+\frac{\epsilon}{t_i-t_{i-1}}$, $L_j =x_{ij}-\frac{\epsilon}{t_i-t_{i-1}}$ with $j=\{1...n\}$.
+%   \item Goto 2.
+%   \item After all, output \textit{z} data point and center of bounding box respectively.
+% \end{enumerate}
+
+According the Implement, the infinity norm boils down to apply 1D LTC algorithm in each dimension respectively. Since, the intersection would be rectangle in 2D and cube in 3D, the corresponding max errors are $\frac{\epsilon}{\sqrt{2}}$ and $\frac{\epsilon}{\sqrt{3}}$. As we mentioned in Section 2, the infinity norm is more 'tolerant' than Euclidean norm. The max error between original data and reconstructed data certainly not greater than $\frac{\epsilon}{\sqrt{n}}$ where $n$ is dimension of data.
+% for tolerance range, it depends on EPSILON and different type of distances for EPSILON.
+% If we using Manhattan distance to create tolerance range, it would become rectangle in 2D and cube for 3D.
+% But the tolerance range wold become disk or ball in 2D and 3D respectively, by using Euclidean distance.
+\todo{maybe need a graphic}
+
+
+% In practice, Multidimensional LTC is same as implementing LTC in each
+% parameter respectively. But we did some changes in our method. Assume
+% $(x_{i1}, x_{i2}, ..., x_{in},t_i)$ is the $i_{th}$ coming data with
+% n-dimension, and a base data point Z  $(z_{1}, z_{2}, ...,
+% z_{n},t_z)$~\cite{schoellhammer2004lightweight}. We map each coming
+% data to $t_1$ time-stamp and create a bounding box for recording
+% overlapping range which includes upper and lower bound for each
+% dimension base on $t_1$. cause the time different between two adjacent
+% data, so the $i_th$ data after mapping is $(\{\hat{x_{ij}}=z_j +
+% \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
+% After that updating tolerance range by adding designed error margin
+% which after mapping $\frac{\epsilon}{t_i-t_z}$ on $\hat{x_{ij}},
+% j={1...n}$ with Manhattan distance. checking if there is overlap
+% between tolerance and bounding box.The algorithm is as follows.
+
+% At beginning of the algorithm, we need a base point (which we will call
+% \textit{z}) and bounding box which has upper and lower bound for each
+% parameter respectively.Then start the algorithm.
+% \begin{enumerate}
+%   \item Initialization: Get first data point, and set point \textit{z} equals to first data point. Get the second data point $(x_{21},...,x_{2n},t_2)$, and assign each upper bound $U_j = x_{2j}+\frac{\epsilon}{t_2-t_1}$ and lower bound $L_j = x_{2j}-\frac{\epsilon}{t_2-t_1}$ where $j=\{1...n\}$.
+%   \item Get next data point, map the data point $(x_{i1},...,x_{in},t_i)$ into $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
+%   \item For each parameter(dimension) \textit{j}, if upper bound $U_j$ smaller than $x_{ij}-\frac{\epsilon}{t_i-t_1}$ or lower bound $L_j$ bigger than $x_{ij}+\frac{\epsilon}{t_i-t_1}$, then \textbf{goto 5}, else $U_j = min(U_j, x_{ij}+\frac{\epsilon}{t_i-t_1})$, and $L_j = max(L_j, x_{ij}-\frac{\epsilon}{t_i-t_1})$.
+%   \item Goto 2.
+%   \item output \textit{z} data point.
+%   \item Reset: set data point \textit{z} equals to center of the bounding box with time-stamp $t_{i-1}$, and $U_j=x_{ij}+\frac{\epsilon}{t_i-t_{i-1}}$, $L_j =x_{ij}-\frac{\epsilon}{t_i-t_{i-1}}$ with $j=\{1...n\}$.
+%   \item Goto 2.
+%   \item After all, output \textit{z} data point and center of bounding box respectively.
+% \end{enumerate}
 
 \subsection{Multidimensional LTC with Euclidean distance}
 In Euclidean distance version, we also map the coming data into same
