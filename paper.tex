@@ -2,16 +2,11 @@
 
 % packages
 \usepackage{algorithm}
-%\usepackage{algorithmic}
 \usepackage{algorithmicx} % Doc is at http://tug.ctan.org/macros/latex/contrib/algorithmicx/algorithmicx.pdf
 \usepackage{algpseudocode}
-%\newtheorem*{theorem}{Lemma}
-
-%\renewcommand{\algorithmicrequire}{\textbf{Input:}}
-%\renewcommand{\algorithmicensure}{\textbf{Output:}}
-%\usepackage{algpseudocode}
 \usepackage{amsfonts} % for R symbol (the set of real numbers)
 \usepackage{color}
+\usepackage{colortbl} % for \rowcolor
 \usepackage[pdftex]{graphicx}
 \usepackage{graphicx}
 \usepackage[bookmarks=false]{hyperref}
@@ -36,8 +31,8 @@
   \color{black}
 }
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
-
 \newtheorem*{theorem}{Theorem}
+\definecolor{headcolor}{gray}{0.9}
 
 
 \begin{document}
@@ -296,7 +291,7 @@ square, we obtain that the compression ratio of a random stream would
 be $\frac{4}{\pi}$ times larger with the infinity norm than with the
 Euclidean norm. Conversely, a compression error bounded by $\epsilon$
 with the infinity norm corresponds to a compression error of
-$\frac{\epsilon}{\sqrt{2}}$ with the Euclidean norm. Unsurprisingly, the
+$\frac{\epsilon}{\sqrt{n}}$ with the Euclidean norm. Unsurprisingly, the
 infinity norm is more 'tolerant' than the Euclidean norm.
 
 \todo{Perhaps add a figure}
@@ -660,27 +655,142 @@ In 2-dimension Euclidean norm, the complexity of this algorithm is $O(n)+O(n\log
 \end{algorithm}
 
 \section{Results}
-\todo{ result table ?}
-\subsection{Experiment 1: Pilot tests on Computer}
-In this experiment, in order to compare the performance in different norm, different EPSILON and different dataset. We collected 2 data set from Neblina, 5-times bicep curl data and Mohammad Lateral bicep curl.
-\begin{itemize}
-    \item Data set: 5-times bicep curl which includes 613 data;
-                    Mohammad Lateral bicep curl which include 41428 data;
-                    All data is collected from Neblina, with 50Hz sampling of Sensors.
-                    Using Valgrind massif measure memory usage. And using 'gettimeofday()' function in 'sys/time.h' for measure processing time usage.
-    \item Experiment Condition: Fedora 64-bit system with 16G memory, i5-3210M CPU @ 2.50GHz × 4. For each data set, we change number of Dimension and EPSILON.
-    \item Result: From the table 1 and table 2, The Max Error, Compression Radio and Time usage in both norm decrease when EPSILON become smaller. Comparing with different norm and same EPSILON, the infinity no, and few ndeed has more 'tolerance'. But when comparing using Infinity with $\epsilon=100/\sqrt{n}$, where n is number of dimension, to make sure the max error would not greater than 100, and Euclidean with $\epsilon$=100, the Euclidean norm has better compression radio. Although Infinity norm makes Max error larger, but it has less running time, and few fixed Memory usage according number of dimension. The Memory Usage of Euclidea is not fixed, because it need save $\mathcal{B}_i, i\subset\llbracket 1, m \rrbracket$ after origin $(u_0^k, y_0^k)$, costing lots of Memory. From the table 1 and 2, the Compression Radio in second data set is pretty better than first data set, because Mohammad Lateral bicep has more data than first dataset about 67.5 times. It is pointless to consider the different compression radio in this situation.
 
-    \item Conclusion: The infinity norm has higher compression radio than Euclidean norm with same $\epsilon$, and uses less running time and little memory. But Euclidean makes sure the Max Error between reconstructed data and original data under EPSILON. Both of norm would has lower Compression ratios when $\epsilon$ becomes smaller.
-\end{itemize}
+We conducted two experiments using Motsai's Neblina 
+module\footnote{\url{ https://motsai.com/products/neblina}}, a system 
+with a Nordic Semiconductor nRF52832 micro-controller, 64~KB of RAM, 
+and Bluetooth Low Energy connectivity. The Neblina has a 3D 
+accelerometer, 3D gyroscope, 3D magnetometer, and environmental sensors 
+for humidity, temperature and pressure. It can function as an Inertial
+Motion Unit, a Vertical Reference Unit, or an Attitude and Heading Reference
+System. 
+
+\subsection{Experiment 1: validation tests}
+
+In this experiment we validated the behavior of our LTC extensions on a 
+PC processing data acquired with the Neblina. We collected 2 data sets, 
+``5-times biceps curl" and ``Mohammad lateral biceps curl". from the 
+accelerometer with a 50Hz sampling rate (see 
+Figure~\ref{fig:datasets}). 
+
+We compressed the datasets with various values of $\epsilon$, using our 
+2D (x and y) and 3D (x, y and z) implementations of LTC. On the Neblina,
+the resolution of the accelerometer is about 20~mg (196~mm/$s^2$).
+ We used a 
+laptop computer with 16~GB of memory, and Intel i5-3210M CPU @ 2.50GHz 
+× 4, and Linux Fedora 27. We measured memory consumption using 
+Valgrind's massif 
+tool~\cite{nethercote2006building}\footnote{\url{http://valgrind.org}}, 
+and processing time using \texttt{gettimeofday()} from the GNU C 
+Library. 
+
+Results are reported in Table~\ref{table:results-validation}. 
+As expected, the maximum measured error remains lower than $\epsilon$ in 
+all cases, and the compression ratio increases with $\epsilon$. 
+%Compared to the infinity norm, The Euclidean norm reduces the 
+%compression ratio by a factor of \pm, which was also expected.
+
+    %~ \item Result: From the table 1 and table 2, The Max Error, 
+    %~ Compression Radio and Time usage in both norm decrease when EPSILON 
+    %~ become smaller. Comparing with different norm and same EPSILON, the 
+    %~ infinity no, and few ndeed has more 'tolerance'. But when comparing 
+    %~ using Infinity with $\epsilon=100/\sqrt{n}$, where n is number of 
+    %~ dimension, to make sure the max error would not greater than 100, 
+    %~ and Euclidean with $\epsilon$=100, the Euclidean norm has better 
+    %~ compression radio. Although Infinity norm makes Max error larger, 
+    %~ but it has less running time, and few fixed Memory usage according 
+    %~ number of dimension. The Memory Usage of Euclidea is not fixed, 
+    %~ because it need save $\mathcal{B}_i, i\subset\llbracket 1, m 
+    %~ \rrbracket$ after origin $(u_0^k, y_0^k)$, costing lots of Memory. 
+    %~ From the table 1 and 2, the Compression Radio in second data set is 
+    %~ pretty better than first data set, because Mohammad Lateral bicep 
+    %~ has more data than first dataset about 67.5 times. It is pointless 
+    %~ to consider the different compression radio in this situation.
+
+    %~ \item Conclusion: The infinity norm has higher compression radio 
+    %~ than Euclidean norm with same $\epsilon$, and uses less running 
+    %~ time and little memory. But Euclidean makes sure the Max Error 
+    %~ between reconstructed data and original data under EPSILON. Both of 
+    %~ norm would has lower Compression ratios when $\epsilon$ becomes 
+    %~ smaller. 
+
+
+\begin{table}
+
+    \begin{subfigure}{\columnwidth}
+    \centering
+    \begin{tabular}{l|l|l|l|l}
+    \hline
+    \rowcolor{headcolor}
+    Norm                       & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean}\\ \hline
+    $\epsilon$                & 100          & 100/$\sqrt{2}$  & 100         & 100/$\sqrt{2}$ \\
+    Max error              & 90.24       & 66.79           & 99.63       & 70.47          \\ 
+    Compression ratio      & 29.03\%      & 20.88\%         & 25.12\%     & 19.57\%        \\ 
+    Peak memory usage      & 80B          & 80B             & 432B        & 240B           \\ 
+    Processing time        & 0.103ms      & 0.082ms         & 0.220ms     & 0.200ms        \\ \hline
+    \end{tabular}
+    \caption{5-times bicep curl (2D)}
+    \end{subfigure}\\
+    \begin{subfigure}{\columnwidth}
+    \centering
+    \begin{tabular}{l|l|l|l|l}
+    \hline
+    \rowcolor{headcolor}
+    Norm               & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
+    $\epsilon$             & 100        & 100/$\sqrt{2}$    & 100        & 100/$\sqrt{2}$    \\ 
+    Max error              & 99.49     & 70.52             & 99.99      & 70.71             \\ 
+    Compression ratio      & 60.17\%    & 51.59\%           & 57.75\%    & 48.86\%           \\ 
+    Peak memory       & 80B        & 80B               & 2.1KB      & 1.3KB             \\ 
+    Processing time      & 5.70ms     & 4.85ms            & 20.04ms    & 19.28ms           \\ \hline
+    \end{tabular}
+    \caption{Mohammad lateral biceps curl (2D)}
+    \end{subfigure}\\    
+    \begin{subfigure}{\columnwidth}
+    \centering
+    \begin{tabular}{l|l|l|l|l}
+    \hline
+    \rowcolor{headcolor}
+                            & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
+    $\epsilon$             & 100          & 100/$\sqrt{3}$  & 100         & 100/$\sqrt{3}$   \\ 
+    Max error              & 100.17       & 60.38           & 99.94       & 56.89            \\ 
+    Compression ratio      & 23.00\%      & 12.89\%         & 18.43\%     & 9.95\%           \\ 
+    Peak memory            & 112B         & 112B            & 384B        & 256B             \\ 
+    Processing time        & 0.119ms      & 0.094ms         & 0.230ms     & 0.200ms          \\ \hline
+    \end{tabular}
+    \caption{5-times biceps curl (3D)}
+    \end{subfigure}\\
+    \begin{subfigure}{\columnwidth}
+    \centering
+    \begin{tabular}{l|l|l|l|l}
+    \hline
+    \rowcolor{headcolor}
+                              & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
+    $\epsilon$                & 100        & 100/$\sqrt{3}$    & 100        & 100/$\sqrt{3}$    \\
+    Max error                 & 97.54     & 56.00             & 99.99      & 57.73             \\
+    Compression ratio         & 51.13\%    & 37.17\%           & 46.05\%    & 32.63\%           \\
+    Peak memory & 112B        & 112B              & 4.9KB      & 3.0KB             \\
+    Processing time           & 8.50ms     & 7.07ms            & 26.41ms    & 21.26ms           \\ \hline
+    \end{tabular}
+    \caption{Mohammad lateral biceps curl (3D)}
+    \end{subfigure}
+    \caption{Validation experiment}
+    \label{table:results-validation}
+\end{table}
 
 \subsection{Experiment 2: energy reduction on the Neblina}
-The experiment in Neblina V2 module~\cite{Neblina}, which is a module integrating multiple sensors. Its current System-on-Chip (SoC) radio is the Nordic Semiconductor nRF52832, and it has 64KB RAM.
 
-The capacity of battery in Neblina is 100mAh, and the battery usage would not change too much, because it contains others fusion method which will running when turning on the Neblina.
-In 50Hz sensor sampling rate, the average usage electric current for transmit accelerometer data is 2.0mA. It means Neblina could transmit accelerometer data constantly in 100/2.0=50 hours.
-when Neblina does not move, the average usage electric current using Infinity norm compression is 1.95mA. It just extend Neblina work life about 1.28 hours.
-But in 200Hz sampling rate. The electric before and after compression are 3.5 and 2.9 respectively. The running time of Neblina would be extended about 5.9 hours.
+
+The capacity of battery in Neblina is 100mAh, and the battery usage 
+would not change too much, because it contains others fusion method 
+which will running when turning on the Neblina. In 50Hz sensor sampling 
+rate, the average usage electric current for transmit accelerometer 
+data is 2.0mA. It means Neblina could transmit accelerometer data 
+constantly in 100/2.0=50 hours. when Neblina does not move, the average 
+usage electric current using Infinity norm compression is 1.95mA. It 
+just extend Neblina work life about 1.28 hours. But in 200Hz sampling 
+rate. The electric before and after compression are 3.5 and 2.9 
+respectively. The running time of Neblina would be extended about 5.9 
+hours.
 
 we wore Neblina on right wrist and
 collected walking data and running data. 4000 data set was collected
@@ -747,39 +857,7 @@ to save devices Energy. At same time, The fidelity is guaranteed.
 \section{Conclusion}
 
 \section*{Acknowledgement}
-\begin{table*}[]
-    \begin{center}
-    \caption{Result of Experiment 1 in Dimension 2}
-    \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
-    \hline
-    \multicolumn{9}{|l|}{Dimension 2}                                                                                                                         \\ \hline
-    Data set               & \multicolumn{4}{l|}{5-times bicep curl}                        & \multicolumn{4}{l|}{Mohammad Lateral bicep}                     \\ \hline
-    Distance               & \multicolumn{2}{l|}{Manhattan} & \multicolumn{2}{l|}{Euclidean} & \multicolumn{2}{l|}{Manhattan} & \multicolumn{2}{l|}{Euclidean} \\ \hline
-    Epsilon                & 100          & 100/$\sqrt{2}$  & 100         & 100/$\sqrt{2}$  & 100        & 100/$\sqrt{2}$    & 100        & 100/$\sqrt{2}$    \\ \hline
-    Max Error              & 127.63       & 94.46           & 99.63       & 70.47           & 140.70     & 99.73             & 99.99      & 70.71             \\ \hline
-    Compression Radio      & 29.03\%      & 20.88\%         & 25.12\%     & 19.57\%         & 60.17\%    & 51.59\%           & 57.75\%    & 48.86\%           \\ \hline
-    Max memory Usage(peak) & 80B          & 80B             & 432B        & 240B            & 80B        & 80B               & 2.1KB      & 1.3KB             \\ \hline
-    Time Usage(Total)      & 0.103ms      & 0.082ms         & 0.220ms     & 0.200ms         & 5.70ms     & 4.85ms            & 20.04ms    & 19.28ms           \\ \hline
-    \end{tabular}
-    \end{center}
-\end{table*}
 
-\begin{table*}[]
-    \begin{center}
-    \caption{Result of Experiment 1 in Dimension 3}
-    \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
-    \hline
-    \multicolumn{9}{|l|}{Dimension 3}                                                                                                                         \\ \hline
-    Data set               & \multicolumn{4}{l|}{5-times bicep curl}                        & \multicolumn{4}{l|}{Mohammad Lateral bicep}                     \\ \hline
-    Distance               & \multicolumn{2}{l|}{Manhattan} & \multicolumn{2}{l|}{Euclidean} & \multicolumn{2}{l|}{Manhattan} & \multicolumn{2}{l|}{Euclidean} \\ \hline
-    Epsilon                & 100          & 100/$\sqrt{3}$  & 100         & 100/$\sqrt{3}$  & 100        & 100/$\sqrt{3}$    & 100        & 100/$\sqrt{3}$    \\ \hline
-    Max Error              & 141.66       & 85.40           & 99.94       & 56.89           & 168.95     & 97.01             & 99.99      & 57.73             \\ \hline
-    Compression Radio      & 23.00\%      & 12.89\%         & 18.43\%     & 9.95\%          & 51.13\%    & 37.17\%           & 46.05\%    & 32.63\%           \\ \hline
-    Max memory Usage(peak) & 112B         & 112B            & 384B        & 256B            & 112B       & 112B              & 4.9KB      & 3.0KB             \\ \hline
-    Time Usage(Total)      & 0.119ms      & 0.094ms         & 0.230ms     & 0.200ms         & 8.50ms     & 7.07ms            & 26.41ms    & 21.26ms           \\ \hline
-    \end{tabular}
-    \end{center}
-\end{table*}
 
 \begin{table}[]
     \begin{center}
