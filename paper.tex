@@ -329,7 +329,7 @@ we show the implementation of infinity norm and Euclidean norm.
 %~ there is a line could represent original data, and vice versa.
 \subsection{Multidimensional LTC with Manhattan distance}
 In section 2, we can know that the repersentation of intersection
-is a rectangular cuboid. So only one bounding box with n-dimansional
+is a rectangular cuboid. So only one bounding box with n-dimensional
 is needed to represent the intersection. Assume a bounding box
 $\mathcal{BOX}_{m-1} = \bigcap_{j=1}^{m-1}{\mathcal{B}_{m-1}}$ which
 has Upper bound $U_i$ and lower Bound $L_i$ for each dimension
@@ -339,17 +339,17 @@ would be updated when this formular return true.
 Otherwise return false.
 \begin{enumerate}
     \item Initialization: Let origin $(u^k_0, y^k_0) = (\tau_k, \xi_k)$.
-    \item For the each $m_{th}$ data $(u_m^k, y_m^k)$ with diminsion $n$,
+    \item For each data $(u_m^k, y_m^k)$ with diminsion $n$,
             defines $(v_m, z_m) = (u_m^k - \tau^k, y_m^k - \xi^k)$ where $z_m =
             \{ x_{mi} \mid 1\leqslant{i}\leqslant{n}\}$.
     \item The $\mathcal{B}_{m}$ should be a ractangular cube with center
-            $\frac{v_1}{v_j}z_m$ and weight $\frac{v_1}{v_j}\epsilon$.
-    \item For each dimension $i$, box upper bound $U_i < \frac{v_1}{v_j}x_{mi}+
-            \frac{v_1}{v_j}\epsilon$ OR lower bound $L_i > \frac{v_1}{v_j}x_{mi}-\frac{v_1}{v_j}\epsilon$, return False.
+            $\frac{v_1}{v_m}z_m$ and weight $\frac{v_1}{v_m}\epsilon$.
+    \item For each dimension $i$, box upper bound $U_i < \frac{v_1}{v_m}x_{mi}+
+            \frac{v_1}{v_m}\epsilon$ OR lower bound $L_i > \frac{v_1}{v_m}x_{mi}-\frac{v_1}{v_m}\epsilon$, return False.
     \item Otherwise, the intersection do not be empty. Updating
             the Bounding box $\mathcal{BOX}_m = \mathcal{BOX}_{m-1} \bigcap \mathcal{B}_{m}$. For
-            each dimension $i$ in $\mathcal{BOX}_m$, $U_i = min(U_i, \frac{v_1}{v_j}x_{mi}+
-            \frac{v_1}{v_j}\epsilon})$, and $L_i = max(L_i , \frac{v_1}{v_j}x_{mi}-\frac{v_1}{v_j}\epsilon})$. Return True.
+            each dimension $i$ in $\mathcal{BOX}_m$, $U_i = min(U_i, \frac{v_1}{v_m}x_{mi}+
+            \frac{v_1}{v_m}\epsilon)$, and $L_i = max(L_i , \frac{v_1}{v_m}x_{mi}-\frac{v_1}{v_m}\epsilon)$. Return True.
 \end{enumerate}
 
 
@@ -416,147 +416,210 @@ According the Implement, the infinity norm boils down to apply 1D LTC algorithm 
 % \end{enumerate}
 
 \subsection{Multidimensional LTC with Euclidean distance}
-In Euclidean distance version, we also map the coming data into same
-time-stamp $t_1$ the timestamp after base point. The difference with
-Manhattan distance version is that recording overlapping part with
-a post-designed model is difficult, which need retain several arcs in
-2-dimension, or convex surfaces in 3-dimension. In our method, we will
-record all tolerance range for every mapped data which come from base
-data point until coming data point, in order to checking if there is
-intersection among them. For instance, in 3D-t, assume we have a the
-base point $Z = D_0$ and the tolerance range $R_1$ which is a ball
-as the intersection S. we need a list L to record mapped balls
-from $D_1$ to coming data. For each comming data $D_i, i>1$ mapping
-this data into $t_1$, and add it into list. Then the work is check out
-if all balls intersect, and form a public intersection. The method is
-based on plane sweep and binary search. At first, select one parameter,
-such as x-axis, finding a bounding range of all balls $B_i$ in x-axis.
-suppose $Max_bound_x = Min{1..n}{B_i.center.x + EPSILON/i}$, and
-$Min_bound_x = Max{1..n}{B_i.center.x - EPSILON/i}$. If there is overlap
-among balls, then the axis of the points inside intersection must located
-between Min_bound_x and Max_bound_x. Using binary search to select
-mid_x = (Min_bound_x + Max_bound_x)/2, then calculate a y-axis bounding
-with the plane x = mid_x. If the get bounding range in y-axis where
-$Max_bound_y > Min_bound_y$ and using binary search again to find mid_y,
-It means there is a line x=mid_x, Max_bound_y>= y >= Min_bound_y,
-parallels z-axis, could pass through all balls. Finally, in z-axis,
-computing bounding range, and If $Max_bound_z > Min_bound_z$, there
-must be one or more points inside all balls. The problem be solved.
-If the loop of binary search in x-axis overs, then there is no public
-intersection among balls, and need to transmit and update base point.
-In this method we need O(n*logn*logn) time complexity for binary search
-in x-axis and y-axis and traversal all balls in z-axis, also O(n) space
-complexity is needed for maintaining list. According this method,
-it could be extended into N-dimensional data. The main idea is to search,
-dimension by dimension, from a room or plane or line and get intersection
-point finally.
-
-\todo{below content is useful? }
-In the rest of this section, we describe examples for 2-dimensional and 3-dimensional version. After that, we extend the method for n-dimension.
-\begin{itemize}
-\item \textbf{2-dimensional LTC in Euclidean distance:}In this situation, the tolerance range after mapping is a disk. After initializing base data point \textit{z}, for each coming data point need to be mapped into a same time-stamp, and heck if there is a intersection amount disks in disks set and new mapped coming data. Therefore, a algorithm is need to determine whether \textit{n} disks intersect or not.
-\item \textbf{3-dimensional LTC in Euclidean distance:}In 3-dimension, cause of the preassigned error margin, the disks become balls with one extra axis. So In 3-dimension whether \textit{n} balls intersect need to be check.
-\end{itemize}
-
-At first, let us solve the \textit{n} disks intersect. We use a algorithm which is based on plane sweep and dichotomy. Assume a disk include center$(x,y)$ and radius $r$. The pseudo-code in Algorithm 1.
+In Euclidea norm, the representation of intersection is
+volume. There is no specific model to record repersentation
+with updating, so a list to save all balls $\mathcal{B}_j, 1\leqslant{j}\leqslant{m}$
+is needed. In order to test weather a set of balls intersect,
+the Helly's theorem could work, but the complexity of
+this method is too high to work with embeded, low-power
+systems which has limited CPU and RAM resource. So we
+implement Euclidean norm by using a method which based
+on plane sweep and binary search. Assume the list of balls $S_{m-1}$ contains balls from $\mathcal{B}_1$ to $\mathcal{B}_{m-1}$, and an temporary data point $output$ used for updated origin $(\tau^k, \xi^k)$. From the formula (1) in Section 3, the $(\mathcal{B}_j)_{j \in \llbracket 1, {m-1} \rrbracket}$ is a sequence of decreasing radius, so the larger balls that includes new coming ball $\mathcal{B}_{m-1}$ could be reomved from list $S_{m-1}$ so that reducing processing complexity of method. Therefore the list $S_{m-1}$ may not includes $m-1$ balls. Assume each $\Hat{\mathcal{B}} \in S$ which has corresponding center $\Hat{z}$ and radius $\Hat{\epsilon}$.
+Let origin $(u^k_0, y^k_0) = (\tau_k, \xi_k)$, and for each data $(u_m^k, y_m^k)$ with diminsion $n$, defines $(v_m, z_m) = (u_m^k - \tau^k, y_m^k - \xi^k)$ where $z_m = \{ x_{mi} \mid 1\leqslant{i}\leqslant{n}\}$. The $\mathcal{B}_{m}$ should be one n-ball with center $\frac{v_1}{v_j}z_m$ and radius $\frac{v_1}{v_j}\epsilon$. The method is written in Algorithm~\ref{algo:isThereIntersection}.
 
 \begin{algorithm}
-    \caption{whether disks intersect}
     \begin{flushleft}
-        \textbf{Input:} $l$ - list of disks, $d$ - mapped coming disk, $p$ - point will be base point\\
-        \textbf{Output:} $true|false$  is there a intersection\\
-        \textbf{function} isIntersect$(l, d, p)$
+        \textbf{Input:} $S$, $\mathcal{B}_m$, $output$ \\
+        \textbf{Output:} $true|false$\\
     \end{flushleft}
     \begin{algorithmic}[1]
-        \State $tmp_list \gets null$
-        \State $max\_x\gets d.x+d.r$
-        \State $min\_x\gets d.x-d.r$
-
-        \ForAll{$old\_disk$ \textbf{in} $l$}
-            \If{$d \cap old\_disk = \emptyset$} % distance(d.center, old\_disk.center) > d.r + old\_disk.r
+        \State d = n \Comment{dimension index}
+        \State $max_d = \frac{v_1}{v_m}(x_d + \epsilon)$
+        \State $min_d = \frac{v_1}{v_m}(x_d - \epsilon)$
+        \ForAll{$\Hat{\mathcal{B}}$ \textbf{in} $S$}
+            \If{$\Hat{\mathcal{B}} \bigcap \mathcal{B}_m = $ \O }
                 \State \textbf{return} false
-            \ElsIf{$d \cap old\_disk \neq d$}
-                \State {$\textbf{add } old\_disk \textbf{ into } tmp\_list$\\
-                        $max\_x\gets $ MIN($max\_x, old\_disk.x+old\_disk.r$)\\
-                        $min\_x\gets $ MAX($min\_x, old\_disk.x-old\_disk.r$)}
+            \ElsIf{$\mathcal{B}_m \bigcap \Hat{\mathcal{B}}  = \mathcal{B}_m $}
+                \State remove $\Hat{\mathcal{B}}$ from $S$
+                \State \textbf{continue}\\
+            $max_d = \min(max_d, \Hat{x_d} + \Hat{\epsilon}$)\\
+            $min_d = \max(min_d, \Hat{x_d} - \Hat{\epsilon}$)
             \EndIf
         \EndFor
-        \State $\textbf{add } d \textbf{ into } tmp\_list$
-        \If{$max\_x < min\_x$}
+        \State $\textbf{add } \mathcal{B}_m \textbf{ into } S$
+        \If{$max_d < min_d$}
             \State \textbf{return} false
         \EndIf
-        \While{$min\_x \leqslant max\_x$}
-            \State $mid \gets (min\_x + max\_x)/2$
-            \State $max\_y \gets +\infty$
-            \State $min\_y \gets -\infty$
-            \For{$i=1$ \textbf{to} $tmp\_list.length$}
-                \State $P_1$ and $P_2$ are intersection points of $tmp\_list[i]$ and line $x=mid$, $(P1.y\geqslant P2.y)$
-                \If{$P_1.y < max\_y$}
-                    \State $max\_y \gets p_1.y$
-                    \State $max\_index \gets i$
-                \EndIf
-                \If{$P_2.y > min\_y$}
-                    \State $min\_y \gets p_2.y$
-                    \State $min\_index \gets i$
-                \EndIf
-            \EndFor
-            \If{$max\_y >= min\_y$}
-                \State $p.x \gets mid$
-                \State $p.y \gets (max\_y+min\_y)/2$
-                \State $l \gets tmp\_list$
-                \State \textbf{return} true
-            \EndIf
-            \State {Assume $P_d$ is the intersection between line of
-            centers from $tmp\_list[max\_index]$ and $tmp\_list[min\_index]$
-            , and their common chord}
-            \If{$P_d.x < mid$}
-                \State $max\_y \gets mid-1$
-            \ElsIf{$P_d.x > mid$}
-                \State $min\_y \gets mid+1$
-            \EndIf
-        \EndWhile
-        \Return false
-    \end{algorithmic}
-\end{algorithm}
-
-The main idea of the algorithm is, remove the bigger disk who contains mapped coming disk. It maybe increase Computational efficiency in the rest of algorithm, cause mapped coming disk is the smallest one than all in list of disks. Then we make a bounding range for x-axis and select a x-value $mid$ by using dichotomy method in order to calculate if a point $(y, mid)$ is included all disks. The complexity of this algorithm is $O(n)+O(n\log\epsilon) = O(n\log\epsilon)$.
-
-For 3-dimension, assume data point like $(x, y, z)$ also need time-stamp t, we can also use above method by selecting $x$ and $y$ with dichotomy method and then check if there are points $(mid\_x, mid\_y, z)$ included by all balls. It needs $O(\log^2\epsilon)$ to determine $mid\_x, mid\_y$, and $O(n)$ to traverse all balls in list and calculate $z$. So 3-dimensional method need $O(n \log^2\epsilon)$ totally. If we extend this idea for n-dimension, suppose that the coming data is $(x_1,x_2,...,x_n)$ and the mapped data is a object with center $(d_1,d_2,...d_n)$ and radius $r$. The pseudo-code would show like Algorithm 2.
-
-\begin{algorithm}
-    \caption{whether intersect  for n dimension}
-    \begin{flushleft}
-        \textbf{Input:} $l$ - list object, $o$ - object of mapped coming data, $p$ - point will be base point\\
-        \textbf{Output:} $true|false$  is there a intersection\\
-        \textbf{function} isIntersect$(l, o, p)$
-    \end{flushleft}
-    \begin{algorithmic}[1]
-        \State $tmp_list \gets null$
-        \State $max \gets o.d\_n+o.r$
-        \State $min \gets o.d\_n-o.r$
-
-        \ForAll{$old\_obj$ \textbf{in} $l$}
-            \If{$o \cap old\_obj = \emptyset$}
-                \State \textbf{return} false
-            \ElsIf{$o \cap old\_obj \neq o$}
-                \State {$\textbf{add } old\_obj \textbf{ into } tmp\_list$\\
-                        $max\gets $ MIN($max, old\_obj.d\_n+old\_obj.r$)\\
-                        $min\gets $ MAX($min, old\_obj.d\_n-old\_obj.r$)}
-            \EndIf
-        \EndFor
-        \State $\textbf{add } o \textbf{ into } tmp\_list$
-        \If{$max < min$}
-            \State \textbf{return} false
-        \EndIf
-        $p\_cp \gets p$
-        \If{Recursive$(min, max, n, p\_cp)$}
-            \State $p \gets p\_cp$
+        \State temp\_output = output \Comment{used for next operation}
+        \If{Recursive$(min_d, max_d, n, p\_cp)$}
+            \State $output = temp\_output$
             \State \textbf{return} true
         \Else
             \State \textbf{return} false
         \EndIf
     \end{algorithmic}
+    \caption{isThereIntersection}
+    \label{algo:isThereIntersection}
 \end{algorithm}
+
+% \begin{enumerate}
+%     \item Initialzation: Let origin $(u^k_0, y^k_0) = (\tau_k, \xi_k)$.
+%     \item For each data $(u_m^k, y_m^k)$ with diminsion $n$,
+%             defines $(v_m, z_m) = (u_m^k - \tau^k, y_m^k - \xi^k)$ where $z_m =
+%             \{ x_{mi} \mid 1\leqslant{i}\leqslant{n}\}$.
+%     \item The $\mathcal{B}_{m}$ should be one n-ball with center
+%             $\frac{v_1}{v_j}z_m$ and radius $\frac{v_1}{v_j}\epsilon$.
+%     \item For each ball $\hat{\mathcal{B}}$ in list $S$, if $\hat{\mathcal{B}} \bigcap \mathcal{B}_m = \O$, return False. Else if
+%     $\mathcal{B}_m\subset\hat{\mathcal{B}}$, remove $\hat{\mathcal{B}}$ from list $S$.
+%     \item Select parameter p = n (which is ball's dimension), define $Max_{(p=n)} = \min_{j=1}^{S.length}{(\frac{v_1}{v_j}z_{(p=n)} + \frac{v_1}{v_j}\epsilon)}$, and $Min_{(p=n)} = \max_{j=1}^{S.length}{(\frac{v_1}{v_j}z_{(p=n)} - \frac{v_1}{v_j}\epsilon)}$. If $Max_{(p=n)} < Min_{(p=n)}$, return False.
+%     \item Use binary search to select $mid_{(p=n)} = (Min_{(p=n)} + Max_{(p=n)})/2$
+% \end{enumerate}
+
+% In Euclidean distance version, we also map the coming data into same
+% time-stamp $t_1$ the timestamp after base point. The difference with
+% Manhattan distance version is that recording overlapping part with
+% a post-designed model is difficult, which need retain several arcs in
+% 2-dimension, or convex surfaces in 3-dimension. In our method, we will
+% record all tolerance range for every mapped data which come from base
+% data point until coming data point, in order to checking if there is
+% intersection among them. For instance, in 3D-t, assume we have a the
+% base point $Z = D_0$ and the tolerance range $R_1$ which is a ball
+% as the intersection S. we need a list L to record mapped balls
+% from $D_1$ to coming data. For each comming data $D_i, i>1$ mapping
+% this data into $t_1$, and add it into list. Then the work is check out
+% if all balls intersect, and form a public intersection.
+% The method is based on plane sweep and binary search. At first, select one parameter,
+% such as x-axis, finding a bounding range of all balls $B_i$ in x-axis.
+% suppose $Max_bound_x = Min{1..n}{B_i.center.x + EPSILON/i}$, and
+% $Min_bound_x = Max{1..n}{B_i.center.x - EPSILON/i}$. If there is overlap
+% among balls, then the axis of the points inside intersection must located
+% between Min_bound_x and Max_bound_x.
+In the method, selecting dimension(n as default in our method) to calculate max point value and min point value of all n-balls in this dimension. If the max value bigger than min value, then there is no intersection. After that. In Recursive function Algorithm~\ref{algo:recursive}, using binary search select
+median $mid_d$ of $max_d$ and $min_d$ in order to find bound range of dimension d-1 ($max_{d-1}$, $min_{d-1}$) over the plane $x_d = max_d$. If bound range of dimension $d-1$ is not empty, continue calling function \textbf{Recursive}($min_{d-1}$, $min_{d-1}$, $d-1$, $temp\_output$). Recursively calling this function, until getting result.
+\todo{add recursive pseudo-code}
+% Using binary search to select
+% mid_x = (Min_bound_x + Max_bound_x)/2, then calculate a y-axis bounding
+% with the plane x = mid_x. If the get bounding range in y-axis where
+% $Max_bound_y > Min_bound_y$ and using binary search again to find mid_y,
+% It means there is a line x=mid_x, Max_bound_y>= y >= Min_bound_y,
+% parallels z-axis, could pass through all balls. Finally, in z-axis,
+% computing bounding range, and If $Max_bound_z > Min_bound_z$, there
+% must be one or more points inside all balls. The problem be solved.
+% If the loop of binary search in x-axis overs, then there is no public
+% intersection among balls, and need to transmit and update base point.
+% In this method we need O(n*logn*logn) time complexity for binary search
+% in x-axis and y-axis and traversal all balls in z-axis, also O(n) space
+% complexity is needed for maintaining list. According this method,
+% it could be extended into N-dimensional data. The main idea is to search,
+% dimension by dimension, from a room or plane or line and get intersection
+% point finally.
+
+% \todo{below content is useful? }
+% In the rest of this section, we describe examples for 2-dimensional and 3-dimensional version. After that, we extend the method for n-dimension.
+% \begin{itemize}
+% \item \textbf{2-dimensional LTC in Euclidean distance:}In this situation, the tolerance range after mapping is a disk. After initializing base data point \textit{z}, for each coming data point need to be mapped into a same time-stamp, and heck if there is a intersection amount disks in disks set and new mapped coming data. Therefore, a algorithm is need to determine whether \textit{n} disks intersect or not.
+% \item \textbf{3-dimensional LTC in Euclidean distance:}In 3-dimension, cause of the preassigned error margin, the disks become balls with one extra axis. So In 3-dimension whether \textit{n} balls intersect need to be check.
+% \end{itemize}
+
+% At first, let us solve the \textit{n} disks intersect. We use a algorithm which is based on plane sweep and dichotomy. Assume a disk include center$(x,y)$ and radius $r$. The pseudo-code in Algorithm 1.
+
+% \begin{algorithm}
+%     \caption{whether disks intersect}
+%     \begin{flushleft}
+%         \textbf{Input:} $l$ - list of disks, $d$ - mapped coming disk, $p$ - point will be base point\\
+%         \textbf{Output:} $true|false$  is there a intersection\\
+%         \textbf{function} isIntersect$(l, d, p)$
+%     \end{flushleft}
+%     \begin{algorithmic}[1]
+%         \State $tmp_list \gets null$
+%         \State $max\_x\gets d.x+d.r$
+%         \State $min\_x\gets d.x-d.r$
+
+%         \ForAll{$old\_disk$ \textbf{in} $l$}
+%             \If{$d \cap old\_disk = \emptyset$} % distance(d.center, old\_disk.center) > d.r + old\_disk.r
+%                 \State \textbf{return} false
+%             \ElsIf{$d \cap old\_disk \neq d$}
+%                 \State {$\textbf{add } old\_disk \textbf{ into } tmp\_list$\\
+%                         $max\_x\gets $ MIN($max\_x, old\_disk.x+old\_disk.r$)\\
+%                         $min\_x\gets $ MAX($min\_x, old\_disk.x-old\_disk.r$)}
+%             \EndIf
+%         \EndFor
+%         \State $\textbf{add } d \textbf{ into } tmp\_list$
+%         \If{$max\_x < min\_x$}
+%             \State \textbf{return} false
+%         \EndIf
+%         \While{$min\_x \leqslant max\_x$}
+%             \State $mid \gets (min\_x + max\_x)/2$
+%             \State $max\_y \gets +\infty$
+%             \State $min\_y \gets -\infty$
+%             \For{$i=1$ \textbf{to} $tmp\_list.length$}
+%                 \State $P_1$ and $P_2$ are intersection points of $tmp\_list[i]$ and line $x=mid$, $(P1.y\geqslant P2.y)$
+%                 \If{$P_1.y < max\_y$}
+%                     \State $max\_y \gets p_1.y$
+%                     \State $max\_index \gets i$
+%                 \EndIf
+%                 \If{$P_2.y > min\_y$}
+%                     \State $min\_y \gets p_2.y$
+%                     \State $min\_index \gets i$
+%                 \EndIf
+%             \EndFor
+%             \If{$max\_y >= min\_y$}
+%                 \State $p.x \gets mid$
+%                 \State $p.y \gets (max\_y+min\_y)/2$
+%                 \State $l \gets tmp\_list$
+%                 \State \textbf{return} true
+%             \EndIf
+%             \State {Assume $P_d$ is the intersection between line of
+%             centers from $tmp\_list[max\_index]$ and $tmp\_list[min\_index]$
+%             , and their common chord}
+%             \If{$P_d.x < mid$}
+%                 \State $max\_y \gets mid-1$
+%             \ElsIf{$P_d.x > mid$}
+%                 \State $min\_y \gets mid+1$
+%             \EndIf
+%         \EndWhile
+%         \Return false
+%     \end{algorithmic}
+% \end{algorithm}
+
+% The main idea of the algorithm is, remove the bigger disk who contains mapped coming disk. It maybe increase Computational efficiency in the rest of algorithm, cause mapped coming disk is the smallest one than all in list of disks. Then we make a bounding range for x-axis and select a x-value $mid$ by using dichotomy method in order to calculate if a point $(y, mid)$ is included all disks.
+In 2-dimension Euclidean norm, the complexity of this algorithm is $O(n)+O(n\log\epsilon) = O(n\log\epsilon)$. In 3-dimension, It needs $O(\log^2\epsilon)$ to determine $mid\_3, mid\_2$, and $O(n)$ to traverse all balls in list and calculate bounding range of dimension d=1. So 3-dimensional method need $O(n \log^2\epsilon)$ totally. If we extend this idea for n-dimension, the complexiy of this method is $O(n \log^{n}\epsilon)$ where n is the number of dimension.
+
+% \begin{algorithm}
+%     \begin{flushleft}
+%         \textbf{Input:} $S$, $\mathcal{B}_m$, $output$
+%         \textbf{Output:} $true|false$  is there a intersection\\
+%         \textbf{function} isIntersect$(l, o, p)$
+%     \end{flushleft}
+%     \begin{algorithmic}[1]
+%         \State $tmp_list \gets null$
+%         \State $max \gets o.d\_n+o.r$
+%         \State $min \gets o.d\_n-o.r$
+
+%         \ForAll{$old\_obj$ \textbf{in} $l$}
+%             \If{$o \cap old\_obj = \emptyset$}
+%                 \State \textbf{return} false
+%             \ElsIf{$o \cap old\_obj \neq o$}
+%                 \State {$\textbf{add } old\_obj \textbf{ into } tmp\_list$\\
+%                         $max\gets $ MIN($max, old\_obj.d\_n+old\_obj.r$)\\
+%                         $min\gets $ MAX($min, old\_obj.d\_n-old\_obj.r$)}
+%             \EndIf
+%         \EndFor
+%         \State $\textbf{add } o \textbf{ into } tmp\_list$
+%         \If{$max < min$}
+%             \State \textbf{return} false
+%         \EndIf
+%         $p\_cp \gets p$
+%         \If{Recursive$(min, max, n, p\_cp)$}
+%             \State $p \gets p\_cp$
+%             \State \textbf{return} true
+%         \Else
+%             \State \textbf{return} false
+%         \EndIf
+%     \end{algorithmic}
+%     \caption{isThereIntersection}
+%     \label{algo:isThereIntersection}
+% \end{algorithm}
 
 \begin{algorithm}
     \begin{flushleft}
@@ -681,6 +744,7 @@ Mohammad Lateral bicep data which include 41428, produced in proximate 14 minute
 
 \section*{Acknowledgement}
 \begin{table*}[]
+    \caption{}
     \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
     \hline
     \multicolumn{9}{|l|}{Dimension 2}                                                                                                                         \\ \hline
@@ -695,6 +759,7 @@ Mohammad Lateral bicep data which include 41428, produced in proximate 14 minute
 \end{table*}
 
 \begin{table*}[]
+    \caption{Table}
     \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
     \hline
     \multicolumn{9}{|l|}{Dimension 3}                                                                                                                         \\ \hline
@@ -708,29 +773,31 @@ Mohammad Lateral bicep data which include 41428, produced in proximate 14 minute
     \end{tabular}
 \end{table*}
 
-
 \begin{table}[]
-\begin{tabular}{lllllll}
-DataSet           & \multicolumn{6}{l}{walking}                                   \\
-Distance          & \multicolumn{3}{l}{Manhattan} & \multicolumn{3}{l}{Euclidean} \\
-Epsilon           & 100       & 20      & 10      & 100       & 20      & 10      \\
-Max Error         & 158.793   & 31.828  & 16.763  & 153.141   & 31.763  & 15.898  \\
-Compression Radio & 88.9\%    & 66.4\%  & 45.5\%  & 68.6\%    & 25.5\%  & 9.5\%   \\
-Energy Usage      & 2.642     & 2.787   & 3.020   & 2.879     & 3.221   & 3.383
-\end{tabular}
+    \caption{}
+    \begin{tabular}{|l|l|l|l|l|l|l|}
+    \hline
+    DataSet           & \multicolumn{6}{l|}{walking}                                   \\\hline
+    Distance          & \multicolumn{3}{l|}{Manhattan} & \multicolumn{3}{l|}{Euclidean} \\\hline
+    Epsilon           & 100       & 20      & 10      & 100       & 20      & 10      \\\hline
+    Max Error         & 158.793   & 31.828  & 16.763  & 153.141   & 31.763  & 15.898  \\\hline
+    Compression Radio & 88.9\%    & 66.4\%  & 45.5\%  & 68.6\%    & 25.5\%  & 9.5\%   \\\hline
+    Energy Usage      & 2.642     & 2.787   & 3.020   & 2.879     & 3.221   & 3.383   \\\hline
+    \end{tabular}
 \end{table}
 
 \begin{table}[]
-\begin{tabular}{lllllll}
-DataSet           & \multicolumn{6}{l}{running}                                   \\
-Distance          & \multicolumn{3}{l}{Manhattan} & \multicolumn{3}{l}{Euclidean} \\
-Epsilon           & 100      & 20       & 10      & 100      & 20       & 10      \\
-Max Error         & 99.995   & 19.984   & 9.979   & 99.995   & 19.989   & 9.959   \\
-Compression Radio & 87.6\%   & 63.3\%   & 37.2\%  & 64.4\%   & 19.8\%   & 5.7\%   \\
-Energy Usage      & 3.098    & 3.020    & 3.134   & 2.952    & 3.320    & 3.393
-\end{tabular}
+    \caption{}
+    \begin{tabular}{|l|l|l|l|l|l|l|}
+    \hline
+    DataSet           & \multicolumn{6}{l|}{running}                                   \\\hline
+    Distance          & \multicolumn{3}{l|}{Manhattan} & \multicolumn{3}{l|}{Euclidean} \\\hline
+    Epsilon           & 100      & 20       & 10      & 100      & 20       & 10      \\\hline
+    Max Error         & 99.995   & 19.984   & 9.979   & 99.995   & 19.989   & 9.959   \\\hline
+    Compression Radio & 87.6\%   & 63.3\%   & 37.2\%  & 64.4\%   & 19.8\%   & 5.7\%   \\\hline
+    Energy Usage      & 3.098    & 3.020    & 3.134   & 2.952    & 3.320    & 3.393   \\\hline
+    \end{tabular}
 \end{table}
-
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,biblio.bib}
