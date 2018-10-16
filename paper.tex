@@ -662,29 +662,33 @@ In 2-dimension Euclidean norm, the complexity of this algorithm is $O(n)+O(n\log
 \section{Results}
 \todo{ result table ?}
 \subsection{Experiment 1: Pilot tests on Computer}
+In this experiment, in order to compare the performance in different norm, different EPSILON and different dataset. We collected 2 data set from Neblina, 5-times bicep curl data and Mohammad Lateral bicep curl.
 \begin{itemize}
     \item Data set: 5-times bicep curl which includes 613 data;
                     Mohammad Lateral bicep curl which include 41428 data;
                     All data is collected from Neblina, with 50Hz sampling of Sensors.
                     Using Valgrind massif measure memory usage. And using 'gettimeofday()' function in 'sys/time.h' for measure processing time usage.
     \item Experiment Condition: Fedora 64-bit system with 16G memory, i5-3210M CPU @ 2.50GHz × 4. For each data set, we change number of Dimension and EPSILON.
-    \item Result: Result shows in table.
-    \item Conclusion: From the table, The LTC-Manhattan has higher compression radio. But LTC-Euclidean make sure the Max Error between reconstructed data and original data under EPSILON.Compression ratios would decrease with changing EPSILON smaller.
+    \item Result: From the table 1 and table 2, The Max Error, Compression Radio and Time usage in both norm decrease when EPSILON become smaller. Comparing with different norm and same EPSILON, the infinity no, and few ndeed has more 'tolerance'. But when comparing using Infinity with $\epsilon=100/\sqrt{n}$, where n is number of dimension, to make sure the max error would not greater than 100, and Euclidean with $\epsilon$=100, the Euclidean norm has better compression radio. Although Infinity norm makes Max error larger, but it has less running time, and few fixed Memory usage according number of dimension. The Memory Usage of Euclidea is not fixed, because it need save $\mathcal{B}_i, i\subset\llbracket 1, m \rrbracket$ after origin $(u_0^k, y_0^k)$, costing lots of Memory. From the table 1 and 2, the Compression Radio in second data set is pretty better than first data set, because Mohammad Lateral bicep has more data than first dataset about 67.5 times. It is pointless to consider the different compression radio in this situation.
+
+    \item Conclusion: The infinity norm has higher compression radio than Euclidean norm with same $\epsilon$, and uses less running time and little memory. But Euclidean makes sure the Max Error between reconstructed data and original data under EPSILON. Both of norm would has lower Compression ratios when $\epsilon$ becomes smaller.
 \end{itemize}
 
 \subsection{Experiment 2: energy reduction on the Neblina}
+The experiment in Neblina V2 module~\cite{Neblina}, which is a module integrating multiple sensors. Its current System-on-Chip (SoC) radio is the Nordic Semiconductor nRF52832, and it has 64KB RAM.
 
-The capacity of battery in Neblina is 100mAh, and the battery usage would not change too much, because it contans others fusion method which will running when turning on the Neblina.
-In 50Hz sensor sampling rate, the average usage electric current for transmit accelerometers data is 2.0mA. It means Neblina could tranmit accelerometers data constantly in 100/2.0=50 hours.
-After compressed by LTC-Manhattan method, the average usage electric current is 1.95mA. It just extend Neblina lift abou 1.28 hours.
-But in 200Hz sampling rate. The electric before and after compression are 3.5 and 2.9 respectively. The running time of Neblina would be extended about 5.9 hours/
+The capacity of battery in Neblina is 100mAh, and the battery usage would not change too much, because it contains others fusion method which will running when turning on the Neblina.
+In 50Hz sensor sampling rate, the average usage electric current for transmit accelerometer data is 2.0mA. It means Neblina could transmit accelerometer data constantly in 100/2.0=50 hours.
+when Neblina does not move, the average usage electric current using Infinity norm compression is 1.95mA. It just extend Neblina work life about 1.28 hours.
+But in 200Hz sampling rate. The electric before and after compression are 3.5 and 2.9 respectively. The running time of Neblina would be extended about 5.9 hours.
 
-The experiment in Neblina, we weared Neblina on right wrist and
+we wore Neblina on right wrist and
 collected walking data and running data. 4000 data set was collected
 from Neblina in 200Hz sampling rate. Since arm swing appearance
 repeated, we just take 1000 data from it, and make data as cycle of
 these 1000 data. Because 1000 data is produced in 5 seconds with 200Hz
 sampling rate, we measured average energy usage in 5 seconds.
+
 
 At first, we measured base energy usage in Neblina. The energy usage
 without transmision is 2.515 mAh. It is 3.472mAh with transmision but
@@ -704,62 +708,65 @@ And vigorous exercise, with same condition, it extends 5.7(19.7\%)
 and 4.8(16.7\%) hours. So LTC-Euclidean and LTC-Manhattan are useful
 to save devices Energy. At same time, The fidelity is guaranteed.
 
-\todo{ update }
-try using difference data set to measure compression radio, Error
-and energy usage. The numerical value presented below, is the
-average value in 5 seconds. The current electric current for Neblina
-without transmit is ***. we received 4000 data for human running and
-walking in 200Hz. Because of the limite RAM, for energy test, we only
-could save 400 static data into Neblina. We make 400 data run as a circle.
-For walking, one time swing arm need 1.2 second. Every 400 data must have 1 arm swing.
-change epsilon in order to decrease compression radio, measuring energy consumption.
+% \todo{ update }
+% try using difference data set to measure compression radio, Error
+% and energy usage. The numerical value presented below, is the
+% average value in 5 seconds. The current electric current for Neblina
+% without transmit is ***. we received 4000 data for human running and
+% walking in 200Hz. Because of the limite RAM, for energy test, we only
+% could save 400 static data into Neblina. We make 400 data run as a circle.
+% % For walking, one time swing arm need 1.2 second. Every 400 data must have 1 arm swing.
+% change epsilon in order to decrease compression radio, measuring energy consumption.
 
-\todo {running}
-If it's possible to save more static data?
-
-
-
-\begin{itemize}
-    \item Data set: human activities, running, walking, jogging and work behind desk.
-    \item Experiment Condition: work with neblina.
-    \item Result:
-    \item Conclusion:
-\end{itemize}
+% \todo {running}
+% If it's possible to save more static data?
 
 
 
-The transform rate of Neblina is 50Hz.
-\\
-5-times bicep curl from Neblina. It includes 613 data which produced in 12.28 seconds.
-\\
-Mohammad Lateral bicep data which include 41428, produced in proximate 14 minutes.
+% \begin{itemize}
+%     \item Data set: human activities, running, walking, jogging and work behind desk.
+%     \item Experiment Condition: work with neblina.
+%     \item Result:
+%     \item Conclusion:
+% \end{itemize}
 
-\subsection{Compression ratios}
 
-\subsection{Errors}
 
-\subsection{Memory consumption}
+% The transform rate of Neblina is 50Hz.
+% \\
+% 5-times bicep curl from Neblina. It includes 613 data which produced in 12.28 seconds.
+% \\
+% Mohammad Lateral bicep data which include 41428, produced in proximate 14 minutes.
+
+% \subsection{Compression ratios}
+
+% \subsection{Errors}
+
+% \subsection{Memory consumption}
 
 \section{Conclusion}
 
 \section*{Acknowledgement}
 \begin{table*}[]
-    \caption{}
+    \begin{center}
+    \caption{Result of Experiment 1 in Dimension 2}
     \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
     \hline
     \multicolumn{9}{|l|}{Dimension 2}                                                                                                                         \\ \hline
     Data set               & \multicolumn{4}{l|}{5-times bicep curl}                        & \multicolumn{4}{l|}{Mohammad Lateral bicep}                     \\ \hline
-    Distance               & \multicolumn{2}{l|}{Manhattan} & \multicolumn{2}{l|}{Eclidean} & \multicolumn{2}{l|}{Manhattan} & \multicolumn{2}{l|}{Euclidean} \\ \hline
+    Distance               & \multicolumn{2}{l|}{Manhattan} & \multicolumn{2}{l|}{Euclidean} & \multicolumn{2}{l|}{Manhattan} & \multicolumn{2}{l|}{Euclidean} \\ \hline
     Epsilon                & 100          & 100/$\sqrt{2}$  & 100         & 100/$\sqrt{2}$  & 100        & 100/$\sqrt{2}$    & 100        & 100/$\sqrt{2}$    \\ \hline
     Max Error              & 127.63       & 94.46           & 99.63       & 70.47           & 140.70     & 99.73             & 99.99      & 70.71             \\ \hline
     Compression Radio      & 29.03\%      & 20.88\%         & 25.12\%     & 19.57\%         & 60.17\%    & 51.59\%           & 57.75\%    & 48.86\%           \\ \hline
     Max memory Usage(peak) & 80B          & 80B             & 432B        & 240B            & 80B        & 80B               & 2.1KB      & 1.3KB             \\ \hline
     Time Usage(Total)      & 0.103ms      & 0.082ms         & 0.220ms     & 0.200ms         & 5.70ms     & 4.85ms            & 20.04ms    & 19.28ms           \\ \hline
     \end{tabular}
+    \end{center}
 \end{table*}
 
 \begin{table*}[]
-    \caption{Table}
+    \begin{center}
+    \caption{Result of Experiment 1 in Dimension 3}
     \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
     \hline
     \multicolumn{9}{|l|}{Dimension 3}                                                                                                                         \\ \hline
@@ -771,10 +778,12 @@ Mohammad Lateral bicep data which include 41428, produced in proximate 14 minute
     Max memory Usage(peak) & 112B         & 112B            & 384B        & 256B            & 112B       & 112B              & 4.9KB      & 3.0KB             \\ \hline
     Time Usage(Total)      & 0.119ms      & 0.094ms         & 0.230ms     & 0.200ms         & 8.50ms     & 7.07ms            & 26.41ms    & 21.26ms           \\ \hline
     \end{tabular}
+    \end{center}
 \end{table*}
 
 \begin{table}[]
-    \caption{}
+    \begin{center}
+    \caption{result of Experiment 2 with walking Data Set}
     \begin{tabular}{|l|l|l|l|l|l|l|}
     \hline
     DataSet           & \multicolumn{6}{l|}{walking}                                   \\\hline
@@ -784,10 +793,12 @@ Mohammad Lateral bicep data which include 41428, produced in proximate 14 minute
     Compression Radio & 88.9\%    & 66.4\%  & 45.5\%  & 68.6\%    & 25.5\%  & 9.5\%   \\\hline
     Energy Usage      & 2.642     & 2.787   & 3.020   & 2.879     & 3.221   & 3.383   \\\hline
     \end{tabular}
+    \end{center}
 \end{table}
 
 \begin{table}[]
-    \caption{}
+    \begin{center}
+    \caption{result of Experiment 2 with running Data Set}
     \begin{tabular}{|l|l|l|l|l|l|l|}
     \hline
     DataSet           & \multicolumn{6}{l|}{running}                                   \\\hline
@@ -797,6 +808,7 @@ Mohammad Lateral bicep data which include 41428, produced in proximate 14 minute
     Compression Radio & 87.6\%   & 63.3\%   & 37.2\%  & 64.4\%   & 19.8\%   & 5.7\%   \\\hline
     Energy Usage      & 3.098    & 3.020    & 3.134   & 2.952    & 3.320    & 3.393   \\\hline
     \end{tabular}
+    \end{center}
 \end{table}
 
 \bibliographystyle{IEEEtran}
