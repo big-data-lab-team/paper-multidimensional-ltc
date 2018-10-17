@@ -61,7 +61,7 @@ extension of LTC to higher dimensions. First, we provide a formulation of the al
 in an arbitrary vectorial space of dimension $n$. Furthermore, we
 implement the algorithm for the infinity and Euclidean norms, in spaces of
 dimension 2D+t and 3D+t. Finally, we compare the multi-dimensional LTC
-to the 1-dimensional version, on gyroscopic data acquired on a SoM
+to the 1-dimensional version, on acceleration data acquired on a SoM
 device.
 \end{abstract}
 
@@ -72,6 +72,7 @@ Section~\ref{sec:extension} presents our formulation in dimension $n$.
 
 % Some related works from Bo's report
 
+Compression reduces radio usage but increases resource usage.
 
 % transmitted, received points
 
@@ -288,10 +289,11 @@ impact on the compression error and ratio. To appreciate this effect,
 let us consider the comparison between the infinity norm and the
 Euclidean norm in dimension 2. By comparing the unit disk to the unit
 square, we obtain that the compression ratio of a random stream would
-be $\frac{4}{\pi}$ times larger with the infinity norm than with the
-Euclidean norm. Conversely, a compression error bounded by $\epsilon$
-with the infinity norm corresponds to a compression error of
-$\frac{\epsilon}{\sqrt{n}}$ with the Euclidean norm. Unsurprisingly, the
+be $\frac{4}{\pi}$ times larger with the infinity norm than with the 
+Euclidean norm. In 3D, this ratio would be $\frac{6}{\pi}$. Conversely, 
+a compression error bounded by $\epsilon$ with the infinity norm 
+corresponds to a compression error of $\frac{\epsilon}{\sqrt{n}}$ with 
+the Euclidean norm. Unsurprisingly, the
 infinity norm is more 'tolerant' than the Euclidean norm.
 
 \todo{Perhaps add a figure}
@@ -305,375 +307,172 @@ in any of the coordinates. \todo{This is unclear}
 \section{Implementation}
 Our code is available at ... (make a clean release!)
 
-As reference above, the norm selection is importance. In this section,
-we show the implementation of infinity norm and Euclidean norm.
+%~ As reference above, the norm selection is importance. In this section,
+%~ we show the implementation of infinity norm and Euclidean norm.
 
-%~ In practice, It's needed to transmit raw data which has multi-parameters
-%~ to clients e.g. Accelerometer, Euler Angle and Magnetometer etc.
-%~ Most of previous paper just force on single dimension sensor
-%~ data Compression. So we purpose a method to compress multi-dimensional
-%~ sensor data named LTC-D. It is used as linear estimation method.
-%~ Same as usual estimation compression method,  distance(different)
-%~ with compressed data from LTC-D and original data would not exceed
-%~ the predefined error range. We need to find line to represent
-%~ original data, it means the lines pass through datas' error range.
-%~ But in stream data, time seires data, it is difficult, because
-%~ all data do not show in same time plane. So this method will
-%~ mapping all data into one time plane. Then for each mapped error
-%~ range of data, check if there is intersection among them. If so means
-%~ there is a line could represent original data, and vice versa.
-\subsection{Multidimensional LTC with Manhattan distance}
-In section 2, we can know that the repersentation of intersection
-is a rectangular cuboid. So only one bounding box with n-dimensional
-is needed to represent the intersection. Assume a bounding box
-$\mathcal{BOX}_{m-1} = \bigcap_{j=1}^{m-1}{\mathcal{B}_{m-1}}$ which
-has Upper bound $U_i$ and lower Bound $L_i$ for each dimension
-$i$. So the fomular (1) in $6_{th}$ line of Algorithm 2 would
-be changed to $\mathcal{BOX}_{m-1} \bigcap \mathcal{B}_{m} \neq \O $. The Bounding box
-would be updated when this formular return true.
-Otherwise return false.
-\begin{enumerate}
-    \item Initialization: Let origin $(u^k_0, y^k_0) = (\tau_k, \xi_k)$.
-    \item For each data $(u_m^k, y_m^k)$ with diminsion $n$,
-            defines $(v_m, z_m) = (u_m^k - \tau^k, y_m^k - \xi^k)$ where $z_m =
-            \{ x_{mi} \mid 1\leqslant{i}\leqslant{n}\}$.
-    \item The $\mathcal{B}_{m}$ should be a ractangular cube with center
-            $\frac{v_1}{v_m}z_m$ and weight $\frac{v_1}{v_m}\epsilon$.
-    \item For each dimension $i$, box upper bound $U_i < \frac{v_1}{v_m}x_{mi}+
-            \frac{v_1}{v_m}\epsilon$ OR lower bound $L_i > \frac{v_1}{v_m}x_{mi}-\frac{v_1}{v_m}\epsilon$, return False.
-    \item Otherwise, the intersection do not be empty. Updating
-            the Bounding box $\mathcal{BOX}_m = \mathcal{BOX}_{m-1} \bigcap \mathcal{B}_{m}$. For
-            each dimension $i$ in $\mathcal{BOX}_m$, $U_i = min(U_i, \frac{v_1}{v_m}x_{mi}+
-            \frac{v_1}{v_m}\epsilon)$, and $L_i = max(L_i , \frac{v_1}{v_m}x_{mi}-\frac{v_1}{v_m}\epsilon)$. Return True.
-\end{enumerate}
+%~ \subsection{Multidimensional LTC with Manhattan distance}
+%~ In section 2, we can know that the repersentation of intersection
+%~ is a rectangular cuboid. So only one bounding box with n-dimensional
+%~ is needed to represent the intersection. Assume a bounding box
+%~ $\mathcal{BOX}_{m-1} = \bigcap_{j=1}^{m-1}{\mathcal{B}_{m-1}}$ which
+%~ has Upper bound $U_i$ and lower Bound $L_i$ for each dimension
+%~ $i$. So the fomular (1) in $6_{th}$ line of Algorithm 2 would
+%~ be changed to $\mathcal{BOX}_{m-1} \bigcap \mathcal{B}_{m} \neq \O $. The Bounding box
+%~ would be updated when this formular return true.
+%~ Otherwise return false.
+%~ \begin{enumerate}
+    %~ \item Initialization: Let origin $(u^k_0, y^k_0) = (\tau_k, \xi_k)$.
+    %~ \item For each data $(u_m^k, y_m^k)$ with diminsion $n$,
+            %~ defines $(v_m, z_m) = (u_m^k - \tau^k, y_m^k - \xi^k)$ where $z_m =
+            %~ \{ x_{mi} \mid 1\leqslant{i}\leqslant{n}\}$.
+    %~ \item The $\mathcal{B}_{m}$ should be a ractangular cube with center
+            %~ $\frac{v_1}{v_m}z_m$ and weight $\frac{v_1}{v_m}\epsilon$.
+    %~ \item For each dimension $i$, box upper bound $U_i < \frac{v_1}{v_m}x_{mi}+
+            %~ \frac{v_1}{v_m}\epsilon$ OR lower bound $L_i > \frac{v_1}{v_m}x_{mi}-\frac{v_1}{v_m}\epsilon$, return False.
+    %~ \item Otherwise, the intersection do not be empty. Updating
+            %~ the Bounding box $\mathcal{BOX}_m = \mathcal{BOX}_{m-1} \bigcap \mathcal{B}_{m}$. For
+            %~ each dimension $i$ in $\mathcal{BOX}_m$, $U_i = min(U_i, \frac{v_1}{v_m}x_{mi}+
+            %~ \frac{v_1}{v_m}\epsilon)$, and $L_i = max(L_i , \frac{v_1}{v_m}x_{mi}-\frac{v_1}{v_m}\epsilon)$. Return True.
+%~ \end{enumerate}
 
 
-% The method as below: assume the stream $i_{th}$ data
-% $D_i = (x_{i1}, x_{i2}, ..., x_{in},t_i)$, the first data $D_0$ would
-% be save as base point $Z=(z_{1}, z_{2}, ..., z_{n},t_z)$in the Method.
-% As usual, the timestamp after basepoint would be set as mapping plane.
-% We also need to record the intersect $S$ for find result lines.
-% The first data $D_1$ would change into tolerance range $R_1$.
-% initializing $S = R_1$. For each follow data$ D_i, i>1$, mapping $D_1$
-% into $\hat{D_1}$ = $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$,
-% and error margin after mapping should be $\frac{\epsilon}{t_i-t_z}$
-% on $\hat{x_{ij}}, j={1...n}$. The tolerance range after R_i, intersect
-% with S, if there is overlap, update S = S intersect R_i. If not, the base point
-% would be transmited and select a point in S as base point with timestamp $t_{i-1}$.
+%~ According the Implement, the infinity norm boils down to apply 1D LTC algorithm in each dimension respectively. Since, the intersection would be rectangle in 2D and cube in 3D, the corresponding max errors are $\frac{\epsilon}{\sqrt{2}}$ and $\frac{\epsilon}{\sqrt{3}}$. As we mentioned in Section 2, the infinity norm is more 'tolerant' than Euclidean norm. The max error between original data and reconstructed data certainly not greater than $\frac{\epsilon}{\sqrt{n}}$ where $n$ is dimension of data.
 
-% \todo{refector}
-% At beginning of the algorithm, we need a base point (which we will call \textit{z}) and bounding box which has upper and lower bound for each parameter respectively.Then start the algorithm.
-% \begin{enumerate}
-%   \item Initialization: Get first data point, and set point \textit{z} equals to first data point. Get the second data point $(x_{21},...,x_{2n},t_2)$, and assign each upper bound $U_j = x_{2j}+\frac{\epsilon}{t_2-t_1}$ and lower bound $L_j = x_{2j}-\frac{\epsilon}{t_2-t_1}$ where $j=\{1...n\}$.
-%   \item Get next data point, map the data point $(x_{i1},...,x_{in},t_i)$ into $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
-%   \item For each parameter(dimension) \textit{j}, if upper bound $U_j$ smaller than $x_{ij}-\frac{\epsilon}{t_i-t_1}$ or lower bound $L_j$ bigger than $x_{ij}+\frac{\epsilon}{t_i-t_1}$, then \textbf{goto 5}, else $U_j = min(U_j, x_{ij}+\frac{\epsilon}{t_i-t_1})$, and $L_j = max(L_j, x_{ij}-\frac{\epsilon}{t_i-t_1})$.
-%   \item Goto 2.
-%   \item output \textit{z} data point.
-%   \item Reset: set data point \textit{z} equals to center of the bounding box with time-stamp $t_{i-1}$, and $U_j=x_{ij}+\frac{\epsilon}{t_i-t_{i-1}}$, $L_j =x_{ij}-\frac{\epsilon}{t_i-t_{i-1}}$ with $j=\{1...n\}$.
-%   \item Goto 2.
-%   \item After all, output \textit{z} data point and center of bounding box respectively.
-% \end{enumerate}
+%~ \todo{maybe need a graphic}
 
-According the Implement, the infinity norm boils down to apply 1D LTC algorithm in each dimension respectively. Since, the intersection would be rectangle in 2D and cube in 3D, the corresponding max errors are $\frac{\epsilon}{\sqrt{2}}$ and $\frac{\epsilon}{\sqrt{3}}$. As we mentioned in Section 2, the infinity norm is more 'tolerant' than Euclidean norm. The max error between original data and reconstructed data certainly not greater than $\frac{\epsilon}{\sqrt{n}}$ where $n$ is dimension of data.
-% for tolerance range, it depends on EPSILON and different type of distances for EPSILON.
-% If we using Manhattan distance to create tolerance range, it would become rectangle in 2D and cube for 3D.
-% But the tolerance range wold become disk or ball in 2D and 3D respectively, by using Euclidean distance.
-\todo{maybe need a graphic}
+%~ \subsection{Multidimensional LTC with Euclidean distance}
+%~ In Euclidea norm, the representation of intersection is
+%~ volume. There is no specific model to record repersentation
+%~ with updating, so a list to save all balls $\mathcal{B}_j, 1\leqslant{j}\leqslant{m}$
+%~ is needed. In order to test weather a set of balls intersect,
+%~ the Helly's theorem could work, but the complexity of
+%~ this method is too high to work with embeded, low-power
+%~ systems which has limited CPU and RAM resource. So we
+%~ implement Euclidean norm by using a method which based
+%~ on plane sweep and binary search. Assume the list of balls $S_{m-1}$ contains balls from $\mathcal{B}_1$ to $\mathcal{B}_{m-1}$, and an temporary data point $output$ used for updated origin $(\tau^k, \xi^k)$. From the formula (1) in Section 3, the $(\mathcal{B}_j)_{j \in \llbracket 1, {m-1} \rrbracket}$ is a sequence of decreasing radius, so the larger balls that includes new coming ball $\mathcal{B}_{m-1}$ could be reomved from list $S_{m-1}$ so that reducing processing complexity of method. Therefore the list $S_{m-1}$ may not includes $m-1$ balls. Assume each $\Hat{\mathcal{B}} \in S$ which has corresponding center $\Hat{z}$ and radius $\Hat{\epsilon}$.
+%~ Let origin $(u^k_0, y^k_0) = (\tau_k, \xi_k)$, and for each data $(u_m^k, y_m^k)$ with diminsion $n$, defines $(v_m, z_m) = (u_m^k - \tau^k, y_m^k - \xi^k)$ where $z_m = \{ x_{mi} \mid 1\leqslant{i}\leqslant{n}\}$. The $\mathcal{B}_{m}$ should be one n-ball with center $\frac{v_1}{v_j}z_m$ and radius $\frac{v_1}{v_j}\epsilon$. The method is written in Algorithm~\ref{algo:isThereIntersection}.
 
+%~ \begin{algorithm}
+    %~ \begin{flushleft}
+        %~ \textbf{Input:} $S$, $\mathcal{B}_m$, $output$ \\
+        %~ \textbf{Output:} $true|false$\\
+    %~ \end{flushleft}
+    %~ \begin{algorithmic}[1]
+        %~ \State d = n \Comment{dimension index}
+        %~ \State $max_d = \frac{v_1}{v_m}(x_d + \epsilon)$
+        %~ \State $min_d = \frac{v_1}{v_m}(x_d - \epsilon)$
+        %~ \ForAll{$\Hat{\mathcal{B}}$ \textbf{in} $S$}
+            %~ \If{$\Hat{\mathcal{B}} \bigcap \mathcal{B}_m = $ \O }
+                %~ \State \textbf{return} false
+            %~ \ElsIf{$\mathcal{B}_m \bigcap \Hat{\mathcal{B}}  = \mathcal{B}_m $}
+                %~ \State remove $\Hat{\mathcal{B}}$ from $S$
+                %~ \State \textbf{continue}\\
+            %~ $max_d = \min(max_d, \Hat{x_d} + \Hat{\epsilon}$)\\
+            %~ $min_d = \max(min_d, \Hat{x_d} - \Hat{\epsilon}$)
+            %~ \EndIf
+        %~ \EndFor
+        %~ \State $\textbf{add } \mathcal{B}_m \textbf{ into } S$
+        %~ \If{$max_d < min_d$}
+            %~ \State \textbf{return} false
+        %~ \EndIf
+        %~ \State temp\_output = output \Comment{used for next operation}
+        %~ \If{Recursive$(min_d, max_d, n, p\_cp)$}
+            %~ \State $output = temp\_output$
+            %~ \State \textbf{return} true
+        %~ \Else
+            %~ \State \textbf{return} false
+        %~ \EndIf
+    %~ \end{algorithmic}
+    %~ \caption{isThereIntersection}
+    %~ \label{algo:isThereIntersection}
+%~ \end{algorithm}
 
-% In practice, Multidimensional LTC is same as implementing LTC in each
-% parameter respectively. But we did some changes in our method. Assume
-% $(x_{i1}, x_{i2}, ..., x_{in},t_i)$ is the $i_{th}$ coming data with
-% n-dimension, and a base data point Z  $(z_{1}, z_{2}, ...,
-% z_{n},t_z)$~\cite{schoellhammer2004lightweight}. We map each coming
-% data to $t_1$ time-stamp and create a bounding box for recording
-% overlapping range which includes upper and lower bound for each
-% dimension base on $t_1$. cause the time different between two adjacent
-% data, so the $i_th$ data after mapping is $(\{\hat{x_{ij}}=z_j +
-% \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
-% After that updating tolerance range by adding designed error margin
-% which after mapping $\frac{\epsilon}{t_i-t_z}$ on $\hat{x_{ij}},
-% j={1...n}$ with Manhattan distance. checking if there is overlap
-% between tolerance and bounding box.The algorithm is as follows.
+%~ In the method, selecting dimension(n as default in our method) to calculate max point value and min point value of all n-balls in this dimension. If the max value bigger than min value, then there is no intersection. After that. In Recursive function Algorithm~\ref{algo:recursive}, using binary search select
+%~ median $mid_d$ of $max_d$ and $min_d$ in order to find bound range of dimension d-1 ($max_{d-1}$, $min_{d-1}$) over the plane $x_d = max_d$. If bound range of dimension $d-1$ is not empty, continue calling function \textbf{Recursive}($min_{d-1}$, $min_{d-1}$, $d-1$, $temp\_output$). Recursively calling this function, until getting result.
+%~ \todo{add recursive pseudo-code}
 
-% At beginning of the algorithm, we need a base point (which we will call
-% \textit{z}) and bounding box which has upper and lower bound for each
-% parameter respectively.Then start the algorithm.
-% \begin{enumerate}
-%   \item Initialization: Get first data point, and set point \textit{z} equals to first data point. Get the second data point $(x_{21},...,x_{2n},t_2)$, and assign each upper bound $U_j = x_{2j}+\frac{\epsilon}{t_2-t_1}$ and lower bound $L_j = x_{2j}-\frac{\epsilon}{t_2-t_1}$ where $j=\{1...n\}$.
-%   \item Get next data point, map the data point $(x_{i1},...,x_{in},t_i)$ into $(\{\hat{x_{ij}}=z_j + \frac{x_{ij}-z_{j}}{t_i-t_z} \mid1\leqslant{j}\leqslant{n}\},t_i)$.
-%   \item For each parameter(dimension) \textit{j}, if upper bound $U_j$ smaller than $x_{ij}-\frac{\epsilon}{t_i-t_1}$ or lower bound $L_j$ bigger than $x_{ij}+\frac{\epsilon}{t_i-t_1}$, then \textbf{goto 5}, else $U_j = min(U_j, x_{ij}+\frac{\epsilon}{t_i-t_1})$, and $L_j = max(L_j, x_{ij}-\frac{\epsilon}{t_i-t_1})$.
-%   \item Goto 2.
-%   \item output \textit{z} data point.
-%   \item Reset: set data point \textit{z} equals to center of the bounding box with time-stamp $t_{i-1}$, and $U_j=x_{ij}+\frac{\epsilon}{t_i-t_{i-1}}$, $L_j =x_{ij}-\frac{\epsilon}{t_i-t_{i-1}}$ with $j=\{1...n\}$.
-%   \item Goto 2.
-%   \item After all, output \textit{z} data point and center of bounding box respectively.
-% \end{enumerate}
+%~ In 2-dimension Euclidean norm, the complexity of this algorithm is $O(n)+O(n\log\epsilon) = O(n\log\epsilon)$. In 3-dimension, It needs $O(\log^2\epsilon)$ to determine $mid\_3, mid\_2$, and $O(n)$ to traverse all balls in list and calculate bounding range of dimension d=1. So 3-dimensional method need $O(n \log^2\epsilon)$ totally. If we extend this idea for n-dimension, the complexiy of this method is $O(n \log^{n}\epsilon)$ where n is the number of dimension.
 
-\subsection{Multidimensional LTC with Euclidean distance}
-In Euclidea norm, the representation of intersection is
-volume. There is no specific model to record repersentation
-with updating, so a list to save all balls $\mathcal{B}_j, 1\leqslant{j}\leqslant{m}$
-is needed. In order to test weather a set of balls intersect,
-the Helly's theorem could work, but the complexity of
-this method is too high to work with embeded, low-power
-systems which has limited CPU and RAM resource. So we
-implement Euclidean norm by using a method which based
-on plane sweep and binary search. Assume the list of balls $S_{m-1}$ contains balls from $\mathcal{B}_1$ to $\mathcal{B}_{m-1}$, and an temporary data point $output$ used for updated origin $(\tau^k, \xi^k)$. From the formula (1) in Section 3, the $(\mathcal{B}_j)_{j \in \llbracket 1, {m-1} \rrbracket}$ is a sequence of decreasing radius, so the larger balls that includes new coming ball $\mathcal{B}_{m-1}$ could be reomved from list $S_{m-1}$ so that reducing processing complexity of method. Therefore the list $S_{m-1}$ may not includes $m-1$ balls. Assume each $\Hat{\mathcal{B}} \in S$ which has corresponding center $\Hat{z}$ and radius $\Hat{\epsilon}$.
-Let origin $(u^k_0, y^k_0) = (\tau_k, \xi_k)$, and for each data $(u_m^k, y_m^k)$ with diminsion $n$, defines $(v_m, z_m) = (u_m^k - \tau^k, y_m^k - \xi^k)$ where $z_m = \{ x_{mi} \mid 1\leqslant{i}\leqslant{n}\}$. The $\mathcal{B}_{m}$ should be one n-ball with center $\frac{v_1}{v_j}z_m$ and radius $\frac{v_1}{v_j}\epsilon$. The method is written in Algorithm~\ref{algo:isThereIntersection}.
+%~ \begin{algorithm}
+    %~ \begin{flushleft}
+        %~ \textbf{function} Recursive$(left, right, j, p)$  -- $j$ means $j_th$ dimension
+    %~ \end{flushleft}
+    %~ \begin{algorithmic}[1]
+        %~ \While{$left \leqslant right$}
+            %~ \State $mid \gets (left + right)/2$
+            %~ \State $max \gets +\infty$
+            %~ \State $min \gets -\infty$
+            %~ \For{$i=1$ \textbf{to} $tmp\_list.length$}
+                %~ \State $P_1$ and $P_2$ are intersection points of $tmp\_list[i]$ and line $d_{j}=mid$, $(P1.d_{j-1}\geqslant P2.d_{j-1})$
+                %~ \If{$P_1.d_{j-1} < max$}
+                    %~ \State $max \gets p_1.d_{j-1}$
+                    %~ \State $max\_index \gets i$
+                %~ \EndIf
+                %~ \If{$P_2.d_{j-1} > min$}
+                    %~ \State $min \gets p_2.d_{j-1}$
+                    %~ \State $min\_index \gets i$
+                %~ \EndIf
+            %~ \EndFor
+            %~ \If{$max >= min$}
+                %~ \State $p.d_j \gets mid$
+                %~ \If{Recursive$(min, max, j-1, p)$}
+                    %~ \State \textbf{return} true
+                %~ \EndIf
+            %~ \EndIf
+            %~ \State Assume $P_d$ is the intersection between common chord of two objects $tmp\_list[max\_index]$, $tmp\_list[min\_index]$ and their line of centers.
+            %~ \If{$P_d.d_j < mid$}
+                %~ \State $right \gets mid-1$
+            %~ \ElsIf{$P_d.d_j > mid$}
+                %~ \State $left \gets mid+1$
+            %~ \EndIf
 
-\begin{algorithm}
-    \begin{flushleft}
-        \textbf{Input:} $S$, $\mathcal{B}_m$, $output$ \\
-        \textbf{Output:} $true|false$\\
-    \end{flushleft}
-    \begin{algorithmic}[1]
-        \State d = n \Comment{dimension index}
-        \State $max_d = \frac{v_1}{v_m}(x_d + \epsilon)$
-        \State $min_d = \frac{v_1}{v_m}(x_d - \epsilon)$
-        \ForAll{$\Hat{\mathcal{B}}$ \textbf{in} $S$}
-            \If{$\Hat{\mathcal{B}} \bigcap \mathcal{B}_m = $ \O }
-                \State \textbf{return} false
-            \ElsIf{$\mathcal{B}_m \bigcap \Hat{\mathcal{B}}  = \mathcal{B}_m $}
-                \State remove $\Hat{\mathcal{B}}$ from $S$
-                \State \textbf{continue}\\
-            $max_d = \min(max_d, \Hat{x_d} + \Hat{\epsilon}$)\\
-            $min_d = \max(min_d, \Hat{x_d} - \Hat{\epsilon}$)
-            \EndIf
-        \EndFor
-        \State $\textbf{add } \mathcal{B}_m \textbf{ into } S$
-        \If{$max_d < min_d$}
-            \State \textbf{return} false
-        \EndIf
-        \State temp\_output = output \Comment{used for next operation}
-        \If{Recursive$(min_d, max_d, n, p\_cp)$}
-            \State $output = temp\_output$
-            \State \textbf{return} true
-        \Else
-            \State \textbf{return} false
-        \EndIf
-    \end{algorithmic}
-    \caption{isThereIntersection}
-    \label{algo:isThereIntersection}
-\end{algorithm}
+        %~ \EndWhile
+        %~ \Return false
+    %~ \end{algorithmic}
+%~ \end{algorithm}
 
-% \begin{enumerate}
-%     \item Initialzation: Let origin $(u^k_0, y^k_0) = (\tau_k, \xi_k)$.
-%     \item For each data $(u_m^k, y_m^k)$ with diminsion $n$,
-%             defines $(v_m, z_m) = (u_m^k - \tau^k, y_m^k - \xi^k)$ where $z_m =
-%             \{ x_{mi} \mid 1\leqslant{i}\leqslant{n}\}$.
-%     \item The $\mathcal{B}_{m}$ should be one n-ball with center
-%             $\frac{v_1}{v_j}z_m$ and radius $\frac{v_1}{v_j}\epsilon$.
-%     \item For each ball $\hat{\mathcal{B}}$ in list $S$, if $\hat{\mathcal{B}} \bigcap \mathcal{B}_m = \O$, return False. Else if
-%     $\mathcal{B}_m\subset\hat{\mathcal{B}}$, remove $\hat{\mathcal{B}}$ from list $S$.
-%     \item Select parameter p = n (which is ball's dimension), define $Max_{(p=n)} = \min_{j=1}^{S.length}{(\frac{v_1}{v_j}z_{(p=n)} + \frac{v_1}{v_j}\epsilon)}$, and $Min_{(p=n)} = \max_{j=1}^{S.length}{(\frac{v_1}{v_j}z_{(p=n)} - \frac{v_1}{v_j}\epsilon)}$. If $Max_{(p=n)} < Min_{(p=n)}$, return False.
-%     \item Use binary search to select $mid_{(p=n)} = (Min_{(p=n)} + Max_{(p=n)})/2$
-% \end{enumerate}
-
-% In Euclidean distance version, we also map the coming data into same
-% time-stamp $t_1$ the timestamp after base point. The difference with
-% Manhattan distance version is that recording overlapping part with
-% a post-designed model is difficult, which need retain several arcs in
-% 2-dimension, or convex surfaces in 3-dimension. In our method, we will
-% record all tolerance range for every mapped data which come from base
-% data point until coming data point, in order to checking if there is
-% intersection among them. For instance, in 3D-t, assume we have a the
-% base point $Z = D_0$ and the tolerance range $R_1$ which is a ball
-% as the intersection S. we need a list L to record mapped balls
-% from $D_1$ to coming data. For each comming data $D_i, i>1$ mapping
-% this data into $t_1$, and add it into list. Then the work is check out
-% if all balls intersect, and form a public intersection.
-% The method is based on plane sweep and binary search. At first, select one parameter,
-% such as x-axis, finding a bounding range of all balls $B_i$ in x-axis.
-% suppose $Max_bound_x = Min{1..n}{B_i.center.x + EPSILON/i}$, and
-% $Min_bound_x = Max{1..n}{B_i.center.x - EPSILON/i}$. If there is overlap
-% among balls, then the axis of the points inside intersection must located
-% between Min_bound_x and Max_bound_x.
-In the method, selecting dimension(n as default in our method) to calculate max point value and min point value of all n-balls in this dimension. If the max value bigger than min value, then there is no intersection. After that. In Recursive function Algorithm~\ref{algo:recursive}, using binary search select
-median $mid_d$ of $max_d$ and $min_d$ in order to find bound range of dimension d-1 ($max_{d-1}$, $min_{d-1}$) over the plane $x_d = max_d$. If bound range of dimension $d-1$ is not empty, continue calling function \textbf{Recursive}($min_{d-1}$, $min_{d-1}$, $d-1$, $temp\_output$). Recursively calling this function, until getting result.
-\todo{add recursive pseudo-code}
-% Using binary search to select
-% mid_x = (Min_bound_x + Max_bound_x)/2, then calculate a y-axis bounding
-% with the plane x = mid_x. If the get bounding range in y-axis where
-% $Max_bound_y > Min_bound_y$ and using binary search again to find mid_y,
-% It means there is a line x=mid_x, Max_bound_y>= y >= Min_bound_y,
-% parallels z-axis, could pass through all balls. Finally, in z-axis,
-% computing bounding range, and If $Max_bound_z > Min_bound_z$, there
-% must be one or more points inside all balls. The problem be solved.
-% If the loop of binary search in x-axis overs, then there is no public
-% intersection among balls, and need to transmit and update base point.
-% In this method we need O(n*logn*logn) time complexity for binary search
-% in x-axis and y-axis and traversal all balls in z-axis, also O(n) space
-% complexity is needed for maintaining list. According this method,
-% it could be extended into N-dimensional data. The main idea is to search,
-% dimension by dimension, from a room or plane or line and get intersection
-% point finally.
-
-% \todo{below content is useful? }
-% In the rest of this section, we describe examples for 2-dimensional and 3-dimensional version. After that, we extend the method for n-dimension.
-% \begin{itemize}
-% \item \textbf{2-dimensional LTC in Euclidean distance:}In this situation, the tolerance range after mapping is a disk. After initializing base data point \textit{z}, for each coming data point need to be mapped into a same time-stamp, and heck if there is a intersection amount disks in disks set and new mapped coming data. Therefore, a algorithm is need to determine whether \textit{n} disks intersect or not.
-% \item \textbf{3-dimensional LTC in Euclidean distance:}In 3-dimension, cause of the preassigned error margin, the disks become balls with one extra axis. So In 3-dimension whether \textit{n} balls intersect need to be check.
-% \end{itemize}
-
-% At first, let us solve the \textit{n} disks intersect. We use a algorithm which is based on plane sweep and dichotomy. Assume a disk include center$(x,y)$ and radius $r$. The pseudo-code in Algorithm 1.
-
-% \begin{algorithm}
-%     \caption{whether disks intersect}
-%     \begin{flushleft}
-%         \textbf{Input:} $l$ - list of disks, $d$ - mapped coming disk, $p$ - point will be base point\\
-%         \textbf{Output:} $true|false$  is there a intersection\\
-%         \textbf{function} isIntersect$(l, d, p)$
-%     \end{flushleft}
-%     \begin{algorithmic}[1]
-%         \State $tmp_list \gets null$
-%         \State $max\_x\gets d.x+d.r$
-%         \State $min\_x\gets d.x-d.r$
-
-%         \ForAll{$old\_disk$ \textbf{in} $l$}
-%             \If{$d \cap old\_disk = \emptyset$} % distance(d.center, old\_disk.center) > d.r + old\_disk.r
-%                 \State \textbf{return} false
-%             \ElsIf{$d \cap old\_disk \neq d$}
-%                 \State {$\textbf{add } old\_disk \textbf{ into } tmp\_list$\\
-%                         $max\_x\gets $ MIN($max\_x, old\_disk.x+old\_disk.r$)\\
-%                         $min\_x\gets $ MAX($min\_x, old\_disk.x-old\_disk.r$)}
-%             \EndIf
-%         \EndFor
-%         \State $\textbf{add } d \textbf{ into } tmp\_list$
-%         \If{$max\_x < min\_x$}
-%             \State \textbf{return} false
-%         \EndIf
-%         \While{$min\_x \leqslant max\_x$}
-%             \State $mid \gets (min\_x + max\_x)/2$
-%             \State $max\_y \gets +\infty$
-%             \State $min\_y \gets -\infty$
-%             \For{$i=1$ \textbf{to} $tmp\_list.length$}
-%                 \State $P_1$ and $P_2$ are intersection points of $tmp\_list[i]$ and line $x=mid$, $(P1.y\geqslant P2.y)$
-%                 \If{$P_1.y < max\_y$}
-%                     \State $max\_y \gets p_1.y$
-%                     \State $max\_index \gets i$
-%                 \EndIf
-%                 \If{$P_2.y > min\_y$}
-%                     \State $min\_y \gets p_2.y$
-%                     \State $min\_index \gets i$
-%                 \EndIf
-%             \EndFor
-%             \If{$max\_y >= min\_y$}
-%                 \State $p.x \gets mid$
-%                 \State $p.y \gets (max\_y+min\_y)/2$
-%                 \State $l \gets tmp\_list$
-%                 \State \textbf{return} true
-%             \EndIf
-%             \State {Assume $P_d$ is the intersection between line of
-%             centers from $tmp\_list[max\_index]$ and $tmp\_list[min\_index]$
-%             , and their common chord}
-%             \If{$P_d.x < mid$}
-%                 \State $max\_y \gets mid-1$
-%             \ElsIf{$P_d.x > mid$}
-%                 \State $min\_y \gets mid+1$
-%             \EndIf
-%         \EndWhile
-%         \Return false
-%     \end{algorithmic}
-% \end{algorithm}
-
-% The main idea of the algorithm is, remove the bigger disk who contains mapped coming disk. It maybe increase Computational efficiency in the rest of algorithm, cause mapped coming disk is the smallest one than all in list of disks. Then we make a bounding range for x-axis and select a x-value $mid$ by using dichotomy method in order to calculate if a point $(y, mid)$ is included all disks.
-In 2-dimension Euclidean norm, the complexity of this algorithm is $O(n)+O(n\log\epsilon) = O(n\log\epsilon)$. In 3-dimension, It needs $O(\log^2\epsilon)$ to determine $mid\_3, mid\_2$, and $O(n)$ to traverse all balls in list and calculate bounding range of dimension d=1. So 3-dimensional method need $O(n \log^2\epsilon)$ totally. If we extend this idea for n-dimension, the complexiy of this method is $O(n \log^{n}\epsilon)$ where n is the number of dimension.
-
-% \begin{algorithm}
-%     \begin{flushleft}
-%         \textbf{Input:} $S$, $\mathcal{B}_m$, $output$
-%         \textbf{Output:} $true|false$  is there a intersection\\
-%         \textbf{function} isIntersect$(l, o, p)$
-%     \end{flushleft}
-%     \begin{algorithmic}[1]
-%         \State $tmp_list \gets null$
-%         \State $max \gets o.d\_n+o.r$
-%         \State $min \gets o.d\_n-o.r$
-
-%         \ForAll{$old\_obj$ \textbf{in} $l$}
-%             \If{$o \cap old\_obj = \emptyset$}
-%                 \State \textbf{return} false
-%             \ElsIf{$o \cap old\_obj \neq o$}
-%                 \State {$\textbf{add } old\_obj \textbf{ into } tmp\_list$\\
-%                         $max\gets $ MIN($max, old\_obj.d\_n+old\_obj.r$)\\
-%                         $min\gets $ MAX($min, old\_obj.d\_n-old\_obj.r$)}
-%             \EndIf
-%         \EndFor
-%         \State $\textbf{add } o \textbf{ into } tmp\_list$
-%         \If{$max < min$}
-%             \State \textbf{return} false
-%         \EndIf
-%         $p\_cp \gets p$
-%         \If{Recursive$(min, max, n, p\_cp)$}
-%             \State $p \gets p\_cp$
-%             \State \textbf{return} true
-%         \Else
-%             \State \textbf{return} false
-%         \EndIf
-%     \end{algorithmic}
-%     \caption{isThereIntersection}
-%     \label{algo:isThereIntersection}
-% \end{algorithm}
-
-\begin{algorithm}
-    \begin{flushleft}
-        \textbf{function} Recursive$(left, right, j, p)$  -- $j$ means $j_th$ dimension
-    \end{flushleft}
-    \begin{algorithmic}[1]
-        \While{$left \leqslant right$}
-            \State $mid \gets (left + right)/2$
-            \State $max \gets +\infty$
-            \State $min \gets -\infty$
-            \For{$i=1$ \textbf{to} $tmp\_list.length$}
-                \State $P_1$ and $P_2$ are intersection points of $tmp\_list[i]$ and line $d_{j}=mid$, $(P1.d_{j-1}\geqslant P2.d_{j-1})$
-                \If{$P_1.d_{j-1} < max$}
-                    \State $max \gets p_1.d_{j-1}$
-                    \State $max\_index \gets i$
-                \EndIf
-                \If{$P_2.d_{j-1} > min$}
-                    \State $min \gets p_2.d_{j-1}$
-                    \State $min\_index \gets i$
-                \EndIf
-            \EndFor
-            \If{$max >= min$}
-                \State $p.d_j \gets mid$
-                \If{Recursive$(min, max, j-1, p)$}
-                    \State \textbf{return} true
-                \EndIf
-            \EndIf
-            \State Assume $P_d$ is the intersection between common chord of two objects $tmp\_list[max\_index]$, $tmp\_list[min\_index]$ and their line of centers.
-            \If{$P_d.d_j < mid$}
-                \State $right \gets mid-1$
-            \ElsIf{$P_d.d_j > mid$}
-                \State $left \gets mid+1$
-            \EndIf
-
-        \EndWhile
-        \Return false
-    \end{algorithmic}
-\end{algorithm}
-
-\section{Results}
+\section{Experiments and Results}
 
 We conducted two experiments using Motsai's Neblina 
 module\footnote{\url{ https://motsai.com/products/neblina}}, a system 
 with a Nordic Semiconductor nRF52832 micro-controller, 64~KB of RAM, 
 and Bluetooth Low Energy connectivity. The Neblina has a 3D 
-accelerometer, 3D gyroscope, 3D magnetometer, and environmental sensors 
-for humidity, temperature and pressure. It can function as an Inertial
-Motion Unit, a Vertical Reference Unit, or an Attitude and Heading Reference
-System. 
+accelerometer, a 3D gyroscope, a 3D magnetometer, and environmental sensors 
+for humidity, temperature and pressure. It can function as an Inertial 
+Motion Unit, a Vertical Reference Unit, or an Attitude and Heading 
+Reference System. The Neblina has a battery of 100mAh; its average 
+consumption is 2.52~mA without radio transmission and 3.47~mA with 
+radio transmission, leading to an autonomy of 39.7~h without 
+transmission and 28.8~h with transmission. \todo{Omid, could you review
+this paragraph?}
 
 \subsection{Experiment 1: validation tests}
 
 In this experiment we validated the behavior of our LTC extensions on a 
-PC processing data acquired with the Neblina. We collected 2 data sets, 
-``5-times biceps curl" and ``Mohammad lateral biceps curl". from the 
-accelerometer with a 50Hz sampling rate (see 
-Figure~\ref{fig:datasets}). 
+PC processing data acquired with the Neblina. We collected two 3D 
+accelerometer time series, a short one and a longer one, acquired 
+on two different subjects performing biceps curl, with a 50Hz sampling rate (see 
+Figure~\ref{fig:datasets-1}). It should be noted that the longer dataset also has 
+a higher amplitude, most likely due to differences between subjects.
 
-We compressed the datasets with various values of $\epsilon$, using our 
+\begin{figure*}
+\begin{subfigure}{2\columnwidth}
+\includegraphics[width=0.33\columnwidth]{figures/5-time-bicep-curl-plot-x.pdf}
+\includegraphics[width=0.33\columnwidth]{figures/5-time-bicep-curl-plot-y.pdf}
+\includegraphics[width=0.33\columnwidth]{figures/5-time-bicep-curl-plot-z.pdf}
+\caption{Short}
+\end{subfigure}
+\begin{subfigure}{2\columnwidth}
+\includegraphics[width=0.33\columnwidth]{figures/Mohammad-bicep-curl-plot-x.pdf}
+\includegraphics[width=0.33\columnwidth]{figures/Mohammad-bicep-curl-plot-y.pdf}
+\includegraphics[width=0.33\columnwidth]{figures/Mohammad-bicep-curl-plot-z.pdf}
+\caption{Long} 
+\end{subfigure}
+\caption{Time series used in Experiment 1}
+\label{fig:datasets-1}
+\end{figure*}
+
+We compressed the time series with various values of $\epsilon$, using our 
 2D (x and y) and 3D (x, y and z) implementations of LTC. On the Neblina,
 the resolution of the accelerometer is about 20~mg (196~mm/$s^2$).
  We used a 
@@ -685,38 +484,39 @@ and processing time using \texttt{gettimeofday()} from the GNU C
 Library. 
 
 Results are reported in Table~\ref{table:results-validation}. 
-As expected, the maximum measured error remains lower than $\epsilon$ in 
-all cases, and the compression ratio increases with $\epsilon$. 
-%Compared to the infinity norm, The Euclidean norm reduces the 
-%compression ratio by a factor of \pm, which was also expected.
+As expected, the compression ratio increases with $\epsilon$, and the 
+maximum measured error remains lower than $\epsilon$ in all cases. The 
+maximum is reached most of the time on these time series.
 
-    %~ \item Result: From the table 1 and table 2, The Max Error, 
-    %~ Compression Radio and Time usage in both norm decrease when EPSILON 
-    %~ become smaller. Comparing with different norm and same EPSILON, the 
-    %~ infinity no, and few ndeed has more 'tolerance'. But when comparing 
-    %~ using Infinity with $\epsilon=100/\sqrt{n}$, where n is number of 
-    %~ dimension, to make sure the max error would not greater than 100, 
-    %~ and Euclidean with $\epsilon$=100, the Euclidean norm has better 
-    %~ compression radio. Although Infinity norm makes Max error larger, 
-    %~ but it has less running time, and few fixed Memory usage according 
-    %~ number of dimension. The Memory Usage of Euclidea is not fixed, 
-    %~ because it need save $\mathcal{B}_i, i\subset\llbracket 1, m 
-    %~ \rrbracket$ after origin $(u_0^k, y_0^k)$, costing lots of Memory. 
-    %~ From the table 1 and 2, the Compression Radio in second data set is 
-    %~ pretty better than first data set, because Mohammad Lateral bicep 
-    %~ has more data than first dataset about 67.5 times. It is pointless 
-    %~ to consider the different compression radio in this situation.
+\paragraph{Inifinity vs Euclidean norms}
+Compared to the infinity norm, The average ratio between the compression ratios obtained
+with the infinity and Euclidean norm is 1.08 for 2D data, and 1.20 
+for 3D data. These ratios are lower than the theoretical values of 
+$\frac{4}{\pi}$ in 2D and $\frac{6}{\pi}$ in 3D, which are obtained for 
+random-uniform signals. Unsurprisingly, the infinity norm surpasses the 
+Euclidean norm in terms of resource consumption. Memory-wise, the 
+infinity norm requires a constant amount of 80~B, used to store the 
+intersection of n-balls. This amount is realistic on modules such as
+the Neblina. The Euclidean norm, however, uses up to 4.9~KB of memory 
+on the Long time series in 3D with $\epsilon=100$. More importantly, 
+the amount of required memory increases for more complex time series 
+(Long vs Short), and it also increases with larger 
+values of $\epsilon$. Similar observations are made for the processing 
+time, with values ranging from 0.2~ms for the simplest time series and 
+smallest $\epsilon$, to 26.4~ms for the most complex time series and 
+largest $\epsilon$. A better algorithm needs to be found to make the 
+Euclidean norm usable for systems on modules.
 
-    %~ \item Conclusion: The infinity norm has higher compression radio 
-    %~ than Euclidean norm with same $\epsilon$, and uses less running 
-    %~ time and little memory. But Euclidean makes sure the Max Error 
-    %~ between reconstructed data and original data under EPSILON. Both of 
-    %~ norm would has lower Compression ratios when $\epsilon$ becomes 
-    %~ smaller. 
-
+\paragraph{2D vs 3D}
+For a given $\epsilon$ of 100 and a given time series, the compression 
+ratios are always higher in 2D than in 3D. It makes sense since the 
+\todo{x} is higher in 3D than it is in 2D. Resource consumption is 
+higher in 3D than in 2D: for the infinity norm, 3D consumes 1.4 times 
+more memory than 2D (1.6 times on average for Euclidean norm), and 
+processing time is 1.3 longer on average (1.18 on average for Euclidean 
+norm).
 
 \begin{table}
-
     \begin{subfigure}{\columnwidth}
     \centering
     \begin{tabular}{l|l|l|l|l}
@@ -726,10 +526,10 @@ all cases, and the compression ratio increases with $\epsilon$.
     $\epsilon$                & 100          & 100/$\sqrt{2}$  & 100         & 100/$\sqrt{2}$ \\
     Max error              & 99.88       & 70.68           & 99.63       & 70.47          \\ 
     Compression ratio      & 29.03\%      & 20.88\%         & 25.12\%     & 19.57\%        \\ 
-    Peak memory usage      & 80B          & 80B             & 432B        & 240B           \\ 
-    Processing time        & 0.103ms      & 0.082ms         & 0.220ms     & 0.200ms        \\ \hline
+    Peak memory            & 80~B          & 80~B             & 432~B        & 240~B           \\ 
+    Processing time        & 0.103~ms      & 0.082~ms         & 0.220~ms     & 0.200~ms        \\ \hline
     \end{tabular}
-    \caption{5-times bicep curl (2D)}
+    \caption{Short (2D)}
     \end{subfigure}\\
     \begin{subfigure}{\columnwidth}
     \centering
@@ -740,10 +540,10 @@ all cases, and the compression ratio increases with $\epsilon$.
     $\epsilon$             & 100        & 100/$\sqrt{2}$    & 100        & 100/$\sqrt{2}$    \\ 
     Max error              & 99.99     & 70.71             & 99.99      & 70.71             \\ 
     Compression ratio      & 60.17\%    & 51.59\%           & 57.75\%    & 48.86\%           \\ 
-    Peak memory       & 80B        & 80B               & 2.1KB      & 1.3KB             \\ 
-    Processing time      & 5.70ms     & 4.85ms            & 20.04ms    & 19.28ms           \\ \hline
+    Peak memory       & 80~B        & 80~B               & 2.1~KB      & 1.3~KB             \\ 
+    Processing time      & 5.70~ms     & 4.85~ms            & 20.04~ms    & 19.28~ms           \\ \hline
     \end{tabular}
-    \caption{Mohammad lateral biceps curl (2D)}
+    \caption{Long (2D)}
     \end{subfigure}\\    
     \begin{subfigure}{\columnwidth}
     \centering
@@ -754,10 +554,10 @@ all cases, and the compression ratio increases with $\epsilon$.
     $\epsilon$             & 100          & 100/$\sqrt{3}$  & 100         & 100/$\sqrt{3}$   \\ 
     Max error              & 99.88       & 57.41           & 99.94       & 56.89            \\ 
     Compression ratio      & 23.00\%      & 12.89\%         & 18.43\%     & 9.95\%           \\ 
-    Peak memory            & 112B         & 112B            & 384B        & 256B             \\ 
-    Processing time        & 0.119ms      & 0.094ms         & 0.230ms     & 0.200ms          \\ \hline
+    Peak memory            & 112~B         & 112~B            & 384~B        & 256~B             \\ 
+    Processing time        & 0.119~ms      & 0.094~ms         & 0.230~ms     & 0.200~ms          \\ \hline
     \end{tabular}
-    \caption{5-times biceps curl (3D)}
+    \caption{Short (3D)}
     \end{subfigure}\\
     \begin{subfigure}{\columnwidth}
     \centering
@@ -768,126 +568,120 @@ all cases, and the compression ratio increases with $\epsilon$.
     $\epsilon$                & 100        & 100/$\sqrt{3}$    & 100        & 100/$\sqrt{3}$    \\
     Max error                 & 99.96     & 57.73             & 99.99      & 57.73             \\
     Compression ratio         & 51.13\%    & 37.17\%           & 46.05\%    & 32.63\%           \\
-    Peak memory & 112B        & 112B              & 4.9KB      & 3.0KB             \\
-    Processing time           & 8.50ms     & 7.07ms            & 26.41ms    & 21.26ms           \\ \hline
+    Peak memory & 112~B        & 112~B              & 4.9~KB      & 3.0~KB             \\
+    Processing time           & 8.50~ms     & 7.07~ms            & 26.41~ms    & 21.26~ms           \\ \hline
     \end{tabular}
-    \caption{Mohammad lateral biceps curl (3D)}
+    \caption{Long (3D)}
     \end{subfigure}
-    \caption{Validation experiment}
+    \caption{Results from Experiment 1}
     \label{table:results-validation}
 \end{table}
 
-\subsection{Experiment 2: energy reduction on the Neblina}
+\subsection{Experiment 2: impact on energy consumption}
+
+We measured the energy consumption of the Neblina module 
+for different values of $\epsilon$ and norms, to quantify the 
+added-value of LTC for this system. 
+
+We acquired two 3D accelerometer time series at 200Hz corresponding to 
+common human activities: walking and running (see Figure~\ref{fig:datasets-2}). In both cases, the 
+subject was wearing the Neblina module on their right wrist.
+We collected 1,000 data points for each activity, corresponding to 
+5 seconds of activity.
+\begin{figure*}
+\begin{subfigure}{2\columnwidth}
+\includegraphics[width=0.33\columnwidth]{./figures/walking-1000-x.pdf}
+\includegraphics[width=0.33\columnwidth]{./figures/walking-1000-y.pdf}
+\includegraphics[width=0.33\columnwidth]{./figures/walking-1000-z.pdf}
+\caption{Walking}
+\end{subfigure}
+\begin{subfigure}{2\columnwidth}
+\includegraphics[width=0.33\columnwidth]{./figures/running-1000-x.pdf}
+\includegraphics[width=0.33\columnwidth]{./figures/running-1000-y.pdf}
+\includegraphics[width=0.33\columnwidth]{./figures/running-1000-z.pdf}
+\caption{Running}
+\end{subfigure}
+\caption{Time series used in Experiment 2}
+\label{fig:datasets-2}
+\end{figure*}
+
+We measured energy consumption associated with the transmission of 
+these time series, for different norms and $\epsilon$ values. To do so, 
+we 'replayed' the time series by loading them as a byte array in the 
+Neblina, and we measured current intensity every 500~ms.
+
+Results are reported in Table~\ref{table:results-energy}\todo{errors don't make sense}.
+For a given $\epsilon$ and norm, the compression ratio was larger for 
+walking than for running, since the running signal had a higher 
+entropy. The ratio of saved energy is relative to the reference current of 
+3.47~mA measured when the Neblina transmits data without compression.
+In all cases, activating compression saved energy. The reduction in energy
+consumption behaved as the compression ratio: it increased with $\epsilon$,
+was higher for the infinity norm than for the Euclidean, and it was 
+higher for the walking activity than for running. For a realistic error 
+of $\epsilon=20$\todo{unit}, the ratio of saved energy with the infinity norm was
+close to 20\%, which is very substantial.
+
+\begin{table}[]
+    \begin{subfigure}{\columnwidth}
+    \centering
+    \begin{tabular}{l|l|l|l|l|l|l}
+    \hline
+    \rowcolor{headcolor}
+                           & \multicolumn{3}{c|}{Infinity} & \multicolumn{3}{c}{Euclidean} \\\hline
+    $\epsilon$              & 100       & 20      & 10      & 100       & 20      & 10   \\
+    Max error              & 158.793   & 31.828  & 16.763  & 153.141   & 31.763  & 15.898  \\
+    Compr.      ratio      & 88.9\%    & 66.4\%  & 45.5\%  & 68.6\%    & 25.5\%  & 9.5\%   \\
+    Average mA    & 2.642     & 2.787   & 3.020   & 2.879     & 3.221   & 3.383   \\
+    Saved energy  & 23.9\%    & 19.7\%  & 13.0\%  & 17.0\%    & 7.18 \% & 2.50\%\\
+    \hline
+    \end{tabular}
+    \caption{Walking}
+    \end{subfigure}
+    \begin{subfigure}{\columnwidth}
+    \centering
+    \begin{tabular}{l|l|l|l|l|l|l}
+    \hline
+    \rowcolor{headcolor}
+                      & \multicolumn{3}{c|}{Infinity} & \multicolumn{3}{c}{Euclidean} \\\hline
+    $\epsilon$         & 100      & 20       & 10      & 100      & 20       & 10      \\
+    Max error         & 99.995   & 19.984   & 9.979   & 99.995   & 19.989   & 9.959   \\
+    Compr.      ratio & 87.6\%   & 63.3\%   & 37.2\%  & 64.4\%   & 19.8\%   & 5.7\%   \\
+    Average mA      & 3.098    & 3.020    & 3.134   & 2.952    & 3.320    & 3.393   \\
+    Saved energy   &  10.7\%   & 13.0\%   & 9.68\%  & 14.9\%   & 4.32\%   & 2.22 \%\\
+    \hline
+    \end{tabular}
+    \caption{Running}
+    \end{subfigure}
+    \caption{Results from Experiment 2}
+    \label{table:results-energy}
+\end{table}
+
+%~ and the battery usage 
+%~ would not change too much, because it contains others fusion method 
+%~ which will running when turning on the Neblina. In 50Hz sensor sampling 
+%~ rate, the average usage electric current for transmit accelerometer 
+%~ data is 2.0mA. It means Neblina could transmit accelerometer data 
+%~ constantly in 100/2.0=50 hours. when Neblina does not move, the average 
+%~ usage electric current using Infinity norm compression is 1.95mA.
+
+ %~ It 
+%~ just extend Neblina work life about 1.28 hours. But in 200Hz sampling 
+%~ rate. The electric before and after compression are 3.5 and 2.9 
+%~ respectively. The running time of Neblina would be extended about 5.9 
+%~ hours.
 
 
-The capacity of battery in Neblina is 100mAh, and the battery usage 
-would not change too much, because it contains others fusion method 
-which will running when turning on the Neblina. In 50Hz sensor sampling 
-rate, the average usage electric current for transmit accelerometer 
-data is 2.0mA. It means Neblina could transmit accelerometer data 
-constantly in 100/2.0=50 hours. when Neblina does not move, the average 
-usage electric current using Infinity norm compression is 1.95mA. It 
-just extend Neblina work life about 1.28 hours. But in 200Hz sampling 
-rate. The electric before and after compression are 3.5 and 2.9 
-respectively. The running time of Neblina would be extended about 5.9 
-hours.
-
-we wore Neblina on right wrist and
-collected walking data and running data. 4000 data set was collected
-from Neblina in 200Hz sampling rate. Since arm swing appearance
-repeated, we just take 1000 data from it, and make data as cycle of
-these 1000 data. Because 1000 data is produced in 5 seconds with 200Hz
-sampling rate, we measured average energy usage in 5 seconds.
 
 
-At first, we measured base energy usage in Neblina. The energy usage
-without transmision is 2.515 mAh. It is 3.472mAh with transmision but
-no compression method. From table 3 and table 4, The MaxError don't exceed EPSILON
-and EPSILON*sqrt(Dimension) with LTC-Euclidean and LTC-Manhatan respectively.
-And the average electric current increase with compression radio decreasing.
-Energy usage by using both compression method are smaller than transmit
-without compression. From the result, the activities which has low frequency
-would gain larger compression radio.
-
-The purpose of the compression method is compressing the number of
-data needed to transmited, in order to extend Neblna's life cycle
-by decreasing energy consumption. From table 3, for not vigorous exercise
-such walking, with EPSILON equals 100, the life cycle could be extend
-3(10\%)and 9(31\%) hours with LTC-Euclidean and LTC-Manhattan respectively.
-And vigorous exercise, with same condition, it extends 5.7(19.7\%)
-and 4.8(16.7\%) hours. So LTC-Euclidean and LTC-Manhattan are useful
-to save devices Energy. At same time, The fidelity is guaranteed.
-
-% \todo{ update }
-% try using difference data set to measure compression radio, Error
-% and energy usage. The numerical value presented below, is the
-% average value in 5 seconds. The current electric current for Neblina
-% without transmit is ***. we received 4000 data for human running and
-% walking in 200Hz. Because of the limite RAM, for energy test, we only
-% could save 400 static data into Neblina. We make 400 data run as a circle.
-% % For walking, one time swing arm need 1.2 second. Every 400 data must have 1 arm swing.
-% change epsilon in order to decrease compression radio, measuring energy consumption.
-
-% \todo {running}
-% If it's possible to save more static data?
-
-
-
-% \begin{itemize}
-%     \item Data set: human activities, running, walking, jogging and work behind desk.
-%     \item Experiment Condition: work with neblina.
-%     \item Result:
-%     \item Conclusion:
-% \end{itemize}
-
-
-
-% The transform rate of Neblina is 50Hz.
-% \\
-% 5-times bicep curl from Neblina. It includes 613 data which produced in 12.28 seconds.
-% \\
-% Mohammad Lateral bicep data which include 41428, produced in proximate 14 minutes.
-
-% \subsection{Compression ratios}
-
-% \subsection{Errors}
-
-% \subsection{Memory consumption}
 
 \section{Conclusion}
 
+Euclidean norm would benefit from a better algorithm but it still
+provides interesting energy savings.
+
 \section*{Acknowledgement}
-
-
-\begin{table}[]
-    \begin{center}
-    \caption{result of Experiment 2 with walking Data Set}
-    \begin{tabular}{|l|l|l|l|l|l|l|}
-    \hline
-    DataSet           & \multicolumn{6}{l|}{walking}                                   \\\hline
-    Distance          & \multicolumn{3}{l|}{Manhattan} & \multicolumn{3}{l|}{Euclidean} \\\hline
-    Epsilon           & 100       & 20      & 10      & 100       & 20      & 10      \\\hline
-    Max Error         & 158.793   & 31.828  & 16.763  & 153.141   & 31.763  & 15.898  \\\hline
-    Compression Radio & 88.9\%    & 66.4\%  & 45.5\%  & 68.6\%    & 25.5\%  & 9.5\%   \\\hline
-    Energy Usage      & 2.642     & 2.787   & 3.020   & 2.879     & 3.221   & 3.383   \\\hline
-    \end{tabular}
-    \end{center}
-\end{table}
-
-\begin{table}[]
-    \begin{center}
-    \caption{result of Experiment 2 with running Data Set}
-    \begin{tabular}{|l|l|l|l|l|l|l|}
-    \hline
-    DataSet           & \multicolumn{6}{l|}{running}                                   \\\hline
-    Distance          & \multicolumn{3}{l|}{Manhattan} & \multicolumn{3}{l|}{Euclidean} \\\hline
-    Epsilon           & 100      & 20       & 10      & 100      & 20       & 10      \\\hline
-    Max Error         & 99.995   & 19.984   & 9.979   & 99.995   & 19.989   & 9.959   \\\hline
-    Compression Radio & 87.6\%   & 63.3\%   & 37.2\%  & 64.4\%   & 19.8\%   & 5.7\%   \\\hline
-    Energy Usage      & 3.098    & 3.020    & 3.134   & 2.952    & 3.320    & 3.393   \\\hline
-    \end{tabular}
-    \end{center}
-\end{table}
+This work was funded by the Canadian 
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,biblio.bib}
