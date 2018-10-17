@@ -522,8 +522,6 @@ Our code is available at ... (make a clean release!)
 \section{Experiments and Results}
 \label{sec:results}
 
-\todo{talk about data shift}
-
 We conducted two experiments using Motsai's Neblina 
 module\footnote{\url{ https://motsai.com/products/neblina}}, a system 
 with a Nordic Semiconductor nRF52832 micro-controller, 64~KB of RAM, 
@@ -572,7 +570,7 @@ a higher amplitude, most likely due to differences between subjects.
 We compressed the time series with various values of $\epsilon$, using 
 our 2D (x and y) and 3D (x, y and z) implementations of LTC. On 
 Neblina, the raw uncalibrated accelerometer data corresponds to errors 
-around 20~mg (196~mm/$s^2$). \todo{Check g units} We used a 
+around 20~mg (1~g is 9.8~m/s$^2$). We used a 
 laptop computer with 16~GB of RAM, an Intel i5-3210M CPU @ 2.50GHz 
 × 4, and Linux Fedora 27. We measured memory consumption using 
 Valgrind's massif 
@@ -601,7 +599,7 @@ values of $\epsilon$. Similar observations are made for the processing
 time, with values ranging from 0.2~ms for the simplest time series and 
 smallest $\epsilon$, to 26.4~ms for the most complex time series and 
 largest $\epsilon$. Figure~\ref{fig:memory} shows the memory consumption 
-of the 3D Euclidean implementation for $\epsilon=48.8~mg$: peaks appear
+of the 3D Euclidean implementation for $\epsilon$=48.8~mg: peaks appear
 at the end of long compressed ranges where the signal was $\epsilon$-closed
 to the linear approximation.
 
@@ -725,7 +723,7 @@ Neblina, and we measured the current every 500~ms.
  increases with $\epsilon$,
 it is higher for the infinity norm than for the Euclidean, and it is
 higher for the walking activity than for running. For a realistic error
-of $\epsilon=9.8~mg$\todo{unit}, the ratio of saved energy with the infinity norm was
+of $\epsilon$=9.8~mg, the ratio of saved energy with the infinity norm was
 close to 20\%, which is substantial.
 
 \begin{table}[]
