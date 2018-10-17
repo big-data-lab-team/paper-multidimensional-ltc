@@ -79,11 +79,13 @@ for i in range(2, n):
     plt.plot([trans_x, x[i-1]], [trans_y, highpoint], '--', color=(0.1, 0.1, 0.1, 0.5))
     trans_x = x[i-1]
     trans_y = (lowpoint+highpoint)/2
+    j = 1
     k = k + 1
-    j = 0
-    plot_point(trans_x, trans_y, epsilon, j, k, True)
+    plot_point(trans_x, trans_y, epsilon, 0, k, True)
     xis.append((lowpoint+highpoint)/2)
     taus.append(i-1)
+   
+
 
     # Update variables
     lowpoint = y[i] - epsilon
