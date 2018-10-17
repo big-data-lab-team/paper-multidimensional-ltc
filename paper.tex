@@ -47,7 +47,7 @@
 
 \author{Bo Li$^1$, Omid Sarbishei$^2$, Tristan Glatard$^1$\\
   $^1$ Department of Computer Science and Software Engineering, Concordia University, Montreal, QC, Canada \\
-  $^2$ Motsai, Saint Bruno, QC, Canada.}
+  $^2$  Research and Development Department, Motsai Research, Saint Bruno, QC, Canada}
 \maketitle
 
 \begin{abstract}
@@ -540,15 +540,15 @@ autonomy of 39.7~h without transmission and 28.8~h with transmission.
 
 \subsection{Experiment 1: validation}
 
-\todo{In all of our experiments, the board was attached to the lower 
-right arm as shown in Fig. X. (Put a picture of Neblina in a box worn 
+\todo{(Put a picture of Neblina in a box worn 
 on the wrist)}
 
 In this experiment, we validated the behavior of our LTC extension on a 
 PC using data acquired with Neblina. We collected two 3D 
 accelerometer time series, a short one and a longer one, acquired 
 on two different subjects performing biceps curl, with a 50Hz sampling rate (see 
-Figure~\ref{fig:datasets-1}). It should be noted that the longer dataset also has 
+Figure~\ref{fig:datasets-1}). In both cases, the 
+subject was wearing Neblina on their right wrist. It should be noted that the longer dataset also has 
 a higher amplitude, most likely due to differences between subjects.
 
 \begin{figure*}
@@ -556,7 +556,7 @@ a higher amplitude, most likely due to differences between subjects.
 \includegraphics[width=0.33\columnwidth]{figures/5-time-bicep-curl-plot-x.pdf}
 \includegraphics[width=0.33\columnwidth]{figures/5-time-bicep-curl-plot-y.pdf}
 \includegraphics[width=0.33\columnwidth]{figures/5-time-bicep-curl-plot-z.pdf}
-\caption{Short biceps curl}
+\caption{Short biceps curl$^a$}
 \end{subfigure}
 \begin{subfigure}{2\columnwidth}
 \includegraphics[width=0.33\columnwidth]{figures/Mohammad-bicep-curl-plot-x.pdf}
@@ -564,7 +564,8 @@ a higher amplitude, most likely due to differences between subjects.
 \includegraphics[width=0.33\columnwidth]{figures/Mohammad-bicep-curl-plot-z.pdf}
 \caption{Long biceps curl} 
 \end{subfigure}
-\caption{Time series used in Experiment 1}
+\caption{Time series used in Experiment 1\\
+{\footnotesize $^a$ Average of az data is -7.81g. It was shifted to 0 so that the graphs can all use the same y scale.}}
 \label{fig:datasets-1}
 \end{figure*}
 
@@ -599,7 +600,10 @@ the amount of required memory increases for more complex time series
 values of $\epsilon$. Similar observations are made for the processing 
 time, with values ranging from 0.2~ms for the simplest time series and 
 smallest $\epsilon$, to 26.4~ms for the most complex time series and 
-largest $\epsilon$. 
+largest $\epsilon$. Figure~\ref{fig:memory} shows the memory consumption 
+of the 3D Euclidean implementation for $\epsilon=48.8~mg$: peaks appear
+at the end of long compressed ranges where the signal was $\epsilon$-closed
+to the linear approximation.
 
 \paragraph{2D vs 3D}
 For a given $\epsilon$ of 100 and a given time series, the compression 
@@ -688,6 +692,13 @@ average for Euclidean norm).
 \caption{Time series used in Experiment 2}
 \label{fig:datasets-2}
 \end{figure*}
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{./figures/memory-mohammad.pdf}
+\caption{Memory usage of 3D Euclidean implementation, long biceps curl time series, $\epsilon$=48.8~mg.}
+\label{fig:memory}
+\end{figure}
+
 \subsection{Experiment 2: impact on energy consumption}
 
 We measured the energy consumption of Neblina
@@ -808,8 +819,9 @@ Euclidean norm than with the infinity norm, such as the ones involving
 position or movement measures. Using the infinity norm instead of the 
 Euclidean would lead to important error differences, proportional to 
 $\sqrt{n}$ in dimension $n$. A better algorithm to detect the 
-intersection of n-balls in our context would improve the efficiency of LTC
-in dimension $n$ for arbitrary norms.
+intersection of n-balls in our context would improve the efficiency of 
+LTC in dimension $n$ for arbitrary norms. Investigating other norms, in 
+particular the 1-norm, would be relevant too.
 
 \section*{Acknowledgement}
 This work was funded by a Strategic Project Grant of the Natural 
