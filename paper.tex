@@ -618,10 +618,10 @@ average for Euclidean norm).
     \hline
     \rowcolor{headcolor}
                            & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean}\\ \hline
-    $\epsilon$                & 100          & 100/$\sqrt{2}$  & 100         & 100/$\sqrt{2}$ \\
-    Max error              & 99.88       & 70.68           & 99.63       & 70.47          \\ 
-    Compression ratio      & 29.03\%      & 20.88\%         & 25.12\%     & 19.57\%        \\ 
-    Peak memory            & 80~B          & 80~B             & 432~B        & 240~B           \\ 
+    $\epsilon$                & 48.8~mg          & 34.5~mg  & 48.8~mg         & 34.5~mg \\
+    Max error              & 48.8~mg       & 34.5~mg           & 48.6~mg       & 34.4~mg          \\
+    Compression ratio      & 29.03\%      & 20.88\%         & 25.12\%     & 19.57\%        \\
+    Peak memory            & 80~B          & 80~B             & 432~B        & 240~B           \\
     Processing time        & 0.103~ms      & 0.082~ms         & 0.220~ms     & 0.200~ms        \\ \hline
     \end{tabular}
     \caption{Short biceps curl (2D)}
@@ -632,24 +632,24 @@ average for Euclidean norm).
     \hline
     \rowcolor{headcolor}
                    & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
-    $\epsilon$             & 100        & 100/$\sqrt{2}$    & 100        & 100/$\sqrt{2}$    \\ 
-    Max error              & 99.99     & 70.71             & 99.99      & 70.71             \\ 
-    Compression ratio      & 60.17\%    & 51.59\%           & 57.75\%    & 48.86\%           \\ 
-    Peak memory       & 80~B        & 80~B               & 2.1~KB      & 2.5~KB             \\ 
+    $\epsilon$             & 48.8~mg        & 34.5~mg    & 48.8~mg        & 34.5~mg    \\
+    Max error              & 48.8~mg     & 34.5~mg   &48.8~mg       & 34.5~mg             \\
+    Compression ratio      & 60.17\%    & 51.59\%           & 57.75\%    & 48.86\%           \\
+    Peak memory       & 80~B        & 80~B               & 2.1~KB      & 2.5~KB             \\
     Processing time      & 5.70~ms     & 4.85~ms            & 20.04~ms    & 19.28~ms           \\ \hline
     \end{tabular}
     \caption{Long biceps curl (2D)}
-    \end{subfigure}\\    
+    \end{subfigure}\\
     \begin{subfigure}{\columnwidth}
     \centering
     \begin{tabular}{l|l|l|l|l}
     \hline
     \rowcolor{headcolor}
                             & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
-    $\epsilon$             & 100          & 100/$\sqrt{3}$  & 100         & 100/$\sqrt{3}$   \\ 
-    Max error              & 99.88       & 57.41           & 99.94       & 56.89            \\ 
-    Compression ratio      & 23.00\%      & 12.89\%         & 18.43\%     & 9.95\%           \\ 
-    Peak memory            & 112~B         & 112~B            & 384~B        & 256~B             \\ 
+    $\epsilon$             & 48.8~mg          & 28.2~mg  & 48.8~mg         & 28.2~mg   \\
+    Max error              & 48.8~mg       & 28.0~mg           & 48.8~mg       & 27.8~mg            \\
+    Compression ratio      & 23.00\%      & 12.89\%         & 18.43\%     & 9.95\%           \\
+    Peak memory            & 112~B         & 112~B            & 384~B        & 256~B             \\
     Processing time        & 0.119~ms      & 0.094~ms         & 0.230~ms     & 0.200~ms          \\ \hline
     \end{tabular}
     \caption{Short biceps curl (3D)}
@@ -660,8 +660,8 @@ average for Euclidean norm).
     \hline
     \rowcolor{headcolor}
                               & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
-    $\epsilon$                & 100        & 100/$\sqrt{3}$    & 100        & 100/$\sqrt{3}$    \\
-    Max error                 & 99.96     & 57.73             & 99.99      & 57.73             \\
+    $\epsilon$                & 48.8~mg        & 28.2~mg    & 48.8~mg        & 28.2~mg    \\
+    Max error                 & 48.8~mg     & 28.2~mg             & 48.8~mg      & 28.2~mg             \\
     Compression ratio         & 51.13\%    & 37.17\%           & 46.05\%    & 32.63\%           \\
     Peak memory & 112~B        & 112~B              & 4.9~KB      & 3.0~KB             \\
     Processing time           & 8.50~ms     & 7.07~ms            & 26.41~ms    & 21.26~ms           \\ \hline
@@ -691,30 +691,30 @@ average for Euclidean norm).
 \subsection{Experiment 2: impact on energy consumption}
 
 We measured the energy consumption of Neblina
-for different values of $\epsilon$ and norms, to quantify the 
-added-value of LTC for this system. 
+for different values of $\epsilon$ and norms, to quantify the
+added-value of LTC for this system.
 
-We acquired two 3D accelerometer time series at 200Hz corresponding to 
-common human activities: walking and running (see Figure~\ref{fig:datasets-2}). In both cases, the 
+We acquired two 3D accelerometer time series at 200Hz corresponding to
+common human activities: walking and running (see Figure~\ref{fig:datasets-2}). In both cases, the
 subject was wearing Neblina on their right wrist.
-We collected 1,000 data points for each activity, corresponding to 
+We collected 1,000 data points for each activity, corresponding to
 5 seconds of activity.
 
-We measured energy consumption associated with the transmission of 
-these time series, for different norms and $\epsilon$ values. To do so, 
-we `replayed' the time series by loading them as a byte array in 
+We measured energy consumption associated with the transmission of
+these time series, for different norms and $\epsilon$ values. To do so,
+we `replayed' the time series by loading them as a byte array in
 Neblina, and we measured the current every 500~ms.
 
- Results are reported in Table~\ref{table:results-energy}. For a given 
- $\epsilon$ and norm, the compression ratio is larger for walking than 
- for running. The ratio of saved energy is relative to the reference 
- current of 3.47~mA measured when Neblina transmits data without 
- compression. In all cases, activating compression saves energy. The 
- reduction in energy consumption behaves as the compression ratio: it 
+ Results are reported in Table~\ref{table:results-energy}. For a given
+ $\epsilon$ and norm, the compression ratio is larger for walking than
+ for running. The ratio of saved energy is relative to the reference
+ current of 3.47~mA measured when Neblina transmits data without
+ compression. In all cases, activating compression saves energy. The
+ reduction in energy consumption behaves as the compression ratio: it
  increases with $\epsilon$,
 it is higher for the infinity norm than for the Euclidean, and it is
-higher for the walking activity than for running. For a realistic error 
-of $\epsilon=20$\todo{unit}, the ratio of saved energy with the infinity norm was
+higher for the walking activity than for running. For a realistic error
+of $\epsilon=9.8~mg$\todo{unit}, the ratio of saved energy with the infinity norm was
 close to 20\%, which is substantial.
 
 \begin{table}[]
@@ -724,10 +724,10 @@ close to 20\%, which is substantial.
    \hline
    \rowcolor{headcolor}
                           & \multicolumn{3}{c|}{Infinity} & \multicolumn{3}{c}{Euclidean} \\\hline
-   $\epsilon$              & 100       & 20      & 10       & 100      & 20       & 10    \\
-   Max error              & 99.97     & 20.00        & 10.00      & 99.99   & 19.98   & 9.98  \\
+   $\epsilon$ (mg)             & 48.8       & 9.8      & 4.9       & 48.8      & 9.8       & 4.9    \\
+   Max error (mg)              & 48.8     & 9.8        & 4.9      & 48.8   & 9.8   & 4.9  \\
    Compr.      ratio      & 88.9\%    & 66.4\%  & 45.5\%   & 87.6\%   & 63.3\%   & 37.2\% \\
-   Average mA                & 2.64     & 2.79   & 3.02   & 3.10    & 3.02    & 3.13  \\
+   Average (mA)                & 2.64     & 2.79   & 3.02   & 3.10    & 3.02    & 3.13  \\
    Saved energy              & 23.9\%    & 19.7\%  & 13.0\%  &  10.7\%   & 13.0\%   & 9.68\%\\
    \hline
    \end{tabular}
@@ -740,10 +740,10 @@ close to 20\%, which is substantial.
    \rowcolor{headcolor}
 
                      & \multicolumn{3}{c|}{Infinity} & \multicolumn{3}{c}{Euclidean} \\\hline
-   $\epsilon$        & 100       & 20      & 10         & 100      & 20       & 10      \\
-   Max error         & 100.00       & 20.00        & 10.00        & 100.00   & 19.99   & 9.96   \\
+   $\epsilon$ (mg)        & 48.8       & 9.8      & 4.9       & 48.8      & 9.8       & 4.9    \\
+   Max error (mg)         & 48.8       & 9.8        & 4.9        & 48.8   &9.8    & 4.9   \\
    Compr.      ratio & 68.6\%    & 25.5\%  & 9.5\%     & 64.4\%   & 19.8\%   & 5.7\%   \\
-   Average mA        & 2.88     & 3.22   & 3.38     & 2.95    & 3.32    & 3.39   \\
+   Average (mA)        & 2.88     & 3.22   & 3.38     & 2.95    & 3.32    & 3.39   \\
    Saved energy      & 17.0\%    & 7.18 \%   & 2.50\%   & 14.9\%   & 4.32\%   & 2.22 \%\\
    \hline
    \end{tabular}
