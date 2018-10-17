@@ -5,3 +5,6 @@ paper.blg
 paper.pdf
 note.txt
 ltc.pdf
+*.pdf
+*.out
+env
