@@ -562,53 +562,53 @@ a higher amplitude, most likely due to differences between subjects.
 \includegraphics[width=0.33\columnwidth]{figures/Mohammad-bicep-curl-plot-x.pdf}
 \includegraphics[width=0.33\columnwidth]{figures/Mohammad-bicep-curl-plot-y.pdf}
 \includegraphics[width=0.33\columnwidth]{figures/Mohammad-bicep-curl-plot-z.pdf}
-\caption{Long biceps curl} 
+\caption{Long biceps curl}
 \end{subfigure}
 \caption{Time series used in Experiment 1}
 \label{fig:datasets-1}
 \end{figure*}
 
-We compressed the time series with various values of $\epsilon$, using 
-our 2D (x and y) and 3D (x, y and z) implementations of LTC. On 
-Neblina, the raw uncalibrated accelerometer data corresponds to errors 
-around 20~mg (196~mm/$s^2$). \todo{Check g units} We used a 
-laptop computer with 16~GB of RAM, an Intel i5-3210M CPU @ 2.50GHz 
-× 4, and Linux Fedora 27. We measured memory consumption using 
-Valgrind's massif 
-tool~\cite{nethercote2006building}\footnote{\url{http://valgrind.org}}, 
-and processing time using \texttt{gettimeofday()} from the GNU C 
-Library. 
+We compressed the time series with various values of $\epsilon$, using
+our 2D (x and y) and 3D (x, y and z) implementations of LTC. On
+Neblina, the raw uncalibrated accelerometer data corresponds to errors
+around 20~mg (196~mm/$s^2$). \todo{Check g units} We used a
+laptop computer with 16~GB of RAM, an Intel i5-3210M CPU @ 2.50GHz
+× 4, and Linux Fedora 27. We measured memory consumption using
+Valgrind's massif
+tool~\cite{nethercote2006building}\footnote{\url{http://valgrind.org}},
+and processing time using \texttt{gettimeofday()} from the GNU C
+Library.
 
-Results are reported in Table~\ref{table:results-validation}. 
-As expected, the compression ratio increases with $\epsilon$, and the 
-maximum measured error remains lower than $\epsilon$ in all cases. The 
+Results are reported in Table~\ref{table:results-validation}.
+As expected, the compression ratio increases with $\epsilon$, and the
+maximum measured error remains lower than $\epsilon$ in all cases. The
 maximum is reached most of the time on these time series.
 
 \paragraph{Inifinity vs Euclidean norms}
 Compared to the infinity norm, the average ratio between the compression ratios obtained
-with the infinity and Euclidean norm is 1.08 for 2D data, and 1.20 
-for 3D data. These ratios are lower than the theoretical values of 
-$\frac{4}{\pi}$ in 2D and $\frac{6}{\pi}$ in 3D, which are obtained for 
-random-uniform signals. Unsurprisingly, the infinity norm surpasses the 
-Euclidean norm in terms of resource consumption. Memory-wise, the 
-infinity norm requires a constant amount of 80~B, used to store the 
-intersection of n-balls. The Euclidean norm, however, uses up to 4.9~KB of memory 
-for the Long time series in 3D with $\epsilon=100$. More importantly, 
-the amount of required memory increases for more complex time series 
-(Long vs Short), and it also increases with larger 
-values of $\epsilon$. Similar observations are made for the processing 
-time, with values ranging from 0.2~ms for the simplest time series and 
-smallest $\epsilon$, to 26.4~ms for the most complex time series and 
-largest $\epsilon$. 
+with the infinity and Euclidean norm is 1.08 for 2D data, and 1.20
+for 3D data. These ratios are lower than the theoretical values of
+$\frac{4}{\pi}$ in 2D and $\frac{6}{\pi}$ in 3D, which are obtained for
+random-uniform signals. Unsurprisingly, the infinity norm surpasses the
+Euclidean norm in terms of resource consumption. Memory-wise, the
+infinity norm requires a constant amount of 80~B, used to store the
+intersection of n-balls. The Euclidean norm, however, uses up to 4.9~KB of memory
+for the Long time series in 3D with $\epsilon=48.8~mg$. More importantly,
+the amount of required memory increases for more complex time series
+(Long vs Short), and it also increases with larger
+values of $\epsilon$. Similar observations are made for the processing
+time, with values ranging from 0.2~ms for the simplest time series and
+smallest $\epsilon$, to 26.4~ms for the most complex time series and
+largest $\epsilon$.
 
 \paragraph{2D vs 3D}
-For a given $\epsilon$ of 100 and a given time series, the compression 
-ratios are always higher in 2D than in 3D. It makes sense since the 
-probability for the signal to deviate from a straight line 
-approximation is higher in 3D than it is in 2D. Besides, resource 
-consumption is higher in 3D than in 2D: for the infinity norm, 3D 
-consumes 1.4 times more memory than 2D (1.6 times on average for 
-Euclidean norm), and processing time is 1.3 longer on average (1.18 on 
+For a given $\epsilon$ of 48.8~mg and a given time series, the compression 
+ratios are always higher in 2D than in 3D. It makes sense since the
+probability for the signal to deviate from a straight line
+approximation is higher in 3D than it is in 2D. Besides, resource
+consumption is higher in 3D than in 2D: for the infinity norm, 3D
+consumes 1.4 times more memory than 2D (1.6 times on average for
+Euclidean norm), and processing time is 1.3 longer on average (1.18 on
 average for Euclidean norm).
 
 \begin{table}
