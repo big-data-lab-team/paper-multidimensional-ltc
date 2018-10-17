@@ -1,4 +1,16 @@
-,Euclidean-2D e=100,,Euclidean-2D e=100\sqrt(2),,Euclidean-3D e=100,,Euclidean-3D e=100/sqrt(3),,instructions executed,Infinity 3D,instructions executed,Infinity 2D
+# 1. Number of instructions
+# 2. RAM (B) Euclidean-2D e=100
+# 3. Number of instructions
+# 4. RAM (B) Euclidean-2D e=100\sqrt(2)
+# 5. Number of instructions
+# 6. RAM (B) Euclidean-3D e=100
+# 7. Number of instructions
+# 8. RMA (B) Euclidean-3D e=100/sqrt(3)
+# 9. EMPTY
+# 10. Number of instructions
+# 11. RAM (B) infinity 3D
+# 12. Number of instructions
+# 13. RAM (B) infinity 2D
 0,0,0,0,0,0,0,0,,0,0,0,0
 1074172,0,792314,48,967613,0,1271845,0,,168344,32,168344,24
 1651417,24,1263062,72,2526359,160,2277289,128,,168402,64,168403,48
