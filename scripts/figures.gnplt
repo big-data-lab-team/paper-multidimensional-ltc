@@ -3,7 +3,7 @@
 set terminal pdf
 
 set datafile separator ","
-set yrange [-15000:15000]
+set yrange [-7:7]
 #set key autotitle columnhead
 set xlabel 'Time (s)'
 set ylabel 'Acceleration (mm/s^2 x 4.8)'
