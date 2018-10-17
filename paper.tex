@@ -39,44 +39,98 @@
 
 \title{A multi-dimensional extension of the Lightweight Temporal Compression method}
 
-\author{Bo Li, Tristan Glatard\\
-  Department of Computer Science and Software Engineering\\ Concordia University, Montreal, Quebec, Canada\\
-  {first.last}@concordia.ca \vspace*{-0.5cm}}
-
+\author{Bo Li$^1$, Omid Sarbishei$^2$, Tristan Glatard$^1$\\
+  $^1$ Department of Computer Science and Software Engineering, Concordia University, Montreal, QC, Canada \\
+  $^2$ Motsai, Saint Bruno, QC, Canada.}
 \maketitle
 
 \begin{abstract}
 Lightweight Temporal Compression
-(LTC~\cite{schoellhammer2004lightweight}) is among the stream
-compression method that provides the highest compression rate for the
+(LTC) is among the lossy stream
+compression methods that provide the highest compression rate for the
 lowest resource (CPU, RAM) consumption. As such, it makes it a very
 good candidate for the compression of data streams acquired in
-embedded, low-power systems such as connected
-objects, systems on module (SoMs), etc The type of data acquired on
-such systems, however, is often multi-dimensional. For instance
-accelerometers and gyroscopes usually measure variables along 3
-directions, these variables being distinct but related through the
-actual movement of the sensor. In this paper, we investigate the
-extension of LTC to higher dimensions. First, we provide a formulation of the algorithm
-in an arbitrary vectorial space of dimension $n$. Furthermore, we
-implement the algorithm for the infinity and Euclidean norms, in spaces of
-dimension 2D+t and 3D+t. Finally, we compare the multi-dimensional LTC
-to the 1-dimensional version, on acceleration data acquired on a SoM
-device.
+energy-constrained systems such as systems on module (SoMs). The type of data acquired on
+such systems, however, is often multi-dimensional. For instance 
+accelerometers and gyroscopes usually measure variables along 3 
+directions, these variables being distinct but related through the 
+actual movement of the sensor. In this paper, we investigate the 
+extension of LTC to higher dimensions. First, we provide a formulation 
+of the algorithm in an arbitrary vectorial space of dimension $n$. 
+Then, we implement the algorithm for the infinity and Euclidean norms, 
+in spaces of dimension 2D+t and 3D+t. We evaluate our implementation on 
+3D acceleration streams acquired by a SoM during human activities. 
+Results show that the 3D implementation of LTC can save up to 20\% in 
+energy consumption for low-paced activities such as walking. The 
+implementation with the infinity norm only requires about 100~B of 
+memory.
 \end{abstract}
 
 \section{Introduction}
 
-Section~\ref{sec:ltc} provides some background on the LTC algorithm.
-Section~\ref{sec:extension} presents our formulation in dimension $n$.
+% Compression of stream data
+% need references
+Compressing data streams is required in many contexts, to reduce 
+storage and network requirements of data analytics. In particular, it is 
+highly beneficial to energy-constrained devices such as Systems on 
+Modules (SoM), as they reduce the amount of energy-consuming radio transmissions.
+However, resource-intensive algorithms such as~\cite{x},~\cite{y} 
+or~\cite{z} are not well-suited for energy-constrained systems, due to 
+the limited memory available on these systems (typically a few KB), and 
+the energy consumption associated with CPU usage. On such systems, 
+compression algorithms need to find a trade-off between reducing 
+network communications and increasing memory and CPU usage. As 
+discussed in~\cite{zordan2014performance}, linear compression methods 
+provide a very good compromise between these two factors, leading to 
+substantial energy reduction.
 
-% Some related works from Bo's report
+% lossy vs lossless compression
 
-Compression reduces radio usage but increases resource usage.
+% LTC summary
+% define transmitted, received points, copmression ratio
+The Lightweight Temporal Compression method 
+(LTC~\cite{schoellhammer2004lightweight}) has been designed 
+specifically for energy-constrained systems, initially sensor networks. 
+It approximates data points by a piecewise linear function that 
+guarantees an upper bound on the reconstruction error. LTC is a very 
+lightweight method, with memory requirements in $\mathcal{O}(1)$. 
+However, LTC has only been described for 1D streams, which makes it 
+limited for multi-dimensional streams such as the ones coming from 
+accelerometers, gyroscopes and other movement sensors.
 
-% transmitted, received points
+In this paper, we extend LTC to dimension $n$. To do so, we propose an 
+algebraic formulation of the algorithm that also yields a 
+norm-independent expression of it. We implement our extension on 
+Motsai's Neblina module, and we test it on 3D acceleration streams 
+acquired during human exercises, namely biceps curling, walking and 
+running. Our implementation of LTC is available as free software on GitHub\todo{add link}.
 
-% contributions: formalization of LTC algorithm, extension to n d, extension to any norm, open-source implementation.
+We assume that the stream consists of a sequence of data points 
+received at uneven intervals. The compression algorithm 
+\emph{transmits} fewer points than it receives. The transmitted points 
+might be part of the stream, or computed from stream elements. The 
+\emph{compression ratio} is the ratio between the number of received 
+points and the number of transmitted points. An application would 
+reconstruct the stream from the transmitted points: the 
+\emph{reconstruction error} is the maximum absolute difference between 
+a data point of the reconstructed stream, and the corresponding data 
+point in the original stream.
+
+% Outline
+Section~\ref{sec:ltc} provides some background on the LTC algorithm, 
+and formalizes the description initially proposed 
+in~\cite{schoellhammer2004lightweight}. Section~\ref{sec:extension} 
+presents our norm-independent extension to dimension $n$, and 
+Section~\ref{sec:implementation} describes our implementation. 
+Section~\ref{sec:results} reports on experiments to validate our 
+implementation, and evaluate the impact of n-dimensional LTC on SoM 
+energy consumption.
+\begin{figure}
+\includegraphics[width=\columnwidth]{ltc.pdf}
+\caption{Illustration of the LTC algorithm and notations used. Red dots indicate transmitted points. Dashed lines
+represent the high line and the low line at times when a point is transmitted.}
+\label{fig:ltc}
+\end{figure}
 
 \section{Lightweight Temporal Compression}
 \label{sec:ltc}
@@ -105,13 +159,6 @@ and:
 This definition is such that $y^k_j$ is the $j^{th}$ data point received
 after the $k^{th}$ transmission.
 Figure~\ref{fig:ltc} illustrates the notations and algorithm.
-\begin{figure}
-\includegraphics[width=\columnwidth]{ltc.pdf}
-\caption{Illustration of the LTC algorithm and notations used. Red dots indicate transmitted points. Dashed lines
-represent the high line and the low line at times when a point is transmitted.}
-\label{fig:ltc}
-\end{figure}
-\subsection{LTC algorithm}
 
 The LTC algorithm maintains two lines, the \emph{high line}, and the
 \emph{low line} defined by (1) the latest transmitted point and (2) the
@@ -305,6 +352,7 @@ in any of the coordinates. \todo{This is unclear}
 
 
 \section{Implementation}
+\label{sec:implementation}
 Our code is available at ... (make a clean release!)
 
 %~ As reference above, the norm selection is importance. In this section,
@@ -432,6 +480,7 @@ Our code is available at ... (make a clean release!)
 %~ \end{algorithm}
 
 \section{Experiments and Results}
+\label{sec:results}
 
 We conducted two experiments using Motsai's Neblina 
 module\footnote{\url{ https://motsai.com/products/neblina}}, a system 
