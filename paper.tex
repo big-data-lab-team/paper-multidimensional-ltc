@@ -139,13 +139,15 @@ point in the original stream.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{ltc.pdf}
-\caption{Illustration of the LTC algorithm and notations used. Blue 
+\caption{Illustration of the LTC algorithm. Blue 
 dots are received points, red dots are transmitted points. Dashed lines 
-represent the high line and the low line at times when a point is 
+represent the high and low lines when a point is 
 transmitted.\vspace*{-0.3cm}}
 \label{fig:ltc}
 \end{figure}
+
 \todo{show $\xi$ in the Figure}
+\todo{Fix Omid's comment in the Figure}
 
 % Outline
 Section~\ref{sec:ltc} provides some background on the LTC algorithm, 
@@ -163,8 +165,7 @@ energy consumption of connected objects.
 \label{sec:ltc}
 
 LTC approximates the data stream
-by a piece-wise linear function of time, ensuring that the error at
-every time-point is bounded by parameter $\epsilon$.
+by a piece-wise linear function of time, with an error bounded by parameter $\epsilon$.
 
 \subsection{Notations}
 
@@ -271,7 +272,7 @@ expressed in the orthogonal space with origin $(\tau_k, \xi_k)$. We denote by $(
 \begin{equation*}
 \forall j \leq m,\  (v_j, z_j) = (u_j^k - \tau_k, y_j^k - \xi_k)
 \end{equation*}
-We define $\mathcal{B}_j$ as the ball of $\mathbb{R}^n$ of center $\frac{v_1}{v_j}z_j$ and of radius
+Let $\mathcal{B}_j$ be the ball of $\mathbb{R}^n$ of center $\frac{v_1}{v_j}z_j$ and radius
 $\frac{v_1}{v_j}\epsilon$:
 \begin{equation*}
 \mathcal{B}_j = \left\{ z \in \mathbb{R}^n,\  \norm{z-\frac{v_1}{v_j}z_j} \leq \frac{v_1}{v_j}\epsilon \right\}
@@ -279,7 +280,7 @@ $\frac{v_1}{v_j}\epsilon$:
 
 \subsubsection{LTC property}
 
-We formulate the \emph{LTC property} as follows:
+We define the \emph{LTC property} as follows:
 \begin{equation*}
 \exists z \in \mathbb{R}^n, \ \forall j \in \llbracket 1, m \rrbracket, \norm{\frac{v_j}{v_1}z-z_j} \leq \epsilon.
 \end{equation*}
@@ -356,7 +357,7 @@ The intersection tests can then be done in constant time. However,
 updating the representation of the intersection may be costly
 depending on the norm used. For the infinity norm, the representation
 is a rectangular cuboid which is straightforward to update by
-intersection with an n-ball, since the n-ball is a rectangular cuboid too.
+intersection with an n-ball.
 For the Euclidean norm, the representation is a volume with no particular property,
 which is more costly to maintain.
 
@@ -364,7 +365,7 @@ which is more costly to maintain.
 
 As mentioned before, norm selection in $\mathbb{R}^n$ has a critical
 impact on the compression error and ratio. To appreciate this effect,
-let us consider the comparison between the infinity norm and the
+let us compare the infinity norm and the
 Euclidean norm in dimension 2. By comparing the unit disk to a
 square of side 2, we obtain that the compression ratio of a random stream would
 be $\frac{4}{\pi}$ times larger with the infinity norm than with the 
@@ -372,9 +373,9 @@ Euclidean norm. In 3D, this ratio would be $\frac{6}{\pi}$. Conversely,
 a compression error bounded by $\epsilon$ with the infinity norm 
 corresponds to a compression error of $\frac{\epsilon}{\sqrt{n}}$ with 
 the Euclidean norm. Unsurprisingly, the
-infinity norm is more 'tolerant' than the Euclidean norm.
+infinity norm is more `tolerant' than the Euclidean norm.
 
-It should also be noted that using the infinity norm in dimension $n$ 
+It should also be noted that using the infinity norm in $\mathbb{R}^n$ 
 boils down to the use of the 1D LTC algorithm independently in each 
 dimension, since a data point will be transmitted as soon as the linear 
 approximation doesn't hold in any of the dimensions.
@@ -385,18 +386,19 @@ approximation doesn't hold in any of the dimensions.
 To implement LTC with the infinity norm, we maintain a cuboid 
 representation of $\cap_{l=1}^j{\mathcal{B}_l}$ throughout the 
 iterations of the \texttt{while} loop in 
-Algorithm~\ref{algo:general-ltc}. The implementation only requires 
-constant memory and reduced CPU time to update the cuboid with the 
-n-ball associated with the new data point at each iteration.
+Algorithm~\ref{algo:general-ltc}. The implementation works with
+constant memory and requires limited CPU time.
 
-With the Euclidean norm, the intersection test is more complex, as 
-mentioned previously. We keep in memory a growing set $S$ of balls and 
-the bounding box $B$ of their intersection. Then, when a new point 
-arrives, we consider the associated ball $\mathcal{B}_j$ and our 
-intersection test works as in Algorithm~\ref{algo:euclidean}. 
-\texttt{box} is a function that returns the bounding box of an n-ball. 
-\texttt{find\_bisection(S, B)} searches for a point in all the elements 
-in S, using plane sweep and bisection initialized by the bounds of B.
+With the Euclidean norm, the intersection test is more complex. We keep 
+in memory a growing set $S$ of balls and the bounding box $B$ of their 
+intersection. Then, when a new point arrives, we consider the 
+associated ball $\mathcal{B}_j$ and our intersection test works as in 
+Algorithm~\ref{algo:euclidean}. \texttt{box} is a function that returns 
+the bounding box of an n-ball. \texttt{find\_bisection(S, B)} searches 
+for a point in all the elements in S, using plane sweep and bisection 
+initialized by the bounds of B. Our code is available at 
+\url{https://github.com/big-data-lab-team/stream-summarization} under 
+MIT license.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -434,10 +436,6 @@ in S, using plane sweep and bisection initialized by the bounds of B.
 \label{algo:euclidean}
 \end{algorithm}
 
-Our code is available at 
-\url{https://github.com/big-data-lab-team/stream-summarization} under
-MIT license.
-
 \section{Experiments and Results}
 \label{sec:results}
 
@@ -460,7 +458,7 @@ autonomy of 39.7~h without transmission and 28.8~h with transmission.
 %\todo{(Put a picture of Neblina in a box worn 
 %on the wrist)}
 
-In this experiment, we validated the behavior of our LTC extension on a 
+We validated the behavior of our LTC extension on a 
 PC using data acquired with Neblina. We collected two 3D 
 accelerometer time series, a short one and a longer one, acquired 
 on two different subjects performing biceps curl, with a 50Hz sampling rate (see 
@@ -517,20 +515,20 @@ the amount of required memory increases for more complex time series
 values of $\epsilon$. Similar observations are made for the processing
 time, with values ranging from 0.2~ms for the simplest time series and
 smallest $\epsilon$, to 26.4~ms for the most complex time series and
-largest $\epsilon$.
+largest~$\epsilon$.
 %~ Figure~\ref{fig:memory} shows the memory consumption 
 %~ of the 3D Euclidean implementation for $\epsilon$=48.8~mg: peaks appear
 %~ at the end of long compressed ranges where the signal was $\epsilon$-closed
 %~ to the linear approximation.
 
 \paragraph{2D vs 3D}
-For a given $\epsilon$ of 48.8~mg and a given time series, the compression 
+For a given $\epsilon$, the compression 
 ratios are always higher in 2D than in 3D. It makes sense since the
 probability for the signal to deviate from a straight line
 approximation is higher in 3D than it is in 2D. Besides, resource
 consumption is higher in 3D than in 2D: for the infinity norm, 3D
 consumes 1.4 times more memory than 2D (1.6 times on average for
-Euclidean norm), and processing time is 1.3 longer on average (1.18 on
+Euclidean norm), and processing time is 1.3 longer (1.18 on
 average for Euclidean norm).
 
 \begin{table}
@@ -607,7 +605,7 @@ average for Euclidean norm).
 \includegraphics[width=0.3\columnwidth]{./figures/running-1000-z.pdf}
 \caption{Running}
 \end{subfigure}
-\caption{Time series used in Experiment 2}
+\caption{Time series used in Experiment 2 \vspace*{-0.3cm}}
 \label{fig:datasets-2}
 \end{figure*}
 
@@ -623,16 +621,16 @@ average for Euclidean norm).
 %~ for different values of $\epsilon$ and norms, to quantify the
 %~ added-value of LTC for this system.
 
-We acquired two 3D accelerometer time series at 200~Hz corresponding to
-common human activities: walking and running (see Figure~\ref{fig:datasets-2}). In both cases, the
-subject was wearing Neblina on their right wrist.
-We collected 1,000 data points for each activity, corresponding to
-5 seconds of activity.
+We acquired two 3D accelerometer time series at 200~Hz for two 
+activities: walking and running (see Figure~\ref{fig:datasets-2}). In 
+both cases, the subject was wearing Neblina on their right wrist. We 
+collected 1,000 data points for each activity, corresponding to 5 
+seconds of activity.
 
 We measured energy consumption associated with the transmission of
-these time series, for different norms and $\epsilon$ values. To do so,
-we `replayed' the time series by loading them as a byte array in
-Neblina, and we measured the current every 500~ms.
+these time series by
+`replaying' the time series after loading them as a byte array in
+Neblina. We measured the current every 500~ms.
 
  Results are reported in Table~\ref{table:results-energy}. For a given
  $\epsilon$ and norm, the compression ratio is larger for walking than
@@ -742,9 +740,9 @@ LTC in dimension $n$ for arbitrary norms. Investigating other norms, in
 particular the 1-norm, would be relevant too.
 
 \section*{Acknowledgement}
-This work was funded by a Strategic Project Grant of the Natural 
+This work was funded by the Natural 
 Sciences and Engineering Research Council of Canada. We thank Hosein 
-Nourani for providing the data used in Experiment 1.
+Nourani for providing data for Experiment 1.
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,biblio.bib}
