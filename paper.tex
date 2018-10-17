@@ -620,11 +620,11 @@ average for Euclidean norm).
     \hline
     \rowcolor{headcolor}
                            & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean}\\ \hline
-    $\epsilon$                & 48.8~mg          & 34.5~mg  & 48.8~mg         & 34.5~mg \\
-    Max error              & 48.8~mg       & 34.5~mg           & 48.6~mg       & 34.4~mg          \\
-    Compression ratio      & 29.03\%      & 20.88\%         & 25.12\%     & 19.57\%        \\
-    Peak memory            & 80~B          & 80~B             & 432~B        & 240~B           \\
-    Processing time        & 0.103~ms      & 0.082~ms         & 0.220~ms     & 0.200~ms        \\ \hline
+    $\epsilon$  (mg)          & 48.8         & 34.5       & 48.8       & 34.5 \\
+    Max error   (mg)          & 48.8         & 34.5       & 48.6       & 34.4 \\
+    Compression ratio (\%)    & 29.03        & 20.88      & 25.12      & 19.57\\
+    Peak memory   (B)         & 80           & 80         & 432        & 240  \\
+    Processing time (ms)      & 0.103        & 0.082      & 0.220s     & 0.200\\ \hline
     \end{tabular}
     \caption{Short biceps curl (2D)}
     \end{subfigure}\\
@@ -634,11 +634,11 @@ average for Euclidean norm).
     \hline
     \rowcolor{headcolor}
                    & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
-    $\epsilon$             & 48.8~mg        & 34.5~mg    & 48.8~mg        & 34.5~mg    \\
-    Max error              & 48.8~mg     & 34.5~mg   &48.8~mg       & 34.5~mg             \\
-    Compression ratio      & 60.17\%    & 51.59\%           & 57.75\%    & 48.86\%           \\
-    Peak memory       & 80~B        & 80~B               & 2.1~KB      & 2.5~KB             \\
-    Processing time      & 5.70~ms     & 4.85~ms            & 20.04~ms    & 19.28~ms           \\ \hline
+    $\epsilon$ (mg)            & 48.8        & 34.5       & 48.8        & 34.5    \\
+    Max error  (mg)            & 48.8        & 34.5       & 48.8        & 34.5             \\
+    Compression ratio (\%)     & 60.17       & 51.59      & 57.75       & 48.86           \\
+    Peak memory  (B)           & 80          & 80         & 2100        & 2500             \\
+    Processing time (ms)       & 5.70        & 4.85       & 20.04       & 19.28           \\ \hline
     \end{tabular}
     \caption{Long biceps curl (2D)}
     \end{subfigure}\\
@@ -647,12 +647,12 @@ average for Euclidean norm).
     \begin{tabular}{l|l|l|l|l}
     \hline
     \rowcolor{headcolor}
-                            & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
-    $\epsilon$             & 48.8~mg          & 28.2~mg  & 48.8~mg         & 28.2~mg   \\
-    Max error              & 48.8~mg       & 28.0~mg           & 48.8~mg       & 27.8~mg            \\
-    Compression ratio      & 23.00\%      & 12.89\%         & 18.43\%     & 9.95\%           \\
-    Peak memory            & 112~B         & 112~B            & 384~B        & 256~B             \\
-    Processing time        & 0.119~ms      & 0.094~ms         & 0.230~ms     & 0.200~ms          \\ \hline
+                           & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
+    $\epsilon$ (mg)        & 48.8          & 28.2          & 48.8   & 28.2   \\
+    Max error  (mg)        & 48.8          & 28.0          & 48.8   & 27.8   \\
+    Compression ratio (\%) & 23.00         & 12.89         & 18.43  & 9.95   \\
+    Peak memory (B)        & 112           & 112           & 384    & 256    \\
+    Processing time (ms)   & 0.119         & 0.094         & 0.230  & 0.200  \\ \hline
     \end{tabular}
     \caption{Short biceps curl (3D)}
     \end{subfigure}\\
@@ -662,11 +662,11 @@ average for Euclidean norm).
     \hline
     \rowcolor{headcolor}
                               & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
-    $\epsilon$                & 48.8~mg        & 28.2~mg    & 48.8~mg        & 28.2~mg    \\
-    Max error                 & 48.8~mg     & 28.2~mg             & 48.8~mg      & 28.2~mg             \\
-    Compression ratio         & 51.13\%    & 37.17\%           & 46.05\%    & 32.63\%           \\
-    Peak memory & 112~B        & 112~B              & 4.9~KB      & 3.0~KB             \\
-    Processing time           & 8.50~ms     & 7.07~ms            & 26.41~ms    & 21.26~ms           \\ \hline
+    $\epsilon$ (mg)                & 48.8        & 28.2       & 48.8     & 28.2    \\
+    Max error  (mg)                & 48.8        & 28.2       & 48.8     & 28.2    \\
+    Compression ratio (\%)         & 51.13       & 37.17      & 46.05    & 32.63   \\
+    Peak memory (B)                & 112         & 112        & 4900     & 3000    \\
+    Processing time (ms)           & 8.50        & 7.07       & 26.41    & 21.26   \\ \hline
     \end{tabular}
     \caption{Long biceps curl (3D)}
     \end{subfigure}
@@ -735,9 +735,9 @@ close to 20\%, which is substantial.
                           & \multicolumn{3}{c|}{Infinity} & \multicolumn{3}{c}{Euclidean} \\\hline
    $\epsilon$ (mg)             & 48.8       & 9.8      & 4.9       & 48.8      & 9.8       & 4.9    \\
    Max error (mg)              & 48.8     & 9.8        & 4.9      & 48.8   & 9.8   & 4.9  \\
-   Compr.      ratio      & 88.9\%    & 66.4\%  & 45.5\%   & 87.6\%   & 63.3\%   & 37.2\% \\
+   Compr.      ratio (\%)      & 88.9    & 66.4  & 45.5   & 87.6   & 63.3   & 37.2 \\
    Average (mA)                & 2.64     & 2.79   & 3.02   & 3.10    & 3.02    & 3.13  \\
-   Saved energy              & 23.9\%    & 19.7\%  & 13.0\%  &  10.7\%   & 13.0\%   & 9.68\%\\
+   Saved energy (\%)              & 23.9    & 19.7  & 13.0  &  10.7   & 13.0   & 9.7\\
    \hline
    \end{tabular}
    \caption{Walking}
@@ -749,11 +749,11 @@ close to 20\%, which is substantial.
    \rowcolor{headcolor}
 
                      & \multicolumn{3}{c|}{Infinity} & \multicolumn{3}{c}{Euclidean} \\\hline
-   $\epsilon$ (mg)        & 48.8       & 9.8      & 4.9       & 48.8      & 9.8       & 4.9    \\
-   Max error (mg)         & 48.8       & 9.8        & 4.9        & 48.8   &9.8    & 4.9   \\
-   Compr.      ratio & 68.6\%    & 25.5\%  & 9.5\%     & 64.4\%   & 19.8\%   & 5.7\%   \\
+   $\epsilon$ (mg)        & 48.8       & 9.8      & 4.9       & 48.8      & 9.8    & 4.9    \\
+   Max error (mg)         & 48.8       & 9.8      & 4.9       & 48.8      & 9.8    & 4.9   \\
+   Compr.      ratio (\%) & 68.6       & 25.5     & 9.5       & 64.4      & 19.8   & 5.7   \\
    Average (mA)        & 2.88     & 3.22   & 3.38     & 2.95    & 3.32    & 3.39   \\
-   Saved energy      & 17.0\%    & 7.18 \%   & 2.50\%   & 14.9\%   & 4.32\%   & 2.22 \%\\
+   Saved energy (\%)      & 17.0    & 7.2    & 2.5   & 14.9   & 4.3   & 2.2\\
    \hline
    \end{tabular}
    \caption{Running}
