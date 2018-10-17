@@ -157,6 +157,7 @@ Section~\ref{sec:results} reports on experiments to validate our
 implementation, and evaluates the impact of n-dimensional LTC on 
 energy consumption of connected objects.
 
+\newpage
 
 \section{Lightweight Temporal Compression}
 \label{sec:ltc}
@@ -197,15 +198,6 @@ is updated from $x_i-\epsilon$. Therefore, any line located between the
 high line and the low line approximates the data points received since
 the last transmitted point with an error bounded by $\epsilon$.
 
-Using these notations, the original LTC algorithm can
-be written as in Algorithm~\ref{algo:ltc}. For readability, we assume
-that access to data points is blocking, i.e., the program will wait
-until the points are available. We also assume that the content of
-variable \texttt{tr} is transmitted after each assignment of this
-variable. Function \texttt{line}, omitted for brevity, returns the
-ordinate at abscissa $x$ (1st argument) of the line defined by the points
-in its 2nd and 3rd arguments.
-
 \begin{algorithm}
 \begin{algorithmic}[1]
 \Input
@@ -238,16 +230,14 @@ in its 2nd and 3rd arguments.
 \label{algo:ltc}
 \end{algorithm}
 
-
- %~ is one of the linear estimation
-%~ method to compress data. It is The first-order interpolator with two
-%~ degrees of freedom (FOI-2DF) which is mentioned in
-%~ ~\cite{jalaleddine1990ecg}.  Most of linear estimation method need a
-%~ predefined parameter which is the error margin (let's call $\epsilon$)
-%~ in order to guarantee the difference between estimation and original
-%~ data within a scope.
-
-%~ \todo{rewrite LTC algorithm, and there is a DP version of LTC maybe should also be written}
+Using these notations, the original LTC algorithm can
+be written as in Algorithm~\ref{algo:ltc}. For readability, we assume
+that access to data points is blocking, i.e., the program will wait
+until the points are available. We also assume that the content of
+variable \texttt{tr} is transmitted after each assignment of this
+variable. Function \texttt{line}, omitted for brevity, returns the
+ordinate at abscissa $x$ (1st argument) of the line defined by the points
+in its 2nd and 3rd arguments.
 
 \section{Extension to dimension $n$}
 \label{sec:extension}
@@ -391,133 +381,62 @@ approximation doesn't hold in any of the dimensions.
 
 \section{Implementation}
 \label{sec:implementation}
-Our code is available at ... (make a clean release!)
 
-\todo{explain difference between exp 1 and exp 2 for euclidean}
+To implement LTC with the infinity norm, we maintain a cuboid 
+representation of $\cap_{l=1}^j{\mathcal{B}_l}$ throughout the 
+iterations of the \texttt{while} loop in 
+Algorithm~\ref{algo:general-ltc}. The implementation only requires 
+constant memory and reduced CPU time to update the cuboid with the 
+n-ball associated with the new data point at each iteration.
 
-%~ As reference above, the norm selection is importance. In this section,
-%~ we show the implementation of infinity norm and Euclidean norm.
+With the Euclidean norm, the intersection test is more complex, as 
+mentioned previously. We keep in memory a growing set $S$ of balls and 
+the bounding box $B$ of their intersection. Then, when a new point 
+arrives, we consider the associated ball $\mathcal{B}_j$ and our 
+intersection test works as in Algorithm~\ref{algo:euclidean}. 
+\texttt{box} is a function that returns the bounding box of an n-ball. 
+\texttt{find\_bisection(S, B)} searches for a point in all the elements 
+in S, using plane sweep and bisection initialized by the bounds of B.
 
-%~ \subsection{Multidimensional LTC with Manhattan distance}
-%~ In section 2, we can know that the repersentation of intersection
-%~ is a rectangular cuboid. So only one bounding box with n-dimensional
-%~ is needed to represent the intersection. Assume a bounding box
-%~ $\mathcal{BOX}_{m-1} = \bigcap_{j=1}^{m-1}{\mathcal{B}_{m-1}}$ which
-%~ has Upper bound $U_i$ and lower Bound $L_i$ for each dimension
-%~ $i$. So the fomular (1) in $6_{th}$ line of Algorithm 2 would
-%~ be changed to $\mathcal{BOX}_{m-1} \bigcap \mathcal{B}_{m} \neq \O $. The Bounding box
-%~ would be updated when this formular return true.
-%~ Otherwise return false.
-%~ \begin{enumerate}
-    %~ \item Initialization: Let origin $(u^k_0, y^k_0) = (\tau_k, \xi_k)$.
-    %~ \item For each data $(u_m^k, y_m^k)$ with diminsion $n$,
-            %~ defines $(v_m, z_m) = (u_m^k - \tau^k, y_m^k - \xi^k)$ where $z_m =
-            %~ \{ x_{mi} \mid 1\leqslant{i}\leqslant{n}\}$.
-    %~ \item The $\mathcal{B}_{m}$ should be a ractangular cube with center
-            %~ $\frac{v_1}{v_m}z_m$ and weight $\frac{v_1}{v_m}\epsilon$.
-    %~ \item For each dimension $i$, box upper bound $U_i < \frac{v_1}{v_m}x_{mi}+
-            %~ \frac{v_1}{v_m}\epsilon$ OR lower bound $L_i > \frac{v_1}{v_m}x_{mi}-\frac{v_1}{v_m}\epsilon$, return False.
-    %~ \item Otherwise, the intersection do not be empty. Updating
-            %~ the Bounding box $\mathcal{BOX}_m = \mathcal{BOX}_{m-1} \bigcap \mathcal{B}_{m}$. For
-            %~ each dimension $i$ in $\mathcal{BOX}_m$, $U_i = min(U_i, \frac{v_1}{v_m}x_{mi}+
-            %~ \frac{v_1}{v_m}\epsilon)$, and $L_i = max(L_i , \frac{v_1}{v_m}x_{mi}-\frac{v_1}{v_m}\epsilon)$. Return True.
-%~ \end{enumerate}
+\begin{algorithm}
+\begin{algorithmic}[1]
+\Input
+   \Desc{$S$}{Set of intersecting balls}
+   \Desc{$B$}{Bounding box of the intersection of balls in $S$}
+   \Desc{$\mathcal{B}_j$}{New ball to check}
+\EndInput
+\Output
+   \Desc{$S$}{Updated set of intersecting balls}
+   \Desc{$B$}{Updated bounding box}
+   \Desc{$T$}{True if all the balls in S and $\mathcal{B}_j$ intersect}
+\EndOutput
 
+\If{$\exists\ \mathcal{B}_i \in S$ s.t. $\mathcal{B}_j \cap \mathcal{B}_i = \O$}
+\State \Return ($S$, False)
+\EndIf
+\If{$\exists\ \mathcal{B}_i \in S$ s.t. $\mathcal{B}_j \subset \mathcal{B}_i$}
+\State Remove $\mathcal{B}_i$ from $B$. Add $\mathcal{B}_j$ to $B$.
+\State \Return ($S$, $B$, True)
+\EndIf
+\If{$\mathcal{B}_j \cap B = \O$}
+\State \Return ($S$, $B$, False)
+\EndIf
+\State $B$ = box($\mathcal{B}_j$) $\ \bigcap\ $ B 
+\State $S$ = $S \ \bigcup \  \{\mathcal{B}_j\}$
+\State $x$ = find\_bisection($S$, $B$)
+\If{$x$ == Null}
+\State \Return ($S$, $B$, False)
+\Else
+\State \Return ($S$, $B$, True)
+\EndIf
+\end{algorithmic}
+\caption{Intersection test for Euclidean n-balls.}
+\label{algo:euclidean}
+\end{algorithm}
 
-%~ According the Implement, the infinity norm boils down to apply 1D LTC algorithm in each dimension respectively. Since, the intersection would be rectangle in 2D and cube in 3D, the corresponding max errors are $\frac{\epsilon}{\sqrt{2}}$ and $\frac{\epsilon}{\sqrt{3}}$. As we mentioned in Section 2, the infinity norm is more 'tolerant' than Euclidean norm. The max error between original data and reconstructed data certainly not greater than $\frac{\epsilon}{\sqrt{n}}$ where $n$ is dimension of data.
-
-%~ \todo{maybe need a graphic}
-
-%~ \subsection{Multidimensional LTC with Euclidean distance}
-%~ In Euclidea norm, the representation of intersection is
-%~ volume. There is no specific model to record repersentation
-%~ with updating, so a list to save all balls $\mathcal{B}_j, 1\leqslant{j}\leqslant{m}$
-%~ is needed. In order to test weather a set of balls intersect,
-%~ the Helly's theorem could work, but the complexity of
-%~ this method is too high to work with embeded, low-power
-%~ systems which has limited CPU and RAM resource. So we
-%~ implement Euclidean norm by using a method which based
-%~ on plane sweep and binary search. Assume the list of balls $S_{m-1}$ contains balls from $\mathcal{B}_1$ to $\mathcal{B}_{m-1}$, and an temporary data point $output$ used for updated origin $(\tau^k, \xi^k)$. From the formula (1) in Section 3, the $(\mathcal{B}_j)_{j \in \llbracket 1, {m-1} \rrbracket}$ is a sequence of decreasing radius, so the larger balls that includes new coming ball $\mathcal{B}_{m-1}$ could be reomved from list $S_{m-1}$ so that reducing processing complexity of method. Therefore the list $S_{m-1}$ may not includes $m-1$ balls. Assume each $\Hat{\mathcal{B}} \in S$ which has corresponding center $\Hat{z}$ and radius $\Hat{\epsilon}$.
-%~ Let origin $(u^k_0, y^k_0) = (\tau_k, \xi_k)$, and for each data $(u_m^k, y_m^k)$ with diminsion $n$, defines $(v_m, z_m) = (u_m^k - \tau^k, y_m^k - \xi^k)$ where $z_m = \{ x_{mi} \mid 1\leqslant{i}\leqslant{n}\}$. The $\mathcal{B}_{m}$ should be one n-ball with center $\frac{v_1}{v_j}z_m$ and radius $\frac{v_1}{v_j}\epsilon$. The method is written in Algorithm~\ref{algo:isThereIntersection}.
-
-%~ \begin{algorithm}
-    %~ \begin{flushleft}
-        %~ \textbf{Input:} $S$, $\mathcal{B}_m$, $output$ \\
-        %~ \textbf{Output:} $true|false$\\
-    %~ \end{flushleft}
-    %~ \begin{algorithmic}[1]
-        %~ \State d = n \Comment{dimension index}
-        %~ \State $max_d = \frac{v_1}{v_m}(x_d + \epsilon)$
-        %~ \State $min_d = \frac{v_1}{v_m}(x_d - \epsilon)$
-        %~ \ForAll{$\Hat{\mathcal{B}}$ \textbf{in} $S$}
-            %~ \If{$\Hat{\mathcal{B}} \bigcap \mathcal{B}_m = $ \O }
-                %~ \State \textbf{return} false
-            %~ \ElsIf{$\mathcal{B}_m \bigcap \Hat{\mathcal{B}}  = \mathcal{B}_m $}
-                %~ \State remove $\Hat{\mathcal{B}}$ from $S$
-                %~ \State \textbf{continue}\\
-            %~ $max_d = \min(max_d, \Hat{x_d} + \Hat{\epsilon}$)\\
-            %~ $min_d = \max(min_d, \Hat{x_d} - \Hat{\epsilon}$)
-            %~ \EndIf
-        %~ \EndFor
-        %~ \State $\textbf{add } \mathcal{B}_m \textbf{ into } S$
-        %~ \If{$max_d < min_d$}
-            %~ \State \textbf{return} false
-        %~ \EndIf
-        %~ \State temp\_output = output \Comment{used for next operation}
-        %~ \If{Recursive$(min_d, max_d, n, p\_cp)$}
-            %~ \State $output = temp\_output$
-            %~ \State \textbf{return} true
-        %~ \Else
-            %~ \State \textbf{return} false
-        %~ \EndIf
-    %~ \end{algorithmic}
-    %~ \caption{isThereIntersection}
-    %~ \label{algo:isThereIntersection}
-%~ \end{algorithm}
-
-%~ In the method, selecting dimension(n as default in our method) to calculate max point value and min point value of all n-balls in this dimension. If the max value bigger than min value, then there is no intersection. After that. In Recursive function Algorithm~\ref{algo:recursive}, using binary search select
-%~ median $mid_d$ of $max_d$ and $min_d$ in order to find bound range of dimension d-1 ($max_{d-1}$, $min_{d-1}$) over the plane $x_d = max_d$. If bound range of dimension $d-1$ is not empty, continue calling function \textbf{Recursive}($min_{d-1}$, $min_{d-1}$, $d-1$, $temp\_output$). Recursively calling this function, until getting result.
-%~ \todo{add recursive pseudo-code}
-
-%~ In 2-dimension Euclidean norm, the complexity of this algorithm is $O(n)+O(n\log\epsilon) = O(n\log\epsilon)$. In 3-dimension, It needs $O(\log^2\epsilon)$ to determine $mid\_3, mid\_2$, and $O(n)$ to traverse all balls in list and calculate bounding range of dimension d=1. So 3-dimensional method need $O(n \log^2\epsilon)$ totally. If we extend this idea for n-dimension, the complexiy of this method is $O(n \log^{n}\epsilon)$ where n is the number of dimension.
-
-%~ \begin{algorithm}
-    %~ \begin{flushleft}
-        %~ \textbf{function} Recursive$(left, right, j, p)$  -- $j$ means $j_th$ dimension
-    %~ \end{flushleft}
-    %~ \begin{algorithmic}[1]
-        %~ \While{$left \leqslant right$}
-            %~ \State $mid \gets (left + right)/2$
-            %~ \State $max \gets +\infty$
-            %~ \State $min \gets -\infty$
-            %~ \For{$i=1$ \textbf{to} $tmp\_list.length$}
-                %~ \State $P_1$ and $P_2$ are intersection points of $tmp\_list[i]$ and line $d_{j}=mid$, $(P1.d_{j-1}\geqslant P2.d_{j-1})$
-                %~ \If{$P_1.d_{j-1} < max$}
-                    %~ \State $max \gets p_1.d_{j-1}$
-                    %~ \State $max\_index \gets i$
-                %~ \EndIf
-                %~ \If{$P_2.d_{j-1} > min$}
-                    %~ \State $min \gets p_2.d_{j-1}$
-                    %~ \State $min\_index \gets i$
-                %~ \EndIf
-            %~ \EndFor
-            %~ \If{$max >= min$}
-                %~ \State $p.d_j \gets mid$
-                %~ \If{Recursive$(min, max, j-1, p)$}
-                    %~ \State \textbf{return} true
-                %~ \EndIf
-            %~ \EndIf
-            %~ \State Assume $P_d$ is the intersection between common chord of two objects $tmp\_list[max\_index]$, $tmp\_list[min\_index]$ and their line of centers.
-            %~ \If{$P_d.d_j < mid$}
-                %~ \State $right \gets mid-1$
-            %~ \ElsIf{$P_d.d_j > mid$}
-                %~ \State $left \gets mid+1$
-            %~ \EndIf
-
-        %~ \EndWhile
-        %~ \Return false
-    %~ \end{algorithmic}
-%~ \end{algorithm}
+Our code is available at 
+\url{https://github.com/big-data-lab-team/stream-summarization} under
+MIT license.
 
 \section{Experiments and Results}
 \label{sec:results}
@@ -538,8 +457,8 @@ autonomy of 39.7~h without transmission and 28.8~h with transmission.
 
 \subsection{Experiment 1: validation}
 
-\todo{(Put a picture of Neblina in a box worn 
-on the wrist)}
+%\todo{(Put a picture of Neblina in a box worn 
+%on the wrist)}
 
 In this experiment, we validated the behavior of our LTC extension on a 
 PC using data acquired with Neblina. We collected two 3D 
@@ -551,15 +470,15 @@ a higher amplitude, most likely due to differences between subjects.
 
 \begin{figure*}
 \begin{subfigure}{2\columnwidth}
-\includegraphics[width=0.33\columnwidth]{figures/5-time-bicep-curl-plot-x.pdf}
-\includegraphics[width=0.33\columnwidth]{figures/5-time-bicep-curl-plot-y.pdf}
-\includegraphics[width=0.33\columnwidth]{figures/5-time-bicep-curl-plot-z.pdf}
+\includegraphics[width=0.3\columnwidth]{figures/5-time-bicep-curl-plot-x.pdf}
+\includegraphics[width=0.3\columnwidth]{figures/5-time-bicep-curl-plot-y.pdf}
+\includegraphics[width=0.3\columnwidth]{figures/5-time-bicep-curl-plot-z.pdf}
 \caption{Short biceps curl$^a$}
 \end{subfigure}
 \begin{subfigure}{2\columnwidth}
-\includegraphics[width=0.33\columnwidth]{figures/Mohammad-bicep-curl-plot-x.pdf}
-\includegraphics[width=0.33\columnwidth]{figures/Mohammad-bicep-curl-plot-y.pdf}
-\includegraphics[width=0.33\columnwidth]{figures/Mohammad-bicep-curl-plot-z.pdf}
+\includegraphics[width=0.3\columnwidth]{figures/Mohammad-bicep-curl-plot-x.pdf}
+\includegraphics[width=0.3\columnwidth]{figures/Mohammad-bicep-curl-plot-y.pdf}
+\includegraphics[width=0.3\columnwidth]{figures/Mohammad-bicep-curl-plot-z.pdf}
 \caption{Long biceps curl}
 \end{subfigure}
 \caption{Time series used in Experiment 1\\
@@ -598,10 +517,11 @@ the amount of required memory increases for more complex time series
 values of $\epsilon$. Similar observations are made for the processing
 time, with values ranging from 0.2~ms for the simplest time series and
 smallest $\epsilon$, to 26.4~ms for the most complex time series and
-largest $\epsilon$.Figure~\ref{fig:memory} shows the memory consumption 
-of the 3D Euclidean implementation for $\epsilon$=48.8~mg: peaks appear
-at the end of long compressed ranges where the signal was $\epsilon$-closed
-to the linear approximation.
+largest $\epsilon$.
+%~ Figure~\ref{fig:memory} shows the memory consumption 
+%~ of the 3D Euclidean implementation for $\epsilon$=48.8~mg: peaks appear
+%~ at the end of long compressed ranges where the signal was $\epsilon$-closed
+%~ to the linear approximation.
 
 \paragraph{2D vs 3D}
 For a given $\epsilon$ of 48.8~mg and a given time series, the compression 
@@ -676,34 +596,34 @@ average for Euclidean norm).
 
 \begin{figure*}
 \begin{subfigure}{2\columnwidth}
-\includegraphics[width=0.33\columnwidth]{./figures/walking-1000-x.pdf}
-\includegraphics[width=0.33\columnwidth]{./figures/walking-1000-y.pdf}
-\includegraphics[width=0.33\columnwidth]{./figures/walking-1000-z.pdf}
+\includegraphics[width=0.3\columnwidth]{./figures/walking-1000-x.pdf}
+\includegraphics[width=0.3\columnwidth]{./figures/walking-1000-y.pdf}
+\includegraphics[width=0.3\columnwidth]{./figures/walking-1000-z.pdf}
 \caption{Walking}
 \end{subfigure}
 \begin{subfigure}{2\columnwidth}
-\includegraphics[width=0.33\columnwidth]{./figures/running-1000-x.pdf}
-\includegraphics[width=0.33\columnwidth]{./figures/running-1000-y.pdf}
-\includegraphics[width=0.33\columnwidth]{./figures/running-1000-z.pdf}
+\includegraphics[width=0.3\columnwidth]{./figures/running-1000-x.pdf}
+\includegraphics[width=0.3\columnwidth]{./figures/running-1000-y.pdf}
+\includegraphics[width=0.3\columnwidth]{./figures/running-1000-z.pdf}
 \caption{Running}
 \end{subfigure}
 \caption{Time series used in Experiment 2}
 \label{fig:datasets-2}
 \end{figure*}
 
-\begin{figure}
-\includegraphics[width=\columnwidth]{./figures/memory-mohammad.pdf}
-\caption{Memory usage of 3D Euclidean implementation, long biceps curl time series, $\epsilon$=48.8~mg.}
-\label{fig:memory}
-\end{figure}
+%~ \begin{figure}
+%~ \includegraphics[width=\columnwidth]{./figures/memory-mohammad.pdf}
+%~ \caption{Memory usage of 3D Euclidean implementation, long biceps curl time series, $\epsilon$=48.8~mg.}
+%~ \label{fig:memory}
+%~ \end{figure}
 
 \subsection{Experiment 2: impact on energy consumption}
 
-We measured the energy consumption of Neblina
-for different values of $\epsilon$ and norms, to quantify the
-added-value of LTC for this system.
+%~ We measured the energy consumption of Neblina
+%~ for different values of $\epsilon$ and norms, to quantify the
+%~ added-value of LTC for this system.
 
-We acquired two 3D accelerometer time series at 200Hz corresponding to
+We acquired two 3D accelerometer time series at 200~Hz corresponding to
 common human activities: walking and running (see Figure~\ref{fig:datasets-2}). In both cases, the
 subject was wearing Neblina on their right wrist.
 We collected 1,000 data points for each activity, corresponding to
