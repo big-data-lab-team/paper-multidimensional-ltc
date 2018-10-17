@@ -1,4 +1,17 @@
-no transmit,Without compression,linfinity walk e=100,infinity walk e=20,infinity walk e=10,Infinity run e=100,infinity run e=20,infinity run e=10,euclidean walk e=100,euclidean walk e=20,euclidean walk e=10,euclidean run e=100,euclidean run e=20,euclidean run e=10
+# 1. no transmit,
+# 2. without compression
+# 3. linfinity walk e=100
+# 4. infinity walk e=20
+# 5. infinity walk e=10
+# 6. infinity run e=100
+# 7. infinity run e=20
+# 8. infinity run e=10
+# 9. euclidean walk e=100
+# 10. euclidean walk e=20
+# 11. euclidean walk e=10
+# 12. euclidean run e=100
+# 13. euclidean run e=20
+# 14. euclidean run e=10
 2.544,3.506,2.627,2.815,3.133,2.944,3.325,3.308,3.104,3.06,3.02,3.005,3.491,3.433
 2.531,3.511,2.666,2.94,3.02,2.748,3.225,3.276,3.228,3.125,3.049,2.951,3.413,3.431
 2.483,3.504,2.68,2.656,3.202,2.769,3.302,3.329,2.939,2.924,3.211,2.917,3.283,3.49
