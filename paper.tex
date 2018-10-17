@@ -70,16 +70,18 @@ memory.
 
 % Compression of stream data
 % need references
-Compressing data streams is required in many contexts, to reduce 
-storage and network requirements of data analytics. In particular, it is 
-highly beneficial to energy-constrained devices such as Systems on 
-Modules (SoM), as they reduce the amount of energy-consuming radio transmissions.
-However, resource-intensive algorithms such as~\cite{x},~\cite{y} 
-or~\cite{z} are not well-suited for energy-constrained systems, due to 
-the limited memory available on these systems (typically a few KB), and 
-the energy consumption associated with CPU usage. On such systems, 
-compression algorithms need to find a trade-off between reducing 
-network communications and increasing memory and CPU usage. As 
+Lossy compression of data streams is required in many contexts, to reduce 
+storage and network requirements of data analytics. In particular, it 
+is highly beneficial to energy-constrained devices such as Systems on 
+Modules (SoM), as they reduce the amount of energy-consuming radio 
+transmissions. However, resource-intensive algorithms such as the ones 
+based on polynomial interpolation or auto-regression 
+methods~\cite{lu2010optimized} are not well-suited for 
+energy-constrained systems, due to the limited memory available on 
+these systems (typically a few KB), and the energy consumption 
+associated with CPU usage. On such systems, compression algorithms need 
+to find a trade-off between reducing network communications and 
+increasing memory and CPU usage. As 
 discussed in~\cite{zordan2014performance}, linear compression methods 
 provide a very good compromise between these two factors, leading to 
 substantial energy reduction.
@@ -103,18 +105,27 @@ algebraic formulation of the algorithm that also yields a
 norm-independent expression of it. We implement our extension on 
 Motsai's Neblina module, and we test it on 3D acceleration streams 
 acquired during human exercises, namely biceps curling, walking and 
-running. Our implementation of LTC is available as free software on GitHub\todo{add link}.
+running. Our implementation of LTC is available as free software.
 
 We assume that the stream consists of a sequence of data points 
 received at uneven intervals. The compression algorithm 
 \emph{transmits} fewer points than it receives. The transmitted points 
-might be part of the stream, or computed from stream elements. The 
+might be included in the stream, or computed from stream points. The 
 \emph{compression ratio} is the ratio between the number of received 
 points and the number of transmitted points. An application would 
 reconstruct the stream from the transmitted points: the 
 \emph{reconstruction error} is the maximum absolute difference between 
-a data point of the reconstructed stream, and the corresponding data 
+a point of the reconstructed stream, and the corresponding 
 point in the original stream.
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{ltc.pdf}
+\caption{Illustration of the LTC algorithm and notations used. Blue 
+dots are received points, red dots are transmitted points. Dashed lines 
+represent the high line and the low line at times when a point is 
+transmitted.\vspace*{-0.3cm}}
+\label{fig:ltc}
+\end{figure}
 
 % Outline
 Section~\ref{sec:ltc} provides some background on the LTC algorithm, 
@@ -125,12 +136,7 @@ Section~\ref{sec:implementation} describes our implementation.
 Section~\ref{sec:results} reports on experiments to validate our 
 implementation, and evaluate the impact of n-dimensional LTC on SoM 
 energy consumption.
-\begin{figure}
-\includegraphics[width=\columnwidth]{ltc.pdf}
-\caption{Illustration of the LTC algorithm and notations used. Red dots indicate transmitted points. Dashed lines
-represent the high line and the low line at times when a point is transmitted.}
-\label{fig:ltc}
-\end{figure}
+
 
 \section{Lightweight Temporal Compression}
 \label{sec:ltc}
@@ -721,16 +727,47 @@ close to 20\%, which is very substantial.
 %~ hours.
 
 
-
-
-
 \section{Conclusion}
 
-Euclidean norm would benefit from a better algorithm but it still
-provides interesting energy savings.
+We presented an extension of the Lightweight Temporal Compression 
+method to dimension $n$ that can be instantiated for any distance 
+function. Our extension formulates LTC as an intersection dection 
+problem between n-balls. We implemented our extension on a SoM for the 
+infinity and Euclidean norms, and we measured the energy reduction 
+resulting from compression for acceleration streams acquired during a 
+few human activities.
+
+We conclude from our experiments that the proposed extension to LTC is 
+well suited to reduce energy consumption on SoMs, as it reduce energy 
+consumption by up to 20\%. The implementation behaves better with the 
+infinity norm than with the Euclidean one, due to the lack of efficient 
+algorithms to detect the intersection between n-balls defined for the 
+Euclidean norms.
+
+Our future work focuses on this issue. Our current implementation with 
+the Euclidean norm relies on Helly's theorem, which only provides an 
+algorithm of complexity ${m \choose n+1}$ to compress $m$ points in 
+dimension $n$. We note that Helly's theorem works for arbitrary convex 
+subsets of $\mathbb{R}^n$, while we are considering a \emph{sequence} 
+of \emph{balls} of \emph{decreasing radius}. Based on this 
+observation, a stronger result might exist that would lead to a more 
+efficient implementation of LTC with the Euclidean norm. Our current 
+idea is to look for a point function of the ball centers that would 
+necessarily belong to the ball intersection when it is not empty; such 
+a point, if it exists, necessarily converges to the center of the last 
+ball in the sequence as $n$ increases, as the radius of the last ball
+decreases to zero.
+
+The effect of norm selection should not be underestimated. Some 
+situations might be better described with the Euclidean norm than with the
+infinity norm, such as the ones involving position or movement measures. 
+Using the infinity norm instead of the Euclidean would lead to important 
+error differences, proportional to $\sqrt{n}$ in dimension $n$. 
 
 \section*{Acknowledgement}
-This work was funded by the Canadian 
+This work was funded by a Strategic Project Grant of the Natural 
+Sciences and Engineering Research Council of Canada. We thank Hosein 
+Nourani for providing the data used in Experiment 1.
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,biblio.bib}
