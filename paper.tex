@@ -22,6 +22,7 @@
 \usepackage{amsthm}
 \usepackage{wrapfig}
 \usepackage{multicol}
+\usepackage{flushend}
 \DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 \DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
 
@@ -49,7 +50,7 @@
 
 \author{Bo Li$^1$, Omid Sarbishei$^2$, Hosein Nourani$^1$, Tristan Glatard$^1$\\
   $^1$ Department of Computer Science and Software Engineering, Concordia University, Montreal, QC, Canada \\
-  $^2$  Research and Development Department, Motsai Research, Saint Bruno, QC, Canada}
+  $^2$  Research and Development Department, Motsai Research, Saint Bruno, QC, Canada \vspace*{0.9cm}}
 \maketitle
 
 \begin{abstract}
@@ -139,7 +140,7 @@ reconstructs the stream from the transmitted points: the
 a point of the reconstructed stream, and the corresponding 
 point in the original stream.
 
-\begin{figure}
+\begin{figure}[b]
 \includegraphics[width=\columnwidth]{./figures/ltc.pdf}
 \caption{Illustration of the LTC algorithm. Blue 
 dots are received points, red dots are transmitted points. Dashed lines 
