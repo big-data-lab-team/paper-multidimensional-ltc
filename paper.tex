@@ -54,18 +54,18 @@
 Lightweight Temporal Compression
 (LTC) is among the lossy stream
 compression methods that provide the highest compression rate for the 
-lowest CPU and memory consumption. As such, it is very well suited to 
+lowest CPU and memory consumption. As such, it is well suited to 
 compress data streams in energy-constrained systems such as connected 
 objects. The current formulation of LTC, however, is one-dimensional 
 while data acquired in connected objects is often multi-dimensional: for instance, 
 accelerometers and gyroscopes usually measure variables along 
-3 directions related by the actual movement of the sensor. In this 
+3 directions. In this 
 paper, we investigate the extension of LTC to 
 higher dimensions. First, we provide a formulation 
 of the algorithm in an arbitrary vectorial space of dimension $n$. 
 Then, we implement the algorithm for the infinity and Euclidean norms, 
 in spaces of dimension 2D+t and 3D+t. We evaluate our implementation on 
-3D acceleration streams acquired during human activities. 
+3D acceleration streams of human activities. 
 Results show that the 3D implementation of LTC can save up to 20\% in 
 energy consumption for low-paced activities, with a memory usage of about 100~B.
 \end{abstract}
@@ -75,7 +75,7 @@ energy consumption for low-paced activities, with a memory usage of about 100~B.
 With the recent technological advances in Internet of Things (IoT) 
 applications, more than one billion connected objects are expected to 
 be launched worldwide by 2025\footnote{\url{ 
-https://www.statista.com/statistics/471264/iot-number-of-connected-devices-worldwide}} 
+https://www.statista.com/statistics/471264/iot-number-of-connected-devices-worldwide}}.
 Power consumption is amongst the biggest challenges targeting connected 
 objects, particularly in the industrial domains, where several sensing 
 systems are commonly launched in the field to run for days or even 
@@ -97,9 +97,9 @@ tolerance for a lossy compression algorithm.
 Resource-intensive lossy compression algorithms such as the ones based on 
 polynomial interpolation, discrete cosine and Fourier transforms, or 
 auto-regression methods~\cite{lu2010optimized} are not well-suited for 
-energy-constrained systems, due to the limited memory available on 
+connected objects, due to the limited memory available on 
 these systems (typically a few KB), and the energy consumption 
-associated with CPU usage. On such systems, compression algorithms need 
+associated with CPU usage. Instead, compression algorithms need 
 to find a trade-off between reducing network communications and 
 increasing memory and CPU usage. As 
 discussed in~\cite{zordan2014performance}, linear compression methods 
@@ -113,7 +113,7 @@ substantial energy reduction.
 The Lightweight Temporal Compression method 
 (LTC~\cite{schoellhammer2004lightweight}) has been designed 
 specifically for energy-constrained systems, initially sensor networks. 
-It approximates data points by a piecewise linear function that 
+It approximates data points by a piece-wise linear function that 
 guarantees an upper bound on the reconstruction error, and a reduced 
 memory footprint in $\mathcal{O}(1)$. However, LTC has only been 
 described for 1D streams, while streams acquired by connected objects, such as 
@@ -122,7 +122,7 @@ acceleration or gyroscopic data, are often multi-dimensional.
 In this paper, we extend LTC to dimension $n$. To do so, we propose an 
 algebraic formulation of the algorithm that also yields a 
 norm-independent expression of it. We implement our extension on 
-Motsai's Neblina module, and we test it on 3D acceleration streams 
+Motsai's Neblina module\footnote{\url{ https://motsai.com/products/neblina}}, and we test it on 3D acceleration streams 
 acquired during human exercises, namely biceps curling, walking and 
 running. Our implementation of LTC is available as free software.
 
@@ -153,7 +153,7 @@ in~\cite{schoellhammer2004lightweight}. Section~\ref{sec:extension}
 presents our norm-independent extension to dimension $n$, and 
 Section~\ref{sec:implementation} describes our implementation. 
 Section~\ref{sec:results} reports on experiments to validate our 
-implementation, and evaluates the impact of n-dimensional LTC on 
+implementation, and evaluate the impact of n-dimensional LTC on 
 energy consumption of connected objects.
 
 \newpage
@@ -205,9 +205,9 @@ the last transmitted point with an error bounded by $\epsilon$.
 \Output
    \Desc{tr}{Transmitted points}
 \EndOutput
-\State tr = $(u^0_0, y^0_0)$ \Comment{last transmitted point}
+\State tr = $(u^0_0, y^0_0)$ \Comment{Last transmitted point}
 \State k = 0 ; j = 1
-\State (lp, hp) = ($y^0_1 - \epsilon$, $y^0_1 + \epsilon$) \Comment{low and high points}
+\State (lp, hp) = ($y^0_1 - \epsilon$, $y^0_1 + \epsilon$) \Comment{Low and high points}
 
 \While{True} \Comment{Process received points as they come}
     \State j += 1
@@ -217,7 +217,7 @@ the last transmitted point with an error bounded by $\epsilon$.
         \State (lp, hp) = (new\_lp, new\_hp)
         \State \textbf{continue}
     \EndIf
-    \State tr = $(u^k_j, (lp+hp)/2)$
+    \State tr = $(u^k_{j-1}, (lp+hp)/2)$
     \Comment{Transmit point}
     \State (lp, hp) = ($y^k_j-\epsilon$, $y^k_j+\epsilon$)
     \State k += 1
@@ -284,7 +284,7 @@ We define the \emph{LTC property} as follows:
 The original LTC algorithm ensures that the LTC property is
 verified between each transmission. Indeed, all the data points
 $z$ such that $(v_1, z)$ is between the high line and the low line
-verify the property. Line 9 in Algorithm~\ref{algo:ltc} guarantees that
+verify the property. Line 13 in Algorithm~\ref{algo:ltc} guarantees that
 such a point exists.
 
 The LTC property can be re-written as follows:
@@ -314,25 +314,23 @@ point. It is written in Algorithm~\ref{algo:general-ltc}.
    \Desc{tr}{Transmitted points}
 \EndOutput
 
-\State tr = ($\tau, \xi$) = ($u^0_0, y^0_0$)
+\State tr = ($\tau, \xi$) = ($u^0_0, y^0_0$) \Comment{Last transmitted point}
 \State k = 0 ; j = 0
 \While{True}
     \State j += 1
     \State ($v_j, z_j$) = ($u_j^k - \tau, y_j^k - \xi$)
-    \If{$\bigcap_{l=1}^j{\mathcal{B}_l} \neq \O$}
+    \If{$\bigcap_{l=1}^j{\mathcal{B}_l} \neq \O$} \Comment{Keep compressing}
         \State \textbf{continue}
     \EndIf
-    \State Pick $z$ in $\bigcap_{l=1}^{j-1}{\mathcal{B}_j}$
+    \State Pick $z$ in $\bigcap_{l=1}^{j-1}{\mathcal{B}_j}$ \Comment{Transmit point}
     \State tr = ($\tau$, $\xi$) = ($u^k_{j-1}, z$)
     \State k += 1
-    \State j = 0
+    \State j = 1
 \EndWhile
 \end{algorithmic}
-\caption{Generalized LTC}
+\caption{Generalized LTC.}
 \label{algo:general-ltc}
 \end{algorithm}
-
-\todo{Check algorithms}
 
 \subsection{Ball intersections}
 
@@ -345,7 +343,7 @@ Let $\left\{ X_i \right\}_{i \in \llbracket 1, m \rrbracket}$ be a collection of
 subsets is non-empty, then the whole collection has an non-empty intersection.
 \end{theorem}
 \noindent This theorem leads to an algorithm of complexity ${m \choose n+1}$ which is
-not usable in resource-constrained environment.
+not usable in resource-constrained environments.
 
 The only feasible algorithm that we found is norm-specific. It
 maintains a representation of the intersection
@@ -370,7 +368,7 @@ Euclidean norm. In 3D, this ratio would be $\frac{6}{\pi}$. Conversely,
 a compression error bounded by $\epsilon$ with the infinity norm 
 corresponds to a compression error of $\frac{\epsilon}{\sqrt{n}}$ with 
 the Euclidean norm. Unsurprisingly, the
-infinity norm is more `tolerant' than the Euclidean norm.
+infinity norm is more tolerant than the Euclidean norm.
 
 It should also be noted that using the infinity norm in $\mathbb{R}^n$ 
 boils down to the use of the 1D LTC algorithm independently in each 
@@ -380,7 +378,7 @@ approximation doesn't hold in any of the dimensions.
 \section{Implementation}
 \label{sec:implementation}
 
-To implement LTC with the infinity norm, we maintain a cuboid 
+To implement LTC in nD with the infinity norm, we maintain a cuboid 
 representation of $\cap_{l=1}^j{\mathcal{B}_l}$ throughout the 
 iterations of the \texttt{while} loop in 
 Algorithm~\ref{algo:general-ltc}. The implementation works with
@@ -411,17 +409,17 @@ MIT license.
 \EndOutput
 
 \If{$\exists\ \mathcal{B}_i \in S$ s.t. $\mathcal{B}_j \cap \mathcal{B}_i = \O$}
-\State \Return ($S$, False)
+\State \Return ($S$, False) \Comment{Some balls don't intersect}
 \EndIf
-\If{$\mathcal{B}_j \cap B = \O$}
-\State \Return ($S$, $B$, False)
+\If{$\mathcal{B}_j \cap B = \O$} \Comment{Ball is outside bounding box}
+\State \Return ($S$, $B$, False) 
 \EndIf
-\If{$\exists\ \mathcal{B}_i \in S$ s.t. $\mathcal{B}_j \subset \mathcal{B}_i$}
+\If{$\exists\ \mathcal{B}_i \in S$ s.t. $\mathcal{B}_j \subset \mathcal{B}_i$} \Comment{Remove inclusions}
 \State Remove $\mathcal{B}_i$ from $B$. Add $\mathcal{B}_j$ to $B$.
 \EndIf
-\State $B$ = box($\mathcal{B}_j$) $\ \bigcap\ $ B 
+\State $B$ = box($\mathcal{B}_j$) $\ \bigcap\ $ $B$
 \State $S$ = $S \ \bigcup \  \{\mathcal{B}_j\}$
-\State $x$ = find\_bisection($S$, $B$)
+\State $x$ = find\_bisection($S$, $B$) \Comment{This can take some time}
 \If{$x$ == Null}
 \State \Return ($S$, $B$, False)
 \Else
@@ -436,7 +434,7 @@ MIT license.
 \label{sec:results}
 
 We conducted two experiments using Motsai's Neblina 
-module\footnote{\url{ https://motsai.com/products/neblina}}, a system 
+module, a system 
 with a Nordic Semiconductor nRF52832 micro-controller, 64~KB of RAM, 
 and Bluetooth Low Energy connectivity. Neblina has a 3D 
 accelerometer, a 3D gyroscope, a 3D magnetometer, and environmental 
@@ -444,8 +442,8 @@ sensors for humidity, temperature and pressure. The platform is
 equipped with sensor fusion algorithms for 3D orientation tracking and 
 a machine learning engine for complex motion analysis and motion 
 pattern recognition~\cite{sarbishei2016accuracy}. Neblina has a 
-battery of 100mAh; its average consumption is 2.52~mA when using 
-accelerometer and gyroscope sensors at 200~Hz but without radio 
+battery of 100mAh; at 200~Hz, its average consumption is 2.52~mA when using 
+accelerometer and gyroscope sensors but without radio 
 transmission, and 3.47~mA with radio transmission, leading to an 
 autonomy of 39.7~h without transmission and 28.8~h with transmission. 
 
@@ -457,7 +455,7 @@ autonomy of 39.7~h without transmission and 28.8~h with transmission.
 We validated the behavior of our LTC extension on a 
 PC using data acquired with Neblina. We collected two 3D 
 accelerometer time series, a short one and a longer one, acquired 
-on two different subjects performing biceps curl, with a 50Hz sampling rate (see 
+on two different subjects performing biceps curl, with a 50~Hz sampling rate (see 
 Figure~\ref{fig:datasets-1}). In both cases, the 
 subject was wearing Neblina on their right wrist. It should be noted that the longer dataset also has 
 a higher amplitude, most likely due to differences between subjects.
@@ -485,7 +483,7 @@ our 2D (x and y) and 3D (x, y and z) implementations of LTC. On
 Neblina, the raw uncalibrated accelerometer data corresponds to errors 
 around 20~mg (1~g is 9.8~m/s$^2$). We used a 
 laptop computer with 16~GB of RAM, an Intel i5-3210M CPU @ 2.50GHz 
-× 4, and Linux Fedora 27. We measured memory consumption using 
+$\times$ 4, and Linux Fedora 27. We measured memory consumption using 
 Valgrind's massif 
 tool~\cite{nethercote2006building}\footnote{\url{http://valgrind.org}}, 
 and processing time using \texttt{gettimeofday()} from the GNU C 
@@ -497,7 +495,7 @@ maximum measured error remains lower than $\epsilon$ in all cases. The
 maximum is reached most of the time on these time series.
 
 \paragraph{Infinity vs Euclidean norms}
-Compared to the infinity norm, the average ratio between the compression ratios obtained
+The average ratio between the compression ratios obtained
 with the infinity and Euclidean norm is 1.08 for 2D data, and 1.20
 for 3D data. These ratios are lower than the theoretical values of
 $\frac{4}{\pi}$ in 2D and $\frac{6}{\pi}$ in 3D, which are obtained for
@@ -625,7 +623,7 @@ seconds of activity.
 
 We measured energy consumption associated with the transmission of
 these time series by
-`replaying' the time series after loading them as a byte array in
+``replaying" the time series after loading them as a byte array in
 Neblina. We measured the current every 500~ms.
 
  Results are reported in Table~\ref{table:results-energy}. For a given
@@ -637,8 +635,8 @@ Neblina. We measured the current every 500~ms.
  increases with $\epsilon$,
 it is higher for the infinity norm than for the Euclidean, and it is
 higher for the walking activity than for running. For a realistic error
-of $\epsilon$=9.8~mg, the ratio of saved energy with the infinity norm was
-close to 20\%, which is substantial.
+of $\epsilon$=9.8~mg, the ratio of saved energy with the infinity norm is
+close to 20\% for the walking activity, which is substantial.
 
 \begin{table}[]
    \begin{subfigure}{\columnwidth}
@@ -707,10 +705,9 @@ behaves better with the infinity norm than with the Euclidean one, due
 to the time complexity of the current algorithm to detect the intersection 
 between n-balls for the Euclidean norm.
 
-Our future work focuses on this latter issue. Our current 
-implementation of LTC with Euclidean norm relies on Helly's theorem, 
-which only provides an algorithm of complexity ${m \choose n+1}$ to 
-compress $m$ points in 
+Our future work focuses on this latter issue. We plan to start from 
+Helly's theorem, which only provides an algorithm of complexity ${m 
+\choose n+1}$ to compress $m$ points in 
 dimension $n$. We note that Helly's theorem holds for arbitrary convex 
 subsets of $\mathbb{R}^n$, while we are considering a \emph{sequence} 
 of \emph{balls} of \emph{decreasing radius}. Based on this 
@@ -724,14 +721,13 @@ decreases to zero. The resulting algorithm would then compute this
 point and check its inclusion in every ball, which is done in 
 $\mathcal{O}(m)$ complexity.
 
-The choice of an appropriate norm should not be underestimated. This problem 
-is specific to multi-dimensional streams, since all common norms are 
-identical in 1D. Some situations might be better described with the 
-Euclidean norm than with the infinity norm, such as the ones involving 
-position or movement measures. Using the infinity norm instead of the 
-Euclidean would lead to important error differences, proportional to 
-$\sqrt{n}$ in dimension $n$. A better algorithm to detect the 
-intersection of n-balls in our context would improve the efficiency of 
+The choice of an appropriate norm should not be underestimated. Some 
+situations might be better described with the Euclidean norm than with 
+the infinity norm, such as the ones involving position or movement 
+measures. Using the infinity norm instead of the Euclidean would lead 
+to important error differences, proportional to $\sqrt{n}$ in dimension 
+$n$. A better algorithm to detect the intersection of n-balls in our 
+context would improve the efficiency of 
 LTC in dimension $n$ for arbitrary norms. Investigating other norms, in 
 particular the 1-norm, would be relevant too.
 
