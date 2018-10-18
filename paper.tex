@@ -20,6 +20,8 @@
 \usepackage{amssymb}
 \usepackage{stmaryrd}
 \usepackage{amsthm}
+\usepackage{wrapfig}
+\usepackage{multicol}
 \DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 \DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
 
@@ -434,6 +436,11 @@ MIT license.
 \section{Experiments and Results}
 \label{sec:results}
 
+\begin{wrapfigure}{R}{3cm}
+\includegraphics[width=3cm]{figures/neblina-wrist.png}
+\caption{Setup with Neblina.}
+\label{fig:neblina-wrist}
+\end{wrapfigure}
 We conducted two experiments using Motsai's Neblina 
 module, a system 
 with a Nordic Semiconductor nRF52832 micro-controller, 64~KB of RAM, 
@@ -458,7 +465,7 @@ acquired with Neblina. We collected two 3D accelerometer time-series, a
 short one and a longer one, acquired on two different subjects 
 performing biceps curl, with a 50~Hz sampling rate (see 
 Figure~\ref{fig:datasets-1}). In both cases, the subject was wearing 
-Neblina on their right wrist. It should be noted that the longer 
+Neblina on their wrist, as in Figure~\ref{fig:neblina-wrist}. It should be noted that the longer 
 time-series also has a higher amplitude, perhaps due to differences between 
 subjects.
 
@@ -613,15 +620,11 @@ average for Euclidean norm).
 
 \subsection{Experiment 2: impact on energy consumption}
 
-%~ We measured the energy consumption of Neblina
-%~ for different values of $\epsilon$ and norms, to quantify the
-%~ added-value of LTC for this system.
-
 We acquired two 3D accelerometer time-series at 200~Hz for two 
 activities: walking and running (see Figure~\ref{fig:datasets-2}). In 
-both cases, the subject was wearing Neblina on their right wrist. We 
-collected 1,000 data points for each activity, corresponding to 5 
-seconds of activity.
+both cases, the subject was wearing Neblina on their wrist as in 
+Experiment 1. We collected 1,000 data points for each activity, 
+corresponding to 5 seconds of activity.
 
 We measured energy consumption associated with the transmission of
 these time-series by
