@@ -147,7 +147,6 @@ transmitted.\vspace*{-0.3cm}}
 \end{figure}
 
 \todo{show $\xi$ in the Figure}
-\todo{Fix Omid's comment in the Figure}
 
 % Outline
 Section~\ref{sec:ltc} provides some background on the LTC algorithm, 
@@ -210,13 +209,13 @@ the last transmitted point with an error bounded by $\epsilon$.
 \EndOutput
 \State tr = $(u^0_0, y^0_0)$ \Comment{last transmitted point}
 \State k = 0 ; j = 1
-\State (lp, hp) = ($y^1_1 - \epsilon$, $y^1_1 + \epsilon$) \Comment{low and high points}
+\State (lp, hp) = ($y^0_1 - \epsilon$, $y^0_1 + \epsilon$) \Comment{low and high points}
 
 \While{True} \Comment{Process received points as they come}
     \State j += 1
     \State new\_lp = max($y^k_j-\epsilon$, line($u^k_j$, tr, ($u^k_{j-1}$, lp)))
     \State new\_hp = max($y^k_j+\epsilon$, line($u^k_j$, tr, ($u^k_{j-1}$, hp)))
-    \If{new\_lp $<$ new\_hp} \Comment{Keep compressing}
+    \If{new\_lp $\leq$ new\_hp} \Comment{Keep compressing}
         \State (lp, hp) = (new\_lp, new\_hp)
         \State \textbf{continue}
     \EndIf
@@ -416,12 +415,11 @@ MIT license.
 \If{$\exists\ \mathcal{B}_i \in S$ s.t. $\mathcal{B}_j \cap \mathcal{B}_i = \O$}
 \State \Return ($S$, False)
 \EndIf
-\If{$\exists\ \mathcal{B}_i \in S$ s.t. $\mathcal{B}_j \subset \mathcal{B}_i$}
-\State Remove $\mathcal{B}_i$ from $B$. Add $\mathcal{B}_j$ to $B$.
-\State \Return ($S$, $B$, True)
-\EndIf
 \If{$\mathcal{B}_j \cap B = \O$}
 \State \Return ($S$, $B$, False)
+\EndIf
+\If{$\exists\ \mathcal{B}_i \in S$ s.t. $\mathcal{B}_j \subset \mathcal{B}_i$}
+\State Remove $\mathcal{B}_i$ from $B$. Add $\mathcal{B}_j$ to $B$.
 \EndIf
 \State $B$ = box($\mathcal{B}_j$) $\ \bigcap\ $ B 
 \State $S$ = $S \ \bigcup \  \{\mathcal{B}_j\}$
