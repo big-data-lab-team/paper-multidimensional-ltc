@@ -76,7 +76,7 @@ With the recent technological advances in Internet of Things (IoT)
 applications, more than one billion connected objects are expected to 
 be launched worldwide by 2025\footnote{\url{ 
 https://www.statista.com/statistics/471264/iot-number-of-connected-devices-worldwide}}.
-Power consumption is amongst the biggest challenges targeting connected 
+Power consumption is among the biggest challenges targeting connected 
 objects, particularly in the industrial domains, where several sensing 
 systems are commonly launched in the field to run for days or even 
 weeks without being recharged. Typically, such devices use sensors to 
@@ -246,12 +246,13 @@ $n+1$.
 
 \subsection{Preliminary comments}
 
-We note that the formulation of LTC in~\cite{schoellhammer2004lightweight} relies on
-the intersection of \emph{convex cones} in dimension $n+1$. For $n=1$, it
-corresponds to the intersection of triangles, which can efficiently be
-computed by maintaining boundary lines, as detailed previously. In higher dimension, however, cone intersections are not so
-straighforward, due to the fact that the intersection between cones
-may not be a cone.
+We note that the formulation of LTC 
+in~\cite{schoellhammer2004lightweight} relies on the intersection of 
+\emph{convex cones} in dimension $n+1$. For $n=1$, it corresponds to 
+the intersection of triangles, which can efficiently be computed by 
+maintaining boundary lines, as detailed previously. In higher 
+dimension, however, cone intersections are not so straightforward, due 
+to the fact that the intersection between cones may not be a cone.
 
 To address this issue, we formulate LTC as an intersection test between
 \emph{balls} of dimension $n$, that is, segments for $n=1$, disks for
@@ -269,7 +270,7 @@ expressed in the orthogonal space with origin $(\tau_k, \xi_k)$. We denote by $(
 \begin{equation*}
 \forall j \leq m,\  (v_j, z_j) = (u_j^k - \tau_k, y_j^k - \xi_k)
 \end{equation*}
-Let $\mathcal{B}_j$ be the ball of $\mathbb{R}^n$ of center $\frac{v_1}{v_j}z_j$ and radius
+Let $\mathcal{B}_j$ be the ball of $\mathbb{R}^n$ of centre $\frac{v_1}{v_j}z_j$ and radius
 $\frac{v_1}{v_j}\epsilon$:
 \begin{equation*}
 \mathcal{B}_j = \left\{ z \in \mathbb{R}^n,\  \norm{z-\frac{v_1}{v_j}z_j} \leq \frac{v_1}{v_j}\epsilon \right\}
@@ -452,13 +453,14 @@ autonomy of 39.7~h without transmission and 28.8~h with transmission.
 %\todo{(Put a picture of Neblina in a box worn 
 %on the wrist)}
 
-We validated the behavior of our LTC extension on a 
-PC using data acquired with Neblina. We collected two 3D 
-accelerometer time series, a short one and a longer one, acquired 
-on two different subjects performing biceps curl, with a 50~Hz sampling rate (see 
-Figure~\ref{fig:datasets-1}). In both cases, the 
-subject was wearing Neblina on their right wrist. It should be noted that the longer dataset also has 
-a higher amplitude, most likely due to differences between subjects.
+We validated the behaviour of our LTC extension on a PC using data 
+acquired with Neblina. We collected two 3D accelerometer time-series, a 
+short one and a longer one, acquired on two different subjects 
+performing biceps curl, with a 50~Hz sampling rate (see 
+Figure~\ref{fig:datasets-1}). In both cases, the subject was wearing 
+Neblina on their right wrist. It should be noted that the longer 
+time-series also has a higher amplitude, perhaps due to differences between 
+subjects.
 
 \begin{figure*}
 \begin{subfigure}{2\columnwidth}
@@ -473,12 +475,12 @@ a higher amplitude, most likely due to differences between subjects.
 \includegraphics[width=0.3\columnwidth]{figures/Mohammad-bicep-curl-plot-z.pdf}
 \caption{Long biceps curl}
 \end{subfigure}
-\caption{Time series used in Experiment 1\\
+\caption{Time-series used in Experiment 1\\
 {\footnotesize $^a$ Average of az data is -7.81g. It was shifted to 0 so that the graphs can all use the same y scale.}}
 \label{fig:datasets-1}
 \end{figure*}
 
-We compressed the time series with various values of $\epsilon$, using 
+We compressed the time-series with various values of $\epsilon$, using 
 our 2D (x and y) and 3D (x, y and z) implementations of LTC. On 
 Neblina, the raw uncalibrated accelerometer data corresponds to errors 
 around 20~mg (1~g is 9.8~m/s$^2$). We used a 
@@ -492,7 +494,7 @@ Library.
 Results are reported in Table~\ref{table:results-validation}. 
 As expected, the compression ratio increases with $\epsilon$, and the 
 maximum measured error remains lower than $\epsilon$ in all cases. The 
-maximum is reached most of the time on these time series.
+maximum is reached most of the time on these time-series.
 
 \paragraph{Infinity vs Euclidean norms}
 The average ratio between the compression ratios obtained
@@ -503,12 +505,12 @@ random-uniform signals. Unsurprisingly, the infinity norm surpasses the
 Euclidean norm in terms of resource consumption. Memory-wise, the
 infinity norm requires a constant amount of 80~B, used to store the
 intersection of n-balls. The Euclidean norm, however, uses up to 4.9~KB of memory
-for the Long time series in 3D with $\epsilon$=48.8~mg. More importantly,
-the amount of required memory increases for more complex time series
+for the Long time-series in 3D with $\epsilon$=48.8~mg. More importantly,
+the amount of required memory increases for more complex time-series
 (Long vs Short), and it also increases with larger
 values of $\epsilon$. Similar observations are made for the processing
-time, with values ranging from 0.2~ms for the simplest time series and
-smallest $\epsilon$, to 26.4~ms for the most complex time series and
+time, with values ranging from 0.2~ms for the simplest time-series and
+smallest $\epsilon$, to 26.4~ms for the most complex time-series and
 largest~$\epsilon$.
 %~ Figure~\ref{fig:memory} shows the memory consumption 
 %~ of the 3D Euclidean implementation for $\epsilon$=48.8~mg: peaks appear
@@ -605,7 +607,7 @@ average for Euclidean norm).
 
 %~ \begin{figure}
 %~ \includegraphics[width=\columnwidth]{./figures/memory-mohammad.pdf}
-%~ \caption{Memory usage of 3D Euclidean implementation, long biceps curl time series, $\epsilon$=48.8~mg.}
+%~ \caption{Memory usage of 3D Euclidean implementation, long biceps curl time-series, $\epsilon$=48.8~mg.}
 %~ \label{fig:memory}
 %~ \end{figure}
 
@@ -615,15 +617,15 @@ average for Euclidean norm).
 %~ for different values of $\epsilon$ and norms, to quantify the
 %~ added-value of LTC for this system.
 
-We acquired two 3D accelerometer time series at 200~Hz for two 
+We acquired two 3D accelerometer time-series at 200~Hz for two 
 activities: walking and running (see Figure~\ref{fig:datasets-2}). In 
 both cases, the subject was wearing Neblina on their right wrist. We 
 collected 1,000 data points for each activity, corresponding to 5 
 seconds of activity.
 
 We measured energy consumption associated with the transmission of
-these time series by
-``replaying" the time series after loading them as a byte array in
+these time-series by
+``replaying" the time-series after loading them as a byte array in
 Neblina. We measured the current every 500~ms.
 
  Results are reported in Table~\ref{table:results-energy}. For a given
@@ -713,9 +715,9 @@ subsets of $\mathbb{R}^n$, while we are considering a \emph{sequence}
 of \emph{balls} of \emph{decreasing radius}. Based on this 
 observation, a stronger result might exist that would lead to a more 
 efficient implementation of LTC with the Euclidean norm. Our current 
-idea is to search for a point expressed as a function of the ball centers that would 
+idea is to search for a point expressed as a function of the ball centres that would 
 necessarily belong to the ball intersection when it is not empty; such 
-a point, if it exists, necessarily converges to the center of the last 
+a point, if it exists, necessarily converges to the centre of the last 
 ball in the sequence as $n$ increases, as the radius of the last ball 
 decreases to zero. The resulting algorithm would then compute this 
 point and check its inclusion in every ball, which is done in 
