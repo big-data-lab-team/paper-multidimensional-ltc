@@ -50,6 +50,7 @@ plot_point(x[1], y[1], epsilon, 1, k, False)
 
 xis = [x[0]]
 taus = [0] 
+xis = []
 for i in range(2, n):
     j += 1
 
@@ -82,10 +83,8 @@ for i in range(2, n):
     j = 1
     k = k + 1
     plot_point(trans_x, trans_y, epsilon, 0, k, True)
-    xis.append((lowpoint+highpoint)/2)
-    taus.append(i-1)
-   
-
+    taus.append(trans_x)
+    xis.append(trans_y)
 
     # Update variables
     lowpoint = y[i] - epsilon
@@ -102,7 +101,19 @@ for i in range(0, n):
 plt.xticks(range(0, n), xticks, fontsize='x-small')
 
 yticks = []
-for i in range(0, n):
-    yticks.append('$x_{}$'.format(i))
-plt.yticks(y, yticks, fontsize='x-small')
-plt.savefig('ltc.pdf', dpi=3000)
+values = sorted(y + xis)
+i = 0
+k = 1
+for v in values:
+    if v == 0:
+        yticks.append('$\\xi_0 = x_{}$'.format(i))
+        i += 1
+        continue
+    if v in y:
+        yticks.append('$x_{}$'.format(i))
+        i += 1
+    else:
+        yticks.append('$\\xi_{}$'.format(k))
+        k += 1
+plt.yticks(values, yticks, fontsize='x-small')
+plt.savefig('./figures/ltc.pdf', dpi=3000)

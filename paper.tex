@@ -45,7 +45,7 @@
 
 \title{A multi-dimensional extension of the Lightweight Temporal Compression method}
 
-\author{Bo Li$^1$, Omid Sarbishei$^2$, Tristan Glatard$^1$\\
+\author{Bo Li$^1$, Omid Sarbishei$^2$, Hosein Nourani$^1$, Tristan Glatard$^1$\\
   $^1$ Department of Computer Science and Software Engineering, Concordia University, Montreal, QC, Canada \\
   $^2$  Research and Development Department, Motsai Research, Saint Bruno, QC, Canada}
 \maketitle
@@ -138,15 +138,13 @@ a point of the reconstructed stream, and the corresponding
 point in the original stream.
 
 \begin{figure}
-\includegraphics[width=\columnwidth]{ltc.pdf}
+\includegraphics[width=\columnwidth]{./figures/ltc.pdf}
 \caption{Illustration of the LTC algorithm. Blue 
 dots are received points, red dots are transmitted points. Dashed lines 
 represent the high and low lines when a point is 
 transmitted.\vspace*{-0.3cm}}
 \label{fig:ltc}
 \end{figure}
-
-\todo{show $\xi$ in the Figure}
 
 % Outline
 Section~\ref{sec:ltc} provides some background on the LTC algorithm, 
@@ -334,7 +332,7 @@ point. It is written in Algorithm~\ref{algo:general-ltc}.
 \label{algo:general-ltc}
 \end{algorithm}
 
-\todo{Check algorithms (reimplement)}
+\todo{Check algorithms}
 
 \subsection{Ball intersections}
 
@@ -738,9 +736,8 @@ LTC in dimension $n$ for arbitrary norms. Investigating other norms, in
 particular the 1-norm, would be relevant too.
 
 \section*{Acknowledgement}
-This work was funded by the Natural 
-Sciences and Engineering Research Council of Canada. We thank Hosein 
-Nourani for providing data for Experiment 1.
+This work was funded by a Strategic Project Grant of the Natural 
+Sciences and Engineering Research Council of Canada.
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,biblio.bib}
