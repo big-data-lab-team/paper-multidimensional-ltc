@@ -8,13 +8,13 @@ set xlabel 'Time (s)'
 set ylabel 'Acceleration (mg)'
 
 set output "./figures/5-time-bicep-curl-plot-x.pdf"
-plot './data/5_times_bicep_curl.csv' u ($1-2912759094.0)/19989/50:($2/2048) w l lt 1 title 'ax'
+plot './data/5_times_bicep_curl.csv' u ($1-1)/50:($2/2048) w l lt 1 title 'ax'
 
 set output "./figures/5-time-bicep-curl-plot-y.pdf"
-plot './data/5_times_bicep_curl.csv' u ($1-2912759094.0)/19989/50:($3/2048) w l lt 2 title 'ay'
+plot './data/5_times_bicep_curl.csv' u ($1-1)/50:($3/2048) w l lt 2 title 'ay'
 
 set output "./figures/5-time-bicep-curl-plot-z.pdf"
-plot './data/5_times_bicep_curl.csv' u ($1-2912759094.0)/19989/50:(($4+16000)/2048) w l lt 3 title 'az'
+plot './data/5_times_bicep_curl.csv' u ($1-1)/50:(($4+16000)/2048) w l lt 3 title 'az'
 
 ### Mohammad
 
