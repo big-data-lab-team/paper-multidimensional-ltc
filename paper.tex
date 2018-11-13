@@ -555,12 +555,11 @@ random-uniform signals. Unsurprisingly, the infinity norm surpasses the
 Euclidean norm in terms of resource consumption. Memory-wise, the
 infinity norm requires a constant amount of 80~B, used to store the
 intersection of n-balls. The Euclidean norm, however, uses up to 4.7~KB of memory
-for the Long time series in 3D with $\epsilon$=48.8~mg. More importantly,
-the amount of required memory increases for more complex time series
-(Long vs Short), and it also increases with larger
+for the Long time-series in 3D with $\epsilon$=48.8~mg. More importantly,
+the amount of required memory increases for longer time-series, and it also increases with larger
 values of $\epsilon$. Similar observations are made for the processing
-time, with values ranging from 0.2~ms for the simplest time series and
-smallest $\epsilon$, to 41.3~ms for the most complex time series and
+time, with values ranging from 0.2~ms for the simplest time-series and
+smallest $\epsilon$, to 41.3~ms for the most complex time-series and
 largest~$\epsilon$.
 %~ Figure~\ref{fig:memory} shows the memory consumption
 %~ of the 3D Euclidean implementation for $\epsilon$=48.8~mg: peaks appear
