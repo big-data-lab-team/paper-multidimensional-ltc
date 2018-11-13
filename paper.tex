@@ -554,26 +554,26 @@ $\frac{4}{\pi}$ in 2D and $\frac{6}{\pi}$ in 3D, which are obtained for
 random-uniform signals. Unsurprisingly, the infinity norm surpasses the
 Euclidean norm in terms of resource consumption. Memory-wise, the
 infinity norm requires a constant amount of 80~B, used to store the
-intersection of n-balls. The Euclidean norm, however, uses up to 4.9~KB of memory
+intersection of n-balls. The Euclidean norm, however, uses up to 4.7~KB of memory
 for the Long time-series in 3D with $\epsilon$=48.8~mg. More importantly,
 the amount of required memory increases for longer time-series, and it also increases with larger
 values of $\epsilon$. Similar observations are made for the processing
 time, with values ranging from 0.2~ms for the simplest time-series and
-smallest $\epsilon$, to 26.4~ms for the most complex time-series and
+smallest $\epsilon$, to 41.3~ms for the most complex time-series and
 largest~$\epsilon$.
-%~ Figure~\ref{fig:memory} shows the memory consumption 
+%~ Figure~\ref{fig:memory} shows the memory consumption
 %~ of the 3D Euclidean implementation for $\epsilon$=48.8~mg: peaks appear
 %~ at the end of long compressed ranges where the signal was $\epsilon$-closed
 %~ to the linear approximation.
 
 \paragraph{2D vs 3D}
-For a given $\epsilon$, the compression 
+For a given $\epsilon$, the compression
 ratios are always higher in 2D than in 3D. It makes sense since the
 probability for the signal to deviate from a straight line
 approximation is higher in 3D than it is in 2D. Besides, resource
 consumption is higher in 3D than in 2D: for the infinity norm, 3D
-consumes 1.4 times more memory than 2D (1.6 times on average for
-Euclidean norm), and processing time is 1.3 longer (1.18 on
+consumes 1.4 times more memory than 2D (1.3 times on average for
+Euclidean norm), and processing time is 1.2 longer (1.13 on
 average for Euclidean norm).
 
 \begin{table}
@@ -599,9 +599,9 @@ average for Euclidean norm).
                    & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
     $\epsilon$ (mg)            & 48.8        & 34.5       & 48.8        & 34.5    \\
     Max error  (mg)            & 48.8        & 34.5       & 48.8        & 34.5             \\
-    Compression ratio (\%)     & 60.17       & 51.59      & 57.75       & 48.86           \\
-    Peak memory  (B)           & 80          & 80         & 2100        & 2500             \\
-    Processing time (ms)       & 5.70        & 4.85       & 20.04       & 19.28           \\ \hline
+    Compression ratio (\%)     & 77.46       & 70.98      & 75.77       & 68.81           \\
+    Peak memory  (B)           & 80          & 80         & 2512        & 2608             \\
+    Processing time (ms)       & 6.06        & 5.84       & 33.84       & 31.07           \\ \hline
     \end{tabular}
     \caption{Long biceps curl (2D)}
     \end{subfigure}\\
@@ -627,9 +627,9 @@ average for Euclidean norm).
                               & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
     $\epsilon$ (mg)                & 48.8        & 28.2       & 48.8     & 28.2    \\
     Max error  (mg)                & 48.8        & 28.2       & 48.8     & 28.2    \\
-    Compression ratio (\%)         & 51.13       & 37.17      & 46.05    & 32.63   \\
-    Peak memory (B)                & 112         & 112        & 4900     & 3000    \\
-    Processing time (ms)           & 8.50        & 7.07       & 26.41    & 21.26   \\ \hline
+    Compression ratio (\%)         & 71.23       & 58.11      & 67.35    & 53.24   \\
+    Peak memory (B)                & 112         & 112        & 4752     & 3856    \\
+    Processing time (ms)           & 7.87        & 7.22       & 41.29    & 39.04   \\ \hline
     \end{tabular}
     \caption{Long biceps curl (3D)}
     \end{subfigure}
