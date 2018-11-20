@@ -548,7 +548,7 @@ maximum is reached most of the time on these time-series.
 
 \paragraph{Infinity vs Euclidean norms}
 The average ratio between the compression ratios obtained
-with the infinity and Euclidean norm is 1.08 for 2D data, and 1.20
+with the infinity and Euclidean norm is 1.04 for 2D data, and 1.14
 for 3D data. These ratios are lower than the theoretical values of
 $\frac{4}{\pi}$ in 2D and $\frac{6}{\pi}$ in 3D, which are obtained for
 random-uniform signals. Unsurprisingly, the infinity norm surpasses the
@@ -558,7 +558,7 @@ intersection of n-balls. The Euclidean norm, however, uses up to 4.7~KB of memor
 for the Long time-series in 3D with $\epsilon$=48.8~mg. More importantly,
 the amount of required memory increases for longer time-series, and it also increases with larger
 values of $\epsilon$. Similar observations are made for the processing
-time, with values ranging from 0.2~ms for the simplest time-series and
+time, with values ranging from 0.4~ms for the simplest time-series and
 smallest $\epsilon$, to 41.3~ms for the most complex time-series and
 largest~$\epsilon$.
 %~ Figure~\ref{fig:memory} shows the memory consumption
@@ -572,8 +572,8 @@ ratios are always higher in 2D than in 3D. It makes sense since the
 probability for the signal to deviate from a straight line
 approximation is higher in 3D than it is in 2D. Besides, resource
 consumption is higher in 3D than in 2D: for the infinity norm, 3D
-consumes 1.4 times more memory than 2D (1.3 times on average for
-Euclidean norm), and processing time is 1.2 longer (1.13 on
+consumes 1.4 times more memory than 2D (1.8 times on average for
+Euclidean norm), and processing time is 1.4 longer (1.3 on
 average for Euclidean norm).
 
 \begin{table}
@@ -686,8 +686,11 @@ Neblina. We measured the current every 500~ms.
 it is higher for the infinity norm than for the Euclidean, and it is
 higher for the walking activity than for running. For a realistic error
 of $\epsilon$=9.8~mg, the ratio of saved energy with the infinity norm is
-close to 20\% for the walking activity, which is substantial.
-
+close to 20\% for the walking activity, which is substantial. We also
+measured processing times of both infinity norm and Euclidean norm in
+Neblina.The result is reported in Table~\ref{table:result-latency}.
+In Neblina, the processing time of different data are similar in Infinity
+norm. In Euclidean norm, the processing time is longer, and data with slight changes using more processing time with comparing result of walking data and running data.
 \begin{table}[]
    \begin{subfigure}{\columnwidth}
    \centering
@@ -724,6 +727,19 @@ close to 20\% for the walking activity, which is substantial.
    \label{table:results-energy}
 \end{table}
 
+\begin{table}[]
+    \begin{tabular}{l|l|l|l|l}
+    \hline
+    \rowcolor{headcolor}
+                                 & \multicolumn{2}{l}{Infinity Norm} & \multicolumn{2}{l}{Euclidean Norm} \\\hline
+    Data set                     & walking         & running         & walking          & running \\
+    Max processing Time (μs)     & 60              & 60              & 1530             & 840     \\
+    average processing Time (μs) & 30.57           & 30.040          & 144.6            & 64.34   \\       
+    \hline
+    \end{tabular}
+    \caption{Processing time from Experiment 2}
+    \label{table:result-latency}
+\end{table}
 %~ and the battery usage 
 %~ would not change too much, because it contains others fusion method 
 %~ which will running when turning on the Neblina. In 50Hz sensor sampling 
