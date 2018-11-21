@@ -682,8 +682,7 @@ corresponding to 5 seconds of activity.
 We measured energy consumption associated with the transmission of 
 these time-series by ``replaying" the time-series after loading them as 
 a byte array in Neblina. We measured the current every 500~ms. We also 
-measured the max and average latency resulting from compression in the 
-data stream.
+measured the max and average latency resulting from compression.
 
  Results are reported in Table~\ref{table:results-energy}. For a given
  $\epsilon$ and norm, the compression ratio is larger for walking than
@@ -783,9 +782,7 @@ situations might be better described with the Euclidean norm than with
 the infinity norm, such as the ones involving position or movement 
 measures. Using the infinity norm instead of the Euclidean would lead 
 to important error differences, proportional to $\sqrt{n}$ in dimension 
-$n$. A better algorithm to detect the intersection of n-balls in our 
-context would improve the efficiency of 
-LTC in dimension $n$ for arbitrary norms. Investigating other norms, in 
+$n$. Investigating other norms, in 
 particular the 1-norm, would be relevant too.
 
 \section*{Acknowledgement}
@@ -794,6 +791,7 @@ Sciences and Engineering Research Council of Canada.
 
 \bibliographystyle{IEEEtran}
 \bibliography{IEEEabrv,biblio.bib}
+
 \end{document}
 
 
