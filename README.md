@@ -1,6 +1,7 @@
 # How to get a pdf
 
 A pdf is uploaded for every release of the paper:
+* [Release 0.2](https://github.com/big-data-lab-team/paper-multidimensional-ltc/releases/download/0.2/paper.pdf)
 * [Release 0.1](https://github.com/big-data-lab-team/paper-multidimensional-ltc/releases/download/0.1/paper.pdf)
 
 See instructions below to create a pdf for the current version.
