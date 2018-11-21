@@ -582,8 +582,10 @@ average for Euclidean norm).
     \begin{tabular}{l|l|l|l|l}
     \hline
     \rowcolor{headcolor}
-                           & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean}\\ \hline
+                           & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean}\\
+    \rowcolor{headcolor}
     $\epsilon$  (mg)          & 48.8         & 34.5       & 48.8       & 34.5 \\
+    \hline
     Max error   (mg)          & 48.8         & 34.4       & 48.8       & 34.5 \\
     Compression ratio (\%)    & 79.77        & 72.59      & 77.49      & 70.96\\
     Peak memory   (B)         & 80           & 80         & 688        & 688  \\
@@ -596,8 +598,10 @@ average for Euclidean norm).
     \begin{tabular}{l|l|l|l|l}
     \hline
     \rowcolor{headcolor}
-                   & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
+                   & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\
+    \rowcolor{headcolor}
     $\epsilon$ (mg)            & 48.8        & 34.5       & 48.8        & 34.5    \\
+    \hline
     Max error  (mg)            & 48.8        & 34.5       & 48.8        & 34.5             \\
     Compression ratio (\%)     & 77.46       & 70.98      & 75.77       & 68.81           \\
     Peak memory  (B)           & 80          & 80         & 2512        & 2608             \\
@@ -610,8 +614,10 @@ average for Euclidean norm).
     \begin{tabular}{l|l|l|l|l}
     \hline
     \rowcolor{headcolor}
-                           & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
+                           & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\
+    \rowcolor{headcolor}
     $\epsilon$ (mg)        & 48.8          & 28.2          & 48.8   & 28.2   \\
+    \hline
     Max error  (mg)        & 48.8          & 28.2          & 48.8   & 28.2   \\
     Compression ratio (\%) & 78.14         & 66.39         & 74.39  & 63.13   \\
     Peak memory (B)        & 112           & 112           & 1744   & 784    \\
@@ -624,8 +630,10 @@ average for Euclidean norm).
     \begin{tabular}{l|l|l|l|l}
     \hline
     \rowcolor{headcolor}
-                              & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\ \hline
+                              & \multicolumn{2}{c|}{Infinity} & \multicolumn{2}{c}{Euclidean} \\
+    \rowcolor{headcolor}
     $\epsilon$ (mg)                & 48.8        & 28.2       & 48.8     & 28.2    \\
+    \hline
     Max error  (mg)                & 48.8        & 28.2       & 48.8     & 28.2    \\
     Compression ratio (\%)         & 71.23       & 58.11      & 67.35    & 53.24   \\
     Peak memory (B)                & 112         & 112        & 4752     & 3856    \\
@@ -671,38 +679,44 @@ both cases, the subject was wearing Neblina on their wrist as in
 Experiment 1. We collected 1,000 data points for each activity, 
 corresponding to 5 seconds of activity.
 
-We measured energy consumption associated with the transmission of
-these time-series by
-``replaying" the time-series after loading them as a byte array in
-Neblina. We measured the current every 500~ms.
+We measured energy consumption associated with the transmission of 
+these time-series by ``replaying" the time-series after loading them as 
+a byte array in Neblina. We measured the current every 500~ms. We also 
+measured the max and average latency resulting from compression in the 
+data stream.
 
  Results are reported in Table~\ref{table:results-energy}. For a given
  $\epsilon$ and norm, the compression ratio is larger for walking than
  for running. The ratio of saved energy is relative to the reference
  current of 3.47~mA measured when Neblina transmits data without
- compression. In all cases, activating compression saves energy. The
- reduction in energy consumption behaves as the compression ratio: it
- increases with $\epsilon$,
-it is higher for the infinity norm than for the Euclidean, and it is
-higher for the walking activity than for running. For a realistic error
-of $\epsilon$=9.8~mg, the ratio of saved energy with the infinity norm is
-close to 20\% for the walking activity, which is substantial. We also
-measured processing times of both infinity norm and Euclidean norm in
-Neblina.The result is reported in Table~\ref{table:result-latency}.
-In Neblina, the processing time of different data are similar in Infinity
-norm. In Euclidean norm, the processing time is longer, and data with slight changes using more processing time with comparing result of walking data and running data.
+ compression. In all cases, activating compression saves energy. The 
+ reduction in energy consumption behaves as the compression ratio: it 
+ increases with $\epsilon$, it is higher for the infinity norm than for 
+ the Euclidean, and it is higher for the walking activity than for 
+ running. For a realistic error of $\epsilon$=9.8~mg, the ratio of 
+ saved energy with the infinity norm is close to 20\% for the walking 
+ activity, which is substantial. Latency is higher for walking 
+ than for running, and it is also higher for the Euclidean norm than 
+ for the infinity norm. In all cases, the latency remains lower 
+ than the 5-ms tolerable latency at 200~Hz, which demonstrates the 
+ feasibility of 3D LTC compression.
+
 \begin{table}[]
    \begin{subfigure}{\columnwidth}
    \centering
    \begin{tabular}{l|l|l|l|l|l|l}
    \hline
    \rowcolor{headcolor}
-                          & \multicolumn{3}{c|}{Infinity} & \multicolumn{3}{c}{Euclidean} \\\hline
-   $\epsilon$ (mg)             & 48.8       & 9.8      & 4.9       & 48.8      & 9.8       & 4.9    \\
-   Max error (mg)              & 48.8     & 9.8        & 4.9      & 48.8   & 9.8   & 4.9  \\
-   Compr.      ratio (\%)      & 88.9    & 66.4  & 45.5   & 87.6   & 63.3   & 37.2 \\
-   Average (mA)                & 2.64     & 2.79   & 3.02   & 3.10    & 3.02    & 3.13  \\
-   Saved energy (\%)              & 23.9    & 19.7  & 13.0  &  10.7   & 13.0   & 9.7\\
+                          & \multicolumn{3}{c|}{Infinity} & \multicolumn{3}{c}{Euclidean} \\
+   \rowcolor{headcolor}
+   $\epsilon$ (mg)             & 48.8    & 9.8      & 4.9   & 48.8   & 9.8   & 4.9   \\
+   \hline
+   Max error (mg)              & 48.8    & 9.8      & 4.9   & 48.8   & 9.8   & 4.9   \\
+   Compr.      ratio (\%)      & 88.9    & 66.4     & 45.5  & 87.6   & 63.3  & 37.2  \\
+   Average (mA)                & 2.64    & 2.79     & 3.02  & 3.10   & 3.02  & 3.13  \\
+   Saved energy (\%)           & 23.9    & 19.7     & 13.0  &  10.7  & 13.0  & 9.7   \\
+   Max latency ($\mu$s)& 60      & --       & --    & 1530   & --    & --    \\
+   Average latency ($\mu$s) & 31 & --       & --    & 145    & --    & --    \\    
    \hline
    \end{tabular}
    \caption{Walking}
@@ -713,12 +727,16 @@ norm. In Euclidean norm, the processing time is longer, and data with slight cha
    \hline
    \rowcolor{headcolor}
 
-                     & \multicolumn{3}{c|}{Infinity} & \multicolumn{3}{c}{Euclidean} \\\hline
+                     & \multicolumn{3}{c|}{Infinity} & \multicolumn{3}{c}{Euclidean} \\
+    \rowcolor{headcolor}
    $\epsilon$ (mg)        & 48.8       & 9.8      & 4.9       & 48.8      & 9.8    & 4.9    \\
+   \hline
    Max error (mg)         & 48.8       & 9.8      & 4.9       & 48.8      & 9.8    & 4.9   \\
    Compr.      ratio (\%) & 68.6       & 25.5     & 9.5       & 64.4      & 19.8   & 5.7   \\
    Average (mA)        & 2.88     & 3.22   & 3.38     & 2.95    & 3.32    & 3.39   \\
    Saved energy (\%)      & 17.0    & 7.2    & 2.5   & 14.9   & 4.3   & 2.2\\
+   Max latency ($\mu$s)& 60      & --       & --    & 840   & --    & --    \\
+   Average latency ($\mu$s) & 30 & --       & --    & 64    & --    & --    \\    
    \hline
    \end{tabular}
    \caption{Running}
@@ -726,37 +744,6 @@ norm. In Euclidean norm, the processing time is longer, and data with slight cha
    \caption{Results from Experiment 2}
    \label{table:results-energy}
 \end{table}
-
-\begin{table}[]
-    \begin{tabular}{l|l|l|l|l}
-    \hline
-    \rowcolor{headcolor}
-                                 & \multicolumn{2}{l}{Infinity Norm} & \multicolumn{2}{l}{Euclidean Norm} \\\hline
-    Data set                     & walking         & running         & walking          & running \\
-    Max processing Time (μs)     & 60              & 60              & 1530             & 840     \\
-    average processing Time (μs) & 30.57           & 30.040          & 144.6            & 64.34   \\       
-    \hline
-    \end{tabular}
-    \caption{Processing time from Experiment 2}
-    \label{table:result-latency}
-\end{table}
-%~ and the battery usage 
-%~ would not change too much, because it contains others fusion method 
-%~ which will running when turning on the Neblina. In 50Hz sensor sampling 
-%~ rate, the average usage electric current for transmit accelerometer 
-%~ data is 2.0mA. It means Neblina could transmit accelerometer data 
-%~ constantly in 100/2.0=50 hours. when Neblina does not move, the average 
-%~ usage electric current using Infinity norm compression is 1.95mA.
-
- %~ It 
-%~ just extend Neblina work life about 1.28 hours. But in 200Hz sampling 
-%~ rate. The electric before and after compression are 3.5 and 2.9 
-%~ respectively. The running time of Neblina would be extended about 5.9 
-%~ hours.
-
-%~ We also measured the compression latency on Neblina for this experiment.
-%~ The maximal measured latency was 7.56~ms, obtained for the Euclidean distance 
-%~ on the walk data, finish this if the correct values are avail.
 
 
 \section{Conclusion}
